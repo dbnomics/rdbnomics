@@ -1,0 +1,16 @@
+Package: rdbnomics
+Type: Package
+Title: Download DBnomics data
+Version: 0.1.0
+Author: Thomas Brand
+Maintainer: <thomas.brand@cepremap.org>
+Description: R access to hundreds of millions data series from DBnomics API.
+License: GNU Affero General Public License (AGPL)
+Encoding: UTF-8
+LazyData: true
+Imports:
+    jsonlite,
+    dplyr,
+    tidyr,
+    magrittr
+RoxygenNote: 6.0.1.9000
