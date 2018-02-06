@@ -1,43 +1,33 @@
-#' Download DBnomics data
+#' Download DBnomics data using url.
 #'
-#' \code{rdb} downloads data series from
+#' \code{rdb_by_url} downloads data series from
 #' \href{https://next.nomics.world/}{DBnomics}.
 #'
 #' This function gives you access to hundreds of millions data series from
 #'  \href{https://api.next.nomics.world/}{DBnomics API} (documentation about
 #'   the API can be found \href{https://api.next.nomics.world/apidocs}{here}).
-#'   The code of each series is given on the
+#'   The url is given on the
 #'   \href{https://next.nomics.world/}{DBnomics website}.
 #'
-#' @param provider_code Character string. DBnomics code of the provider.
-#' @param dataset_code Character string. DBnomics code of the dataset.
-#' @param series_code Character string or vector of character strings. DBnomics
-#'  code of one or several series in the specified dataset.
-#' @param api_base_url Character string. DBnomics API link.
+#' @param url_code Character string. DBnomics url of the search.
 #' @return A data frame.
 #' @examples
 #' # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-#' df1 <- rdb('AMECO','ZUTN','EA19.1.0.0.0.ZUTN')
+#' df1 <- rdb_by_url('https://api.next.nomics.world/AMECO/ZUTN?series_codes=EA19.1.0.0.0.ZUTN')
 #'
 #' # Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-#' df2 <- rdb('AMECO','ZUTN',c('EA19.1.0.0.0.ZUTN','DNK.1.0.0.0.ZUTN'))
+#' df2 <- rdb_by_url('https://api.next.nomics.world/AMECO/ZUTN?series_codes=EA19.1.0.0.0.ZUTN,DNK.1.0.0.0.ZUTN')
 #'
 #' # Fetch one dataset 'Exports and imports by Member States of the EU/third countries'
 #'  (namq_10_exi) of Eurostat provider:
-#' df3 <- rdb('Eurostat','namq_10_exi')
+#' df3 <- rdb_by_url('https://api.next.nomics.world/Eurostat/namq_10_exi')
 #' @import jsonlite dplyr tidyr
+#' @seealso \code{\link{rdb_by_codes}}
 #' @export
 
-rdb <- function(provider_code,dataset_code,series_code=NA,api_base_url="https://api.next.nomics.world"){
+rdb_by_url <- function(url_code){
 
-  if (is.na(series_code[1])) {
-    url <- paste0(api_base_url,"/",provider_code,"/",dataset_code)
-  } else {
-    url_series_code <- paste0(series_code, collapse = "&series_code=")
-    url <- paste0(api_base_url,"/",provider_code,"/",dataset_code,"/?series_code=",url_series_code)
-  }
-
-  DBlist <- jsonlite::fromJSON(url)
+  DBlist <- jsonlite::fromJSON(url_code)
   DBdata <- list()
   DBdata[[1]] <- DBlist$series$data
 
@@ -49,8 +39,8 @@ rdb <- function(provider_code,dataset_code,series_code=NA,api_base_url="https://
     n_iter <- ceiling(num_found/limit)-1
 
     for (i in 1:n_iter){
-      url2 <- paste0(url,"?offset=",paste(i*limit))
-      DBlist <- jsonlite::fromJSON(url2)
+      url_code2 <- paste0(url_code,"?offset=",paste(i*limit))
+      DBlist <- jsonlite::fromJSON(url_code2)
       DBdata[[i+1]] <- DBlist$series$data
     }
 
