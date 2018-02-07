@@ -26,7 +26,7 @@
 #'  (namq_10_exi) of Eurostat provider:
 #' df3 <- rdb_by_codes('Eurostat','namq_10_exi')
 #' @import jsonlite dplyr tidyr
-#' @seealso \code{\link{rdb_by_url}}
+#' @seealso \code{\link{rdb_by_url}} \code{\link{rdb_by_dimensions}}
 #' @export
 
 rdb_by_codes <- function(provider_code,dataset_code,series_codes=NA,api_base_url="https://api.next.nomics.world"){
