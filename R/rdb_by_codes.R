@@ -25,7 +25,7 @@
 #' # Fetch one dataset 'Exports and imports by Member States of the EU/third countries'
 #'  (namq_10_exi) of Eurostat provider:
 #' df3 <- rdb_by_codes('Eurostat','namq_10_exi')
-#' @import jsonlite dplyr tidyr
+#' @import jsonlite dplyr tidyr stringr
 #' @seealso \code{\link{rdb_by_url}} \code{\link{rdb_by_dimensions}}
 #' @export
 

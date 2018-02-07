@@ -10,22 +10,40 @@ To install `rdbnomics`, you will need **devtools** :
 devtools::install_github("dbnomics/rdbnomics")
 ```
 
-Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+3 ways to fetch the same series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 
 ```r
-df1 <- rdb('AMECO','ZUTN','EA19.1.0.0.0.ZUTN')
+# Series codes
+df1    <- rdb_by_codes('AMECO','ZUTN','EA19.1.0.0.0.ZUTN')
+# Dimensions
+df1bis <- rdb_by_dimensions('AMECO','ZUTN','{"geo": ["ea12"]}')
+# Url
+df1ter <- rdb_by_url('https://api.next.nomics.world/AMECO/ZUTN?series_codes=EA19.1.0.0.0.ZUTN')
 ```
 
-Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+3 ways to fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 
 ```r
-df2 <- rdb('AMECO','ZUTN',c('EA19.1.0.0.0.ZUTN','DNK.1.0.0.0.ZUTN'))
+# Series codes
+df2    <- rdb_by_codes('AMECO','ZUTN',c('EA19.1.0.0.0.ZUTN','DNK.1.0.0.0.ZUTN'))
+# Dimensions
+df2bis <- rdb_by_dimensions('AMECO','ZUTN','{"geo": ["ea12", "dnk"]}')
+# Url
+df2ter <- rdb_by_url('https://api.next.nomics.world/AMECO/ZUTN?series_codes=EA19.1.0.0.0.ZUTN,DNK.1.0.0.0.ZUTN')
+```
+
+Fetch several values of several dimensions from dataset 'Doing business' (DB) of World bank:
+
+```r
+dim <- '{"country": ["DZ", "BT", "PE"],
+         "indicator": ["IC.DCP.BQCI","IC.REG.COST.PC.ZS"]}'
+df3 <- rdb_by_dimensions('world-bank','DB',dim)
 ```
 
 Fetch one dataset 'Exports and imports by Member States of the EU/third countries' (namq_10_exi) of Eurostat provider:
 
 ```r
-df3 <- rdb('Eurostat','namq_10_exi')
+df3 <- rdb_by_codes('Eurostat','namq_10_exi')
 ```
 
 
