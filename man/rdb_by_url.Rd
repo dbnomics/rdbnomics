@@ -35,5 +35,5 @@ df2 <- rdb_by_url('https://api.next.nomics.world/AMECO/ZUTN?series_codes=EA19.1.
 df3 <- rdb_by_url('https://api.next.nomics.world/Eurostat/namq_10_exi')
 }
 \seealso{
-\code{\link{rdb_by_codes}}
+\code{\link{rdb_by_codes}} \code{\link{rdb_by_dimensions}}
 }

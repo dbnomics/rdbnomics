@@ -43,5 +43,5 @@ df2 <- rdb_by_codes('AMECO','ZUTN',c('EA19.1.0.0.0.ZUTN','DNK.1.0.0.0.ZUTN'))
 df3 <- rdb_by_codes('Eurostat','namq_10_exi')
 }
 \seealso{
-\code{\link{rdb_by_url}}
+\code{\link{rdb_by_url}} \code{\link{rdb_by_dimensions}}
 }
