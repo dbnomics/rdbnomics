@@ -1,3 +1,5 @@
+# DBnomics R client
+
 This package provides you access to DBnomics data series. DBnomics is an open-source project with the goal of aggregating the world’s economic data in one location, free of charge to the public. DBnomics covers hundreds of millions of series from international and national institutions (Eurostat, World Bank, IMF, ...).
 
 To use this package, you have to provide the codes of the provider, dataset and series you want. You can retrieve them directly on the [website](https://next.nomics.world/). You have access to the API through this [link](http://api.next.nomics.world/) and the documentation is [**here**](https://api.next.nomics.world/apidocs).
