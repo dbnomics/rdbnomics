@@ -34,7 +34,7 @@
 
 rdb_by_dimensions <- function(provider_code,dataset_code,dimensions=NA,api_base_url="https://api.next.nomics.world"){
 
-  dimensions <- str_replace_all(dimensions,"\\s","")
+  dimensions <- stringr::str_replace_all(dimensions,"\\s","")
   
   if (is.na(dimensions[1])) {
     url_code <- paste0(api_base_url,"/",provider_code,"/",dataset_code)
