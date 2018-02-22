@@ -2,7 +2,7 @@
 
 This package provides you access to DBnomics data series. DBnomics is an open-source project with the goal of aggregating the world’s economic data in one location, free of charge to the public. DBnomics covers hundreds of millions of series from international and national institutions (Eurostat, World Bank, IMF, ...).
 
-To use this package, you have to provide the codes of the provider, dataset and series you want. You can retrieve them directly on the [website](https://next.nomics.world/). You have access to the API through this [link](http://api.next.nomics.world/) and the documentation is [**here**](https://api.next.nomics.world/apidocs).
+To use this package, you have to provide the codes of the provider, dataset and series you want. You can retrieve them directly on the [website](https://next.nomics.world/). You have access to the API through this [link](http://api.next.nomics.world/) and the documentation is [here](https://api.next.nomics.world/apidocs).
 
 DBnomics is hosted on its own [Gitlab platform](https://git.nomics.world/). However, in order to install the package more easily, we created a mirror of this package on GitHub.
 
@@ -10,6 +10,7 @@ To install `rdbnomics`, you will need **devtools** :
 
 ```r
 devtools::install_github("dbnomics/rdbnomics")
+library(rdbnomics)
 ```
 
 3 ways to fetch the same series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
