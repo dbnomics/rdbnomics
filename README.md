@@ -33,7 +33,7 @@ df2 <- rdb('AMECO','ZUTN',dimensions='{"geo": ["ea12", "dnk"]}')
 df3 <- rdb('WB','DB',dimensions='{"country": ["DZ", "BT", "PE"],"indicator": ["IC.DCP.BQCI","IC.REG.COST.PC.ZS"]}')
 ```
 
-Fetch series by sdmx filter (only for some providers, check the \href{https://git.nomics.world/dbnomics/dbnomics-api/blob/master/dbnomics_api/application.cfg}{list}.)
+Fetch series by sdmx filter (only for some providers, check the [list](https://git.nomics.world/dbnomics/dbnomics-api/blob/master/dbnomics_api/application.cfg).
 ```r
 # Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF:
 df1 <- rdb('IMF','CPI',sdmx_filter='M.DE.PCPIEC_WT')
