@@ -24,10 +24,10 @@ This function gives you access to hundreds of millions data series from
   \href{https://next.nomics.world/}{DBnomics website}.
 }
 \examples{
-# Fetch two series from different datasets of different providers:
+Fetch two series from different datasets of different providers:
 df1 <- rdb_by_api_link('https://api.next.nomics.world/series?series_ids=AMECO/ZUTN/EA19.1.0.0.0.ZUTN,IMF/CPI/A.AT.PCPIT_IX')
 
-# Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 df2 <- rdb_by_api_link('https://api.next.nomics.world/series?provider_code=AMECO&dataset_code=ZUTN&dimensions=\%7B\%22geo\%22\%3A\%5B\%22ea12\%22\%5D\%7D')
 
 }
