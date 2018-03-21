@@ -6,49 +6,41 @@ To use this package, you have to provide the codes of the provider, dataset and 
 
 DBnomics is hosted on its own [Gitlab platform](https://git.nomics.world/). However, in order to install the package more easily, we created a mirror of this package on GitHub.
 
-To install `rdbnomics`, you will need **devtools** :
+To install `rdbnomics`, you will need `devtools`:
 
 ```r
 devtools::install_github("dbnomics/rdbnomics")
 library(rdbnomics)
 ```
 
-3 ways to fetch the same series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-
+Fetch series by id :
 ```r
-# Series codes
-df1    <- rdb_by_codes('AMECO','ZUTN','EA19.1.0.0.0.ZUTN')
-# Dimensions
-df1bis <- rdb_by_dimensions('AMECO','ZUTN','{"geo": ["ea12"]}')
-# Url
-df1ter <- rdb_by_url('https://api.next.nomics.world/AMECO/ZUTN?series_codes=EA19.1.0.0.0.ZUTN')
+# Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+df1 <- rdb(ids='AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+# Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+df2 <- rdb(ids=c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN','AMECO/ZUTN/DNK.1.0.0.0.ZUTN'))
+# Fetch two series from different datasets of different providers:
+df3 <- rdb(ids=c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN','IMF/CPI/A.AT.PCPIT_IX'))
 ```
 
-3 ways to fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-
+Fetch series by dimension :
 ```r
-# Series codes
-df2    <- rdb_by_codes('AMECO','ZUTN',c('EA19.1.0.0.0.ZUTN','DNK.1.0.0.0.ZUTN'))
-# Dimensions
-df2bis <- rdb_by_dimensions('AMECO','ZUTN','{"geo": ["ea12", "dnk"]}')
-# Url
-df2ter <- rdb_by_url('https://api.next.nomics.world/AMECO/ZUTN?series_codes=EA19.1.0.0.0.ZUTN,DNK.1.0.0.0.ZUTN')
+# Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+df1 <- rdb('AMECO','ZUTN',dimensions='{"geo": ["ea12"]}')
+# Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+df2 <- rdb('AMECO','ZUTN',dimensions='{"geo": ["ea12", "dnk"]}')
+# Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank:
+df3 <- rdb('WB','DB',dimensions='{"country": ["DZ", "BT", "PE"],"indicator": ["IC.DCP.BQCI","IC.REG.COST.PC.ZS"]}')
 ```
 
-Fetch several values of several dimensions from dataset 'Doing business' (DB) of World bank:
-
+Fetch series by sdmx filter (only for some providers, check the \href{https://git.nomics.world/dbnomics/dbnomics-api/blob/master/dbnomics_api/application.cfg}{list}.)
 ```r
-dim <- '{"country": ["DZ", "BT", "PE"],
-         "indicator": ["IC.DCP.BQCI","IC.REG.COST.PC.ZS"]}'
-df3 <- rdb_by_dimensions('world-bank','DB',dim)
+# Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF:
+df1 <- rdb('IMF','CPI',sdmx_filter='M.DE.PCPIEC_WT')
+# Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF:
+df2 <- rdb('IMF','CPI',sdmx_filter='M.DE+FR.PCPIEC_WT')
+# Fetch all series along one dimension from dataset 'Consumer Price Index' (CPI) of IMF:
+df3 <- rdb('IMF','CPI',sdmx_filter='M..PCPIEC_WT')
+# Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF:
+df4 <- rdb('IMF','CPI',sdmx_filter='M..PCPIEC_IX+PCPIA_IX')
 ```
-
-Fetch one dataset 'Exports and imports by Member States of the EU/third countries' (namq_10_exi) of Eurostat provider:
-
-```r
-df3 <- rdb_by_codes('Eurostat','namq_10_exi')
-```
-
-
-
-
