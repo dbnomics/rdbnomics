@@ -76,7 +76,6 @@ rdb <- function(provider_code=NULL,dataset_code=NULL,ids=NULL,dimensions=NULL,ma
       
       if (!is.null(provider_code) & !is.null(dataset_code)){
         
-        mask <- stringr::str_replace_all(mask,"\\+","%2B")
         api_link <- paste0(api_base_url,
                            "provider_code=",provider_code,
                            "&dataset_code=",dataset_code,
