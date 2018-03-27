@@ -36,11 +36,11 @@ df3 <- rdb('WB','DB',dimensions='{"country": ["DZ", "BT", "PE"],"indicator": ["I
 Fetch series by sdmx filter (only for some providers, check the [list](https://git.nomics.world/dbnomics/dbnomics-api/blob/master/dbnomics_api/application.cfg).
 ```r
 # Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF:
-df1 <- rdb('IMF','CPI',sdmx_filter='M.DE.PCPIEC_WT')
+df1 <- rdb('IMF','CPI',mask='M.DE.PCPIEC_WT')
 # Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF:
-df2 <- rdb('IMF','CPI',sdmx_filter='M.DE+FR.PCPIEC_WT')
+df2 <- rdb('IMF','CPI',mask='M.DE+FR.PCPIEC_WT')
 # Fetch all series along one dimension from dataset 'Consumer Price Index' (CPI) of IMF:
-df3 <- rdb('IMF','CPI',sdmx_filter='M..PCPIEC_WT')
+df3 <- rdb('IMF','CPI',mask='M..PCPIEC_WT')
 # Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF:
-df4 <- rdb('IMF','CPI',sdmx_filter='M..PCPIEC_IX+PCPIA_IX')
+df4 <- rdb('IMF','CPI',mask='M..PCPIEC_IX+PCPIA_IX')
 ```

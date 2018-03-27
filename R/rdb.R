@@ -15,7 +15,7 @@
 #'  code of one or several series.
 #' @param dimensions Character string (single quote). DBnomics
 #'  code of one or several dimensions in the specified provider and dataset.
-#' @param sdmx_filter Character string. DBnomics
+#' @param mask Character string. DBnomics
 #'  code of one or several dimensions in the specified provider and dataset.
 #' @param api_base_url Character string. DBnomics API link.
 #' @return A data frame.
@@ -36,21 +36,21 @@
 #' # Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank:
 #' df3 <- rdb('WB','DB',dimensions='{"country": ["DZ", "BT", "PE"],"indicator": ["IC.DCP.BQCI","IC.REG.COST.PC.ZS"]}')
 #' 
-#' By sdmx filter (only for some providers, check the list here : https://git.nomics.world/dbnomics/dbnomics-api/blob/master/dbnomics_api/application.cfg.)
+#' By mask (only for some providers, check the list here : https://git.nomics.world/dbnomics/dbnomics-api/blob/master/dbnomics_api/application.cfg.)
 #' # Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF:
-#' df1 <- rdb('IMF','CPI',sdmx_filter='M.DE.PCPIEC_WT')
+#' df1 <- rdb('IMF','CPI',mask='M.DE.PCPIEC_WT')
 #' # Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF:
-#' df2 <- rdb('IMF','CPI',sdmx_filter='M.DE+FR.PCPIEC_WT')
+#' df2 <- rdb('IMF','CPI',mask='M.DE+FR.PCPIEC_WT')
 #' # Fetch all series along one dimension from dataset 'Consumer Price Index' (CPI) of IMF:
-#' df3 <- rdb('IMF','CPI',sdmx_filter='M..PCPIEC_WT')
+#' df3 <- rdb('IMF','CPI',mask='M..PCPIEC_WT')
 #' # Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF:
-#' df4 <- rdb('IMF','CPI',sdmx_filter='M..PCPIEC_IX+PCPIA_IX')
+#' df4 <- rdb('IMF','CPI',mask='M..PCPIEC_IX+PCPIA_IX')
 #' 
 #' @import jsonlite dplyr tidyr stringr
 #' @seealso \code{\link{rdb_by_api_link}}
 #' @export
 
-rdb <- function(provider_code=NULL,dataset_code=NULL,ids=NULL,dimensions=NULL,sdmx_filter=NULL,
+rdb <- function(provider_code=NULL,dataset_code=NULL,ids=NULL,dimensions=NULL,mask=NULL,
                 api_base_url="https://api.next.nomics.world/series?"){
   
   if (!is.null(dimensions)){
@@ -72,20 +72,20 @@ rdb <- function(provider_code=NULL,dataset_code=NULL,ids=NULL,dimensions=NULL,sd
 
   } else {
     
-    if (!is.null(sdmx_filter)){
+    if (!is.null(mask)){
       
       if (!is.null(provider_code) & !is.null(dataset_code)){
         
-        sdmx_filter <- stringr::str_replace_all(sdmx_filter,"\\+","%2B")
+        mask <- stringr::str_replace_all(mask,"\\+","%2B")
         api_link <- paste0(api_base_url,
                            "provider_code=",provider_code,
                            "&dataset_code=",dataset_code,
-                           "&sdmx_filter=",sdmx_filter)
+                           "&series_code_mask=",mask)
         rdb_by_api_link(api_link) 
         
       } else {
         
-        stop("When you filter with sdmx, you must specifiy provider_code and dataset_code as arguments of the function.")
+        stop("When you filter with mask, you must specifiy provider_code and dataset_code as arguments of the function.")
       
       }
       

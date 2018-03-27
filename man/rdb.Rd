@@ -5,7 +5,7 @@
 \title{Download DBnomics data.}
 \usage{
 rdb(provider_code = NULL, dataset_code = NULL, ids = NULL,
-  dimensions = NULL, sdmx_filter = NULL,
+  dimensions = NULL, mask = NULL,
   api_base_url = "https://api.next.nomics.world/series?")
 }
 \arguments{
@@ -19,7 +19,7 @@ code of one or several series.}
 \item{dimensions}{Character string (single quote). DBnomics
 code of one or several dimensions in the specified provider and dataset.}
 
-\item{sdmx_filter}{Character string. DBnomics
+\item{mask}{Character string. DBnomics
 code of one or several dimensions in the specified provider and dataset.}
 
 \item{api_base_url}{Character string. DBnomics API link.}
@@ -55,15 +55,15 @@ df2 <- rdb('AMECO','ZUTN',dimensions='{"geo": ["ea12", "dnk"]}')
 # Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank:
 df3 <- rdb('WB','DB',dimensions='{"country": ["DZ", "BT", "PE"],"indicator": ["IC.DCP.BQCI","IC.REG.COST.PC.ZS"]}')
 
-By sdmx filter (only for some providers, check the list here : https://git.nomics.world/dbnomics/dbnomics-api/blob/master/dbnomics_api/application.cfg.)
+By mask (only for some providers, check the list here : https://git.nomics.world/dbnomics/dbnomics-api/blob/master/dbnomics_api/application.cfg.)
 # Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF:
-df1 <- rdb('IMF','CPI',sdmx_filter='M.DE.PCPIEC_WT')
+df1 <- rdb('IMF','CPI',mask='M.DE.PCPIEC_WT')
 # Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF:
-df2 <- rdb('IMF','CPI',sdmx_filter='M.DE+FR.PCPIEC_WT')
+df2 <- rdb('IMF','CPI',mask='M.DE+FR.PCPIEC_WT')
 # Fetch all series along one dimension from dataset 'Consumer Price Index' (CPI) of IMF:
-df3 <- rdb('IMF','CPI',sdmx_filter='M..PCPIEC_WT')
+df3 <- rdb('IMF','CPI',mask='M..PCPIEC_WT')
 # Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF:
-df4 <- rdb('IMF','CPI',sdmx_filter='M..PCPIEC_IX+PCPIA_IX')
+df4 <- rdb('IMF','CPI',mask='M..PCPIEC_IX+PCPIA_IX')
 
 }
 \seealso{
