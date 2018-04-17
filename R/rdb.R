@@ -46,7 +46,7 @@
 #' # Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF:
 #' df4 <- rdb('IMF','CPI',mask='M..PCPIEC_IX+PCPIA_IX')
 #' 
-#' @import jsonlite dplyr tidyr stringr
+#' @import jsonlite dplyr tidyr stringr lubridate
 #' @seealso \code{\link{rdb_by_api_link}}
 #' @export
 

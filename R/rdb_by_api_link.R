@@ -18,7 +18,7 @@
 #' Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 #' df2 <- rdb_by_api_link('https://api.next.nomics.world/series?provider_code=AMECO&dataset_code=ZUTN&dimensions=%7B%22geo%22%3A%5B%22ea12%22%5D%7D')
 #'
-#' @import jsonlite dplyr tidyr stringr
+#' @import jsonlite dplyr tidyr stringr lubridate
 #' @seealso \code{\link{rdb}}
 #' @export
 
@@ -48,5 +48,14 @@ rdb_by_api_link <- function(api_link){
   DBdf <-
     DBdf %>%
     unnest(period,value)
+  
+  DBdf <-
+    DBdf %>% 
+    mutate(period=case_when(
+      str_count(period,"-")==2 ~ as.Date(parse_date_time(period,"ymd",quiet=T)),
+      str_detect(period,"Q") ~ as.Date(parse_date_time(period,"yq",quiet=T)),
+      str_detect(period,"W") ~ as.Date(paste0(str_replace(period,"W",""),"-1"),"%Y-%W-%w"),
+      str_count(period,"-")==1 & !str_detect(period,"Q") & !str_detect(period,"W") ~ as.Date(parse_date_time(period,"ym",quiet=T)),
+      str_count(period,"-")==0 ~ as.Date(parse_date_time(period,"Y!",quiet=T))))
 
 }

@@ -1,7 +1,7 @@
 Package: rdbnomics
 Type: Package
 Title: Download DBnomics data
-Version: 0.3.1
+Version: 0.4.0
 Author: Thomas Brand
 Maintainer: <thomas.brand@cepremap.org>
 Description: R access to hundreds of millions data series from DBnomics API.
@@ -10,6 +10,7 @@ Encoding: UTF-8
 LazyData: true
 Imports:
     jsonlite,
+    lubridate,
     dplyr,
     stringr,
     tidyr
