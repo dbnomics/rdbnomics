@@ -1,17 +1,29 @@
 Package: rdbnomics
 Type: Package
-Title: Download DBnomics data
-Version: 0.4.0
-Author: Thomas Brand
-Maintainer: <thomas.brand@cepremap.org>
+Title: Download DBnomics Data
+Version: 0.4.3
+Authors@R: c(person("Thomas", "Brand", role = c("aut"),
+                     email = "thomas.brand@cepremap.org"),
+             person("Sebastien", "Galais", role = c("cre", "ctb"),
+                     email = "Sebastien.GALAIS@banque-france.fr"))
 Description: R access to hundreds of millions data series from DBnomics API.
-License: GNU Affero General Public License (AGPL)
+Depends:
+    R (>= 3.1.0)
+License: AGPL-3
+URL: https://github.com/dbnomics/rdbnomics
+BugReports: https://github.com/dbnomics/rdbnomics/issues
 Encoding: UTF-8
 LazyData: true
 Imports:
     jsonlite,
-    lubridate,
+    data.table
+RoxygenNote: 6.1.0
+Suggests:
+    knitr,
+    rmarkdown,
     dplyr,
-    stringr,
-    tidyr
-RoxygenNote: 6.0.1.9000
+    magrittr,
+    ggplot2,
+    DT,
+    testthat
+VignetteBuilder: knitr

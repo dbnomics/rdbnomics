@@ -4,32 +4,47 @@
 \alias{rdb_by_api_link}
 \title{Download DBnomics data using API link.}
 \usage{
-rdb_by_api_link(api_link)
+rdb_by_api_link(api_link,
+  use_readLines = getOption("rdbnomics.use_readLines"))
 }
 \arguments{
 \item{api_link}{Character string. DBnomics API link of the search.}
+
+\item{use_readLines}{Logical (default \code{FALSE}). If \code{TRUE}, then
+the data are requested and read with the base function \code{readLines}.}
 }
 \value{
-A data frame.
+A data.frame.
 }
 \description{
 \code{rdb_by_api_link} downloads data series from
-\href{https://next.nomics.world/}{DBnomics}.
+\href{https://db.nomics.world/}{DBnomics}.
 }
 \details{
 This function gives you access to hundreds of millions data series from
- \href{https://api.next.nomics.world/}{DBnomics API} (documentation about
-  the API can be found \href{https://api.next.nomics.world/apidocs}{here}).
-  The API link is given on the
-  \href{https://next.nomics.world/}{DBnomics website}.
+\href{https://api.db.nomics.world/}{DBnomics API} (documentation about
+the API can be found \href{https://api.db.nomics.world/apidocs}{here}).
+The API link is given on the
+\href{https://db.nomics.world/}{DBnomics website}.
 }
 \examples{
-Fetch two series from different datasets of different providers:
-df1 <- rdb_by_api_link('https://api.next.nomics.world/series?series_ids=AMECO/ZUTN/EA19.1.0.0.0.ZUTN,IMF/CPI/A.AT.PCPIT_IX')
+\dontrun{
+# Fetch two series from different datasets of different providers:
+df1 <- rdb_by_api_link(
+  paste0(
+    'https://api.db.nomics.world/',
+    'series?series_ids=AMECO/ZUTN/EA19.1.0.0.0.ZUTN,IMF/CPI/A.AT.PCPIT_IX'
+  )
+)
 
-Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-df2 <- rdb_by_api_link('https://api.next.nomics.world/series?provider_code=AMECO&dataset_code=ZUTN&dimensions=\%7B\%22geo\%22\%3A\%5B\%22ea12\%22\%5D\%7D')
-
+# Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+df2 <- rdb_by_api_link(
+  paste0(
+    'https://api.db.nomics.world/',
+    'series?provider_code=AMECO&dataset_code=ZUTN&dimensions=\%7B\%22geo\%22\%3A\%5B\%22ea12\%22\%5D\%7D'
+  )
+)
+}
 }
 \seealso{
 \code{\link{rdb}}

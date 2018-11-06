@@ -6,40 +6,46 @@
 \usage{
 rdb(provider_code = NULL, dataset_code = NULL, ids = NULL,
   dimensions = NULL, mask = NULL,
-  api_base_url = "https://api.next.nomics.world/series?")
+  api_base_url = "https://api.db.nomics.world/series?",
+  verbose = getOption("rdbnomics.verbose_warning"), ...)
 }
 \arguments{
 \item{provider_code}{Character string. DBnomics code of the provider.}
 
 \item{dataset_code}{Character string. DBnomics code of the dataset.}
 
-\item{ids}{Character string. DBnomics
-code of one or several series.}
+\item{ids}{Character string. DBnomics code of one or several series.}
 
 \item{dimensions}{Character string (single quote). DBnomics
 code of one or several dimensions in the specified provider and dataset.}
 
-\item{mask}{Character string. DBnomics
-code of one or several dimensions in the specified provider and dataset.}
+\item{mask}{Character string. DBnomics code of one or several dimensions
+in the specified provider and dataset.}
 
 \item{api_base_url}{Character string. DBnomics API link.}
+
+\item{verbose}{Logical (default \code{getOption("rdbnomics.verbose_warning")}).
+Show warnings of the function.}
+
+\item{...}{Arguments to be passed to \code{\link{rdb_by_api_link}}.}
 }
 \value{
-A data frame.
+A data.frame.
 }
 \description{
 \code{rdb} downloads data series from
-\href{https://next.nomics.world/}{DBnomics}.
+\href{https://db.nomics.world/}{DBnomics}.
 }
 \details{
 This function gives you access to hundreds of millions data series from
- \href{https://api.next.nomics.world/}{DBnomics API} (documentation about
-  the API can be found \href{https://api.next.nomics.world/apidocs}{here}).
-  The code of each series is given on the
-  \href{https://next.nomics.world/}{DBnomics website}.
+\href{https://api.db.nomics.world/}{DBnomics API} (documentation about
+the API can be found \href{https://api.db.nomics.world/apidocs}{here}).
+The code of each series is given on the
+\href{https://db.nomics.world/}{DBnomics website}.
 }
 \examples{
-By id
+\dontrun{
+# By id
 # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 df1 <- rdb(ids='AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 # Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
@@ -47,15 +53,20 @@ df2 <- rdb(ids=c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN','AMECO/ZUTN/DNK.1.0.0.0.ZUTN'))
 # Fetch two series from different datasets of different providers:
 df3 <- rdb(ids=c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN','IMF/CPI/A.AT.PCPIT_IX'))
 
-By dimension
+# By dimension
 # Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 df1 <- rdb('AMECO','ZUTN',dimensions='{"geo": ["ea12"]}')
 # Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 df2 <- rdb('AMECO','ZUTN',dimensions='{"geo": ["ea12", "dnk"]}')
 # Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank:
-df3 <- rdb('WB','DB',dimensions='{"country": ["DZ", "BT", "PE"],"indicator": ["IC.DCP.BQCI","IC.REG.COST.PC.ZS"]}')
+df3 <- rdb(
+  'WB',
+  'DB',
+  dimensions='{"country": ["DZ", "BT", "PE"],"indicator": ["IC.DCP.BQCI","IC.REG.COST.PC.ZS"]}'
+)
 
-By mask (only for some providers, check the list here : https://git.nomics.world/dbnomics/dbnomics-api/blob/master/dbnomics_api/application.cfg.)
+# By mask (only for some providers, check the list here :
+# https://git.nomics.world/dbnomics/dbnomics-api/blob/master/dbnomics_api/application.cfg.)
 # Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF:
 df1 <- rdb('IMF','CPI',mask='M.DE.PCPIEC_WT')
 # Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF:
@@ -65,6 +76,13 @@ df3 <- rdb('IMF','CPI',mask='M..PCPIEC_WT')
 # Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF:
 df4 <- rdb('IMF','CPI',mask='M..PCPIEC_IX+PCPIA_IX')
 
+# Use readLines before fromJSON to avoid a proxy failure
+# Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+options(rdbnomics.use_readLines = TRUE)
+df1 <- rdb(ids='AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+# or
+df1 <- rdb(ids='AMECO/ZUTN/EA19.1.0.0.0.ZUTN', use_readLines = TRUE)
+}
 }
 \seealso{
 \code{\link{rdb_by_api_link}}

@@ -2,8 +2,5 @@
 
 export(rdb)
 export(rdb_by_api_link)
-import(dplyr)
+import(data.table)
 import(jsonlite)
-import(lubridate)
-import(stringr)
-import(tidyr)
