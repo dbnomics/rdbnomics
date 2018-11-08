@@ -1,0 +1,7 @@
+image: r-base
+
+test:
+  script:
+    - R -e 'install.packages(c("jsonlite", "data.table", "knitr", "rmarkdown", "dplyr", "magrittr", "ggplot2", "DT", "testthat"))'
+    - R CMD build . --no-manual
+    - R CMD check *tar.gz --no-manual
