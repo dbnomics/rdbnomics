@@ -29,7 +29,8 @@ After installation, a vignette is available to the user:
 vignette("rdbnomics-tutorial")
 ```
 
-Fetch time series by id :
+## Examples
+Fetch time series by `ids` :
 ```r
 # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
@@ -39,7 +40,7 @@ df2 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'AMECO/ZUTN/DNK.1.0.0.0.ZUTN'
 df3 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'IMF/CPI/A.AT.PCPIT_IX'))
 ```
 
-Fetch time series by mask (only for some providers, check the <a href="https://git.nomics.world/dbnomics/dbnomics-api/blob/master/dbnomics_api/application.cfg" target="_blank">list</a>).
+Fetch time series by `mask` (only for some providers, check the <a href="https://git.nomics.world/dbnomics/dbnomics-api/blob/master/dbnomics_api/application.cfg" target="_blank">list</a>).
 ```r
 # Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF:
 df1 <- rdb('IMF', 'CPI', mask = 'M.DE.PCPIEC_WT')
@@ -51,14 +52,19 @@ df3 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_WT')
 df4 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_IX+PCPIA_IX')
 ```
 
-Fetch time series by dimension :
+Fetch time series by `dimensions` :
 ```r
 # Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 df1 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12"]}')
 # Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 df2 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12", "dnk"]}')
 # Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank:
-df3 <- rdb('WB', 'DB', dimensions = '{"country": ["DZ", "BT", "PE"],"indicator": ["IC.DCP.BQCI","IC.REG.COST.PC.ZS"]}')
+df3 <- rdb('WB', 'DB', dimensions = '{"country": ["DZ", "PE"],"indicator": ["ENF.CONT.COEN.COST.ZS","IC.REG.COST.PC.FE.ZS"]}')
+```
+
+Fetch one series from dataset 'Doing Business' of WB provider:
+```r
+df1 <- rdb_by_api_link('https://api.db.nomics.world/v21/series?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%2C%22indicator%22%3A%5B%22IC.REG.PROC.FE.NO%22%5D%7D&provider_code=WB&dataset_code=DB&format=json')
 ```
 
 ## Connection error `Could not resolve host`

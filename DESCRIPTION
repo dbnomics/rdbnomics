@@ -6,7 +6,7 @@ Authors@R: c(person("Thomas", "Brand", role = c("aut"),
                      email = "thomas.brand@cepremap.org"),
              person("Sebastien", "Galais", role = c("cre", "ctb"),
                      email = "Sebastien.GALAIS@banque-france.fr"))
-Description: R access to hundreds of millions data series from DBnomics API.
+Description: R access to hundreds of millions data series from DBnomics API (<https://db.nomics.world/>).
 Depends:
     R (>= 3.1.0)
 License: AGPL-3
@@ -17,7 +17,7 @@ LazyData: true
 Imports:
     jsonlite,
     data.table
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Suggests:
     knitr,
     rmarkdown,

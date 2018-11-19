@@ -12,6 +12,7 @@
 #' @param api_link Character string. DBnomics API link of the search.
 #' @param use_readLines Logical (default \code{FALSE}). If \code{TRUE}, then
 #' the data are requested and read with the base function \code{readLines}.
+#' This can be used to get round the error \code{Could not resolve host: api.db.nomics.world}.
 #' @return A data.frame.
 #' @examples
 #' \dontrun{
@@ -23,12 +24,33 @@
 #'   )
 #' )
 #' 
-#' # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+#' # Fetch one series from dataset 'Doing Business' of WB provider:
 #' df2 <- rdb_by_api_link(
 #'   paste0(
-#'     'https://api.db.nomics.world/',
-#'     'series?provider_code=AMECO&dataset_code=ZUTN&dimensions=%7B%22geo%22%3A%5B%22ea12%22%5D%7D'
+#'     'https://api.db.nomics.world/v21/',
+#'     'series?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%2C%22',
+#'     'indicator%22%3A%5B%22IC.REG.PROC.FE.NO%22%5D%7D&provider_code=WB&dataset_code=DB&format=json'
 #'   )
+#' )
+#' 
+#' # Use readLines before fromJSON to avoid a proxy failure
+#' # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+#' options(rdbnomics.use_readLines = TRUE)
+#' df2 <- rdb_by_api_link(
+#'   paste0(
+#'     'https://api.db.nomics.world/v21/',
+#'     'series?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%2C%22',
+#'     'indicator%22%3A%5B%22IC.REG.PROC.FE.NO%22%5D%7D&provider_code=WB&dataset_code=DB&format=json'
+#'   )
+#' )
+#' # or
+#' df2 <- rdb_by_api_link(
+#'   paste0(
+#'     'https://api.db.nomics.world/v21/',
+#'     'series?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%2C%22',
+#'     'indicator%22%3A%5B%22IC.REG.PROC.FE.NO%22%5D%7D&provider_code=WB&dataset_code=DB&format=json'
+#'   ),
+#'   use_readLines = TRUE
 #' )
 #' }
 #' @seealso \code{\link{rdb}}

@@ -41,9 +41,9 @@ You can explore all the economic data from different providers by following the 
 
 [![](dbnomics001.png)](https://db.nomics.world){target="_blank"}
 
-# Fetch time series by `id`
+# Fetch time series by `ids`
 
-First, let's assume that we know which series we want to download. A series identifier (`id`) is defined by three values, formatted like this: `provider_code`/`dataset_code`/`series_code`.
+First, let's assume that we know which series we want to download. A series identifier (`ids`) is defined by three values, formatted like this: `provider_code`/`dataset_code`/`series_code`.
 
 ## Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider
 
@@ -294,7 +294,7 @@ df %>%
   DT::datatable(rownames = FALSE, options = list(pageLength = 5, scrollX = TRUE))
 ```
 
-# Fetch time series by `dimension`
+# Fetch time series by `dimensions`
 Searching by dimension is a less concise way to select time series than using the code mask, but it works with all the different providers. You have a "*Description of series code*" at the bottom of each dataset page on the [DBnomics website](https://db.nomics.world){target="_blank"}.
 
 ## Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider
@@ -345,7 +345,7 @@ ggplot(df, aes(x = period, y = value, color = series_code)) +
 ## Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank
 
 ```{r, eval = FALSE}
-df <- rdb('WB', 'DB', dimensions = '{"country": ["DZ", "PE"],"indicator": ["IC.EC.COST","IC.REG.COST.PC.ZS"]}') %>%
+df <- rdb('WB', 'DB', dimensions = '{"country": ["DZ", "PE"],"indicator": ["ENF.CONT.COEN.COST.ZS","IC.REG.COST.PC.FE.ZS"]}') %>%
   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
@@ -380,7 +380,7 @@ When you don't know the codes of the dimensions, provider, dataset or series, yo
 - use the `rdb_by_api_link` function such as below.  
 
 ```{r, eval = FALSE}
-df <- rdb_by_api_link("https://api.db.nomics.world/v21/series?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%2C%22indicator%22%3A%5B%22IC.REG.PROC.WOMEN%22%5D%7D&provider_code=WB&dataset_code=DB&format=json") %>%
+df <- rdb_by_api_link("https://api.db.nomics.world/v21/series?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%2C%22indicator%22%3A%5B%22IC.REG.PROC.FE.NO%22%5D%7D&provider_code=WB&dataset_code=DB&format=json") %>%
   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
@@ -446,4 +446,4 @@ ggplot(df, aes(x = period, y = value, color = series_name)) +
   dbnomics()
 ```
 
-[^1]: In the examples, data have already been retrieved on october 30<sup>th</sup> 2018.
+[^1]: In the examples, data have already been retrieved on november 19<sup>th</sup> 2018.

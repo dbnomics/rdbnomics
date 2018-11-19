@@ -19,11 +19,14 @@
 #' @param api_base_url Character string. DBnomics API link.
 #' @param verbose Logical (default \code{getOption("rdbnomics.verbose_warning")}).
 #' Show warnings of the function.
-#' @param ... Arguments to be passed to \code{\link{rdb_by_api_link}}.
+#' @param ... Arguments to be passed to \code{\link{rdb_by_api_link}}. For
+#' example, you can set \code{use_readLines = TRUE} to request and read the data
+#' with the base function \code{readLines}. This can be used to get round the error
+#' \code{Could not resolve host: api.db.nomics.world}.
 #' @return A data.frame.
 #' @examples
 #' \dontrun{
-#' # By id
+#' # By ids
 #' # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 #' df1 <- rdb(ids='AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 #' # Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
@@ -31,17 +34,14 @@
 #' # Fetch two series from different datasets of different providers:
 #' df3 <- rdb(ids=c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN','IMF/CPI/A.AT.PCPIT_IX'))
 #' 
-#' # By dimension
+#' # By dimensions
 #' # Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 #' df1 <- rdb('AMECO','ZUTN',dimensions='{"geo": ["ea12"]}')
 #' # Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 #' df2 <- rdb('AMECO','ZUTN',dimensions='{"geo": ["ea12", "dnk"]}')
 #' # Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank:
-#' df3 <- rdb(
-#'   'WB',
-#'   'DB',
-#'   dimensions='{"country": ["DZ", "BT", "PE"],"indicator": ["IC.DCP.BQCI","IC.REG.COST.PC.ZS"]}'
-#' )
+#' dim <- '{"country": ["DZ", "PE"],"indicator": ["ENF.CONT.COEN.COST.ZS","IC.REG.COST.PC.FE.ZS"]}'
+#' df3 <- rdb('WB', 'DB', dimensions = dim)
 #' 
 #' # By mask (only for some providers, check the list here :
 #' # https://git.nomics.world/dbnomics/dbnomics-api/blob/master/dbnomics_api/application.cfg.)
