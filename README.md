@@ -1,4 +1,4 @@
-# rdbnomics
+# rdbnomics <img src="man/figures/logo.png" align="right" width="120" />
 
 [![pipeline status](https://git.nomics.world/dbnomics/rdbnomics/badges/master/pipeline.svg)](https://git.nomics.world/dbnomics/rdbnomics/commits/master)
 
