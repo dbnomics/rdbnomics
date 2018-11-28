@@ -19,7 +19,7 @@
 #' # Fetch two series from different datasets of different providers:
 #' df1 <- rdb_by_api_link(
 #'   paste0(
-#'     'https://api.db.nomics.world/',
+#'     'https://api.db.nomics.world/v21/',
 #'     'series?series_ids=AMECO/ZUTN/EA19.1.0.0.0.ZUTN,IMF/CPI/A.AT.PCPIT_IX'
 #'   )
 #' )
