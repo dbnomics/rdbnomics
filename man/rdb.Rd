@@ -6,7 +6,7 @@
 \usage{
 rdb(provider_code = NULL, dataset_code = NULL, ids = NULL,
   dimensions = NULL, mask = NULL,
-  api_base_url = "https://api.db.nomics.world/series?",
+  api_base_url = "https://api.db.nomics.world/v21/series?",
   verbose = getOption("rdbnomics.verbose_warning"), ...)
 }
 \arguments{
