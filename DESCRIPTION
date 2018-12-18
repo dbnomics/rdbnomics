@@ -1,12 +1,13 @@
 Package: rdbnomics
 Type: Package
 Title: Download DBnomics Data
-Version: 0.4.3
+Version: 0.4.4
 Authors@R: c(person("Thomas", "Brand", role = c("aut"),
                      email = "thomas.brand@cepremap.org"),
              person("Sebastien", "Galais", role = c("cre", "ctb"),
                      email = "Sebastien.GALAIS@banque-france.fr"))
-Description: R access to hundreds of millions data series from DBnomics API (<https://db.nomics.world/>).
+Description: R access to hundreds of millions data series from DBnomics API
+    (<https://db.nomics.world/>).
 Depends:
     R (>= 3.1.0)
 License: AGPL-3

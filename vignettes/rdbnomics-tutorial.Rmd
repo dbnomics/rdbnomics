@@ -37,9 +37,10 @@ h4.date { /* Header 4 - and the author and data headers use this too  */
 
 # DBnomics : the world's economic database
 
-You can explore all the economic data from different providers by following the link [db.nomics.world](https://db.nomics.world){target="_blank"} [^1].
+You can explore all the economic data from different providers by following the link [db.nomics.world](https://db.nomics.world)  
+(*N.B. : in the examples, data have already been retrieved on november 19<sup>th</sup> 2018*).
 
-[![](dbnomics001.png)](https://db.nomics.world){target="_blank"}
+[![](dbnomics001.png)](https://db.nomics.world)
 
 # Fetch time series by `ids`
 
@@ -120,6 +121,24 @@ dbnomics <- function(legend_title = "Code") {
     )
   )
 }
+
+display_table <- function(DT) {
+  DT_ok <- FALSE
+  if (rmarkdown::pandoc_available()) {
+    if (rmarkdown::pandoc_version() >= numeric_version("1.12.3")) {
+      DT_ok <- TRUE
+    }
+  }
+
+  if (DT_ok) {
+    DT::datatable(
+      DT,
+      rownames = FALSE, options = list(pageLength = 5, scrollX = TRUE)
+    )
+  } else {
+    dplyr::as.tbl(DT)
+  }
+}
 ```
 
 ```{r, eval = FALSE}
@@ -151,10 +170,7 @@ The other columns depend on the provider and on the dataset. They always come in
 ```{r, echo = FALSE}
 df %>%
   reorder_cols() %>%
-  DT::datatable(
-    rownames = FALSE,
-    options = list(pageLength = 5, scrollX = TRUE, scrollX = TRUE)
-  )
+  display_table()
 ```
 
 ```{r, fig.align = 'center'}
@@ -177,7 +193,7 @@ df <- rdbnomics:::rdbnomics_df002
 df %>%
   arrange(series_code, period) %>%
   reorder_cols() %>%
-  DT::datatable(rownames = FALSE, options = list(pageLength = 5, scrollX = TRUE))
+  display_table()
 ```
 
 ```{r, fig.align = 'center'}
@@ -200,7 +216,7 @@ df <- rdbnomics:::rdbnomics_df003
 df %>%
   arrange(series_code, period) %>%
   reorder_cols() %>%
-  DT::datatable(rownames = FALSE, options = list(pageLength = 5, scrollX = TRUE))
+  display_table()
 ```
 
 ```{r, fig.align = 'center'}
@@ -225,7 +241,7 @@ df <- rdbnomics:::rdbnomics_df004
 ```{r, echo = FALSE}
 df %>%
   reorder_cols() %>%
-  DT::datatable(rownames = FALSE, options = list(pageLength = 5, scrollX = TRUE))
+  display_table()
 ```
 
 ```{r, fig.align = 'center'}
@@ -249,7 +265,7 @@ df <- rdbnomics:::rdbnomics_df005
 df %>%
   arrange(series_code, period) %>%
   reorder_cols() %>%
-  DT::datatable(rownames = FALSE, options = list(pageLength = 5, scrollX = TRUE))
+  display_table()
 ```
 
 ```{r, fig.align = 'center'}
@@ -273,7 +289,7 @@ df <- rdbnomics:::rdbnomics_df006
 ```{r, echo = FALSE}
 df %>%
   reorder_cols() %>%
-  DT::datatable(rownames = FALSE, options = list(pageLength = 5, scrollX = TRUE))
+  display_table()
 ```
 
 ## Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF
@@ -285,17 +301,17 @@ df <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_IX+PCPIA_IX') %>%
   top_n(n = 50, wt = period)
 ```
 ```{r, eval = TRUE, echo = FALSE}
-df <- rdbnomics:::rdbnomics_df007
+df <- ungroup(rdbnomics:::rdbnomics_df007)
 ```
 
 ```{r, echo = FALSE}
 df %>%
   reorder_cols() %>%
-  DT::datatable(rownames = FALSE, options = list(pageLength = 5, scrollX = TRUE))
+  display_table()
 ```
 
 # Fetch time series by `dimensions`
-Searching by dimension is a less concise way to select time series than using the code mask, but it works with all the different providers. You have a "*Description of series code*" at the bottom of each dataset page on the [DBnomics website](https://db.nomics.world){target="_blank"}.
+Searching by dimension is a less concise way to select time series than using the code mask, but it works with all the different providers. You have a "*Description of series code*" at the bottom of each dataset page on the [DBnomics website](https://db.nomics.world).
 
 ## Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider
 
@@ -310,7 +326,7 @@ df <- rdbnomics:::rdbnomics_df008
 ```{r, echo = FALSE}
 df %>%
   reorder_cols() %>%
-  DT::datatable(rownames = FALSE, options = list(pageLength = 5, scrollX = TRUE))
+  display_table()
 ```
 
 ```{r, fig.align = 'center'}
@@ -333,7 +349,7 @@ df <- rdbnomics:::rdbnomics_df009
 df %>%
   arrange(series_code, period) %>%
   reorder_cols() %>%
-  DT::datatable(rownames = FALSE, options = list(pageLength = 5, scrollX = TRUE))
+  display_table()
 ```
 
 ```{r, fig.align = 'center'}
@@ -356,7 +372,7 @@ df <- rdbnomics:::rdbnomics_df010
 df %>%
   arrange(series_name, period) %>%
   reorder_cols() %>%
-  DT::datatable(rownames = FALSE, options = list(pageLength = 5, scrollX = TRUE))
+  display_table()
 ```
 
 ```{r, fig.align = 'center'}
@@ -369,13 +385,13 @@ ggplot(df, aes(x = period, y = value, color = series_name)) +
 
 When you don't know the codes of the dimensions, provider, dataset or series, you can:
 
-- go to the page of a dataset on [DBnomics website](https://db.nomics.world){target="_blank"}, for example [Doing Business](https://db.nomics.world/WB/DB){target="_blank"},  
+- go to the page of a dataset on [DBnomics website](https://db.nomics.world), for example [Doing Business](https://db.nomics.world/WB/DB),  
 
 - select some dimensions by using the input widgets of the left column,
-![](dbnomics002.png){width=60%}  
+![](dbnomics002.png)  
 
 - click on "*Copy API link*" in the menu of the "*Download*" button,
-![](dbnomics003.png){width=60%}  
+![](dbnomics003.png)  
 
 - use the `rdb_by_api_link` function such as below.  
 
@@ -391,7 +407,7 @@ df <- rdbnomics:::rdbnomics_df011
 df %>%
   arrange(period, series_name) %>%
   reorder_cols() %>%
-  DT::datatable(rownames = FALSE, options = list(pageLength = 5, scrollX = TRUE))
+  display_table()
 ```
 
 ```{r, fig.align = 'center'}
@@ -402,9 +418,9 @@ ggplot(df, aes(x = period, y = value, color = series_name)) +
 
 # Fetch time series from the cart
 
-On the cart page of the [DBnomics website](https://db.nomics.world){target="_blank"}, click on "*Copy API link*" and copy-paste it as an argument of the `rdb_by_api_link` function. Please note that when you update your cart, you have to copy this link again, because the link itself contains the ids of the series in the cart.
+On the cart page of the [DBnomics website](https://db.nomics.world), click on "*Copy API link*" and copy-paste it as an argument of the `rdb_by_api_link` function. Please note that when you update your cart, you have to copy this link again, because the link itself contains the ids of the series in the cart.
 <center>
-![](dbnomics004.png){width=75%}
+![](dbnomics004.png)
 </center>
   
 ```{r, eval = FALSE}
@@ -436,7 +452,7 @@ df %<>%
 df %>%
   arrange(period, series_name) %>%
   reorder_cols() %>%
-  DT::datatable(rownames = FALSE, options = list(pageLength = 5, scrollX = TRUE))
+  display_table()
 ```
 
 ```{r, fig.align = 'center'}
@@ -445,5 +461,3 @@ ggplot(df, aes(x = period, y = value, color = series_name)) +
   scale_y_continuous(labels = function(x) { format(x, big.mark = " ") }) +
   dbnomics()
 ```
-
-[^1]: In the examples, data have already been retrieved on november 19<sup>th</sup> 2018.
