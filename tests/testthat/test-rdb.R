@@ -6,6 +6,9 @@ test_that("Fetch by dimensions", {
   expect_error(rdb(dimensions = "x", provider_code = "y", dataset_code = NULL))
   expect_error(rdb(dimensions = "x", provider_code = NULL, dataset_code = NULL))
   expect_error(rdb(dimensions = c("x1", "x2"), provider_code = "y", dataset_code = "z"))
+  expect_error(rdb(dimensions = list(), provider_code = "y", dataset_code = "z"))
+  expect_error(rdb(dimensions = list("x1", "x2"), provider_code = "y", dataset_code = "z"))
+  expect_error(rdb(dimensions = list(elt1 = "x1", "x2"), provider_code = "y", dataset_code = "z"))
 })
 
 test_that("Fetch by mask", {

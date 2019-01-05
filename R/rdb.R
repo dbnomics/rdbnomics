@@ -13,8 +13,10 @@
 #' @param provider_code Character string. DBnomics code of the provider.
 #' @param dataset_code Character string. DBnomics code of the dataset.
 #' @param ids Character string. DBnomics code of one or several series.
-#' @param dimensions Character string (single quoted). DBnomics
+#' @param dimensions Character string (single quoted) or List. DBnomics
 #' code of one or several dimensions in the specified provider and dataset.
+#' If it is a named list, then the function \code{toJSON} (from the
+#' package \pkg{jsonlite}) is applied to generate the json object.
 #' @param mask Character string. DBnomics code of one or several masks
 #' in the specified provider and dataset.
 #' @param verbose Logical (default \code{getOption("rdbnomics.verbose_warning")}).
@@ -39,13 +41,26 @@
 #' 
 #' ## By dimensions
 #' # Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+#' df1 <- rdb('AMECO', 'ZUTN', dimensions = list(geo = "ea12"))
+#' # or
 #' df1 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12"]}')
 #' 
 #' # Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+#' df2 <- rdb('AMECO', 'ZUTN', dimensions = list(geo = c("ea12", "dnk")))
+#' # or
 #' df2 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12", "dnk"]}')
 #' 
 #' # Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank:
-#' dim <- '{"country": ["DZ", "PE"],"indicator": ["ENF.CONT.COEN.COST.ZS","IC.REG.COST.PC.FE.ZS"]}'
+#' dim <- list(
+#'   country = c("DZ", "PE"),
+#'   indicator = c("ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS")
+#' )
+#' df3 <- rdb('WB', 'DB', dimensions = dim)
+#' # or
+#' dim <- paste0(
+#'   '{"country": ["DZ", "PE"],',
+#'   '"indicator": ["ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"]}'
+#' )
 #' df3 <- rdb('WB', 'DB', dimensions = dim)
 #' 
 #' 
@@ -119,7 +134,8 @@ rdb <- function(
       )
     }
 
-    check_argument(dimensions, "character", not_null = FALSE)
+    dimensions <- to_json_if_list(dimensions)
+    check_argument(dimensions, c("character", "json"), not_null = FALSE)
     check_argument(provider_code, "character", not_null = FALSE)
     check_argument(dataset_code, "character", not_null = FALSE)
 

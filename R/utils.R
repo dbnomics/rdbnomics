@@ -37,7 +37,7 @@ deploy <- function(DT, columns = NULL, reference_column = "value") {
   if (ncol(DT) <= 0) { return(DT) }
 
   has_list <- sapply(1:ncol(DT), function(x) {
-    is.list(DT[[x]])
+    inherits(DT[[x]], "list")
   }, USE.NAMES = FALSE)
   has_list <- sum(has_list, na.rm = TRUE)
   has_list <- (has_list > 0)
@@ -54,7 +54,7 @@ deploy <- function(DT, columns = NULL, reference_column = "value") {
       # Transform lists into vectors
       if (is.null(columns)) {
         y <- lapply(y, function(v) {
-          if (is.list(v)) {
+          if (inherits(v, "list")) {
             v <- unlist(v)
             if (length(v) != to_list_length) {
               v <- paste(v, collapse = ",")
@@ -174,4 +174,24 @@ check_argument <- function(x, type, len = TRUE, n = 1, not_null = TRUE) {
   stopifnot(inherits(x, type))
   if (len) { stopifnot(length(x) == n) }
   invisible()
+}
+
+#-------------------------------------------------------------------------------
+# to_json_if_list
+to_json_if_list <- function(x) {
+  if (inherits(x, "list")) {
+    if (is.null(names(x))) {
+      stop("The list 'dimensions' must be named.")
+    }
+    if (length(x) <= 0) {
+      stop("The list 'dimensions' is empty.")
+    }
+    nm <- names(x)
+    nm <- no_empty_char(nm)
+    if (length(x) != length(nm)) {
+      stop("All elements of 'dimensions' must be named.")
+    }
+    return(jsonlite::toJSON(x))
+  }
+  x
 }

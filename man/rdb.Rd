@@ -15,8 +15,10 @@ rdb(provider_code = NULL, dataset_code = NULL, ids = NULL,
 
 \item{ids}{Character string. DBnomics code of one or several series.}
 
-\item{dimensions}{Character string (single quoted). DBnomics
-code of one or several dimensions in the specified provider and dataset.}
+\item{dimensions}{Character string (single quoted) or List. DBnomics
+code of one or several dimensions in the specified provider and dataset.
+If it is a named list, then the function \code{toJSON} (from the
+package \pkg{jsonlite}) is applied to generate the json object.}
 
 \item{mask}{Character string. DBnomics code of one or several masks
 in the specified provider and dataset.}
@@ -59,13 +61,26 @@ df3 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'IMF/CPI/A.AT.PCPIT_IX'))
 
 ## By dimensions
 # Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+df1 <- rdb('AMECO', 'ZUTN', dimensions = list(geo = "ea12"))
+# or
 df1 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12"]}')
 
 # Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+df2 <- rdb('AMECO', 'ZUTN', dimensions = list(geo = c("ea12", "dnk")))
+# or
 df2 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12", "dnk"]}')
 
 # Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank:
-dim <- '{"country": ["DZ", "PE"],"indicator": ["ENF.CONT.COEN.COST.ZS","IC.REG.COST.PC.FE.ZS"]}'
+dim <- list(
+  country = c("DZ", "PE"),
+  indicator = c("ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS")
+)
+df3 <- rdb('WB', 'DB', dimensions = dim)
+# or
+dim <- paste0(
+  '{"country": ["DZ", "PE"],',
+  '"indicator": ["ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"]}'
+)
 df3 <- rdb('WB', 'DB', dimensions = dim)
 
 

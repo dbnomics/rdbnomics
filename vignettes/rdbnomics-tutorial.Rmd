@@ -321,8 +321,11 @@ Searching by dimension is a less concise way to select time series than using th
 ## Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider
 
 ```{r, eval = FALSE}
-df <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea19"]}') %>%
+df <- rdb('AMECO', 'ZUTN', dimensions = list(geo = "ea19")) %>%
   filter(!is.na(value))
+# or
+# df <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea19"]}') %>%
+#   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
 df <- rdbnomics:::rdbnomics_df008
@@ -343,8 +346,11 @@ ggplot(df, aes(x = period, y = value, color = series_code)) +
 ## Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider
 
 ```{r, eval = FALSE}
-df <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea19", "dnk"]}') %>%
+df <- rdb('AMECO', 'ZUTN', dimensions = list(geo = c("ea19", "dnk"))) %>%
   filter(!is.na(value))
+# or
+# df <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea19", "dnk"]}') %>%
+#   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
 df <- rdbnomics:::rdbnomics_df009
@@ -366,8 +372,11 @@ ggplot(df, aes(x = period, y = value, color = series_code)) +
 ## Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank
 
 ```{r, eval = FALSE}
-df <- rdb('WB', 'DB', dimensions = '{"country": ["DZ", "PE"],"indicator": ["ENF.CONT.COEN.COST.ZS","IC.REG.COST.PC.FE.ZS"]}') %>%
+df <- rdb('WB', 'DB', dimensions = list(country = c("DZ", "PE"), indicator = c("ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"))) %>%
   filter(!is.na(value))
+# or
+# df <- rdb('WB', 'DB', dimensions = '{"country": ["DZ", "PE"], "indicator": ["ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"]}') %>%
+#   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
 df <- rdbnomics:::rdbnomics_df010
