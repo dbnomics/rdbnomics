@@ -71,4 +71,3 @@ df2 <- rdb_by_api_link(
 \seealso{
 \code{\link{rdb}}
 }
-

@@ -37,4 +37,3 @@ rdb_last_updates(all = TRUE)
 \seealso{
 \code{\link{rdb_providers}}
 }
-

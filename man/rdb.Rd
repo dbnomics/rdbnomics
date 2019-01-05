@@ -94,4 +94,3 @@ df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', use_readLines = TRUE)
 \seealso{
 \code{\link{rdb_by_api_link}}
 }
-

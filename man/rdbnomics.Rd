@@ -8,4 +8,3 @@
 \description{
 DBnomics R client.
 }
-
