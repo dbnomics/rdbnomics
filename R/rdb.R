@@ -1,7 +1,8 @@
 #' Download DBnomics data.
 #'
 #' \code{rdb} downloads data series from
-#' \href{https://db.nomics.world/}{DBnomics}.
+#' \href{https://db.nomics.world/}{DBnomics} using shortcuts like \code{ids},
+#' \code{dimensions} or \code{mask}.
 #'
 #' This function gives you access to hundreds of millions data series from
 #' \href{https://api.db.nomics.world/}{DBnomics API} (documentation about
@@ -12,67 +13,84 @@
 #' @param provider_code Character string. DBnomics code of the provider.
 #' @param dataset_code Character string. DBnomics code of the dataset.
 #' @param ids Character string. DBnomics code of one or several series.
-#' @param dimensions Character string (single quote). DBnomics
+#' @param dimensions Character string (single quoted). DBnomics
 #' code of one or several dimensions in the specified provider and dataset.
-#' @param mask Character string. DBnomics code of one or several dimensions
+#' @param mask Character string. DBnomics code of one or several masks
 #' in the specified provider and dataset.
-#' @param api_base_url Character string. DBnomics API link.
 #' @param verbose Logical (default \code{getOption("rdbnomics.verbose_warning")}).
 #' Show warnings of the function.
 #' @param ... Arguments to be passed to \code{\link{rdb_by_api_link}}. For
 #' example, you can set \code{use_readLines = TRUE} to request and read the data
 #' with the base function \code{readLines}. This can be used to get round the error
 #' \code{Could not resolve host: api.db.nomics.world}.
-#' @return A data.frame.
+#' @return A \code{data.frame} or a \code{data.table}.
 #' @examples
 #' \dontrun{
-#' # By ids
+#' ## By ids
 #' # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-#' df1 <- rdb(ids='AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
-#' # Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-#' df2 <- rdb(ids=c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN','AMECO/ZUTN/DNK.1.0.0.0.ZUTN'))
-#' # Fetch two series from different datasets of different providers:
-#' df3 <- rdb(ids=c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN','IMF/CPI/A.AT.PCPIT_IX'))
+#' df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 #' 
-#' # By dimensions
+#' # Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+#' df2 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'AMECO/ZUTN/DNK.1.0.0.0.ZUTN'))
+#' 
+#' # Fetch two series from different datasets of different providers:
+#' df3 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'IMF/CPI/A.AT.PCPIT_IX'))
+#' 
+#' 
+#' ## By dimensions
 #' # Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-#' df1 <- rdb('AMECO','ZUTN',dimensions='{"geo": ["ea12"]}')
+#' df1 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12"]}')
+#' 
 #' # Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-#' df2 <- rdb('AMECO','ZUTN',dimensions='{"geo": ["ea12", "dnk"]}')
+#' df2 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12", "dnk"]}')
+#' 
 #' # Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank:
 #' dim <- '{"country": ["DZ", "PE"],"indicator": ["ENF.CONT.COEN.COST.ZS","IC.REG.COST.PC.FE.ZS"]}'
 #' df3 <- rdb('WB', 'DB', dimensions = dim)
 #' 
-#' # By mask (only for some providers, check the list here :
+#' 
+#' ## By mask (only for some providers, check the list here :
 #' # https://git.nomics.world/dbnomics/dbnomics-api/blob/master/dbnomics_api/application.cfg.)
 #' # Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF:
-#' df1 <- rdb('IMF','CPI',mask='M.DE.PCPIEC_WT')
-#' # Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF:
-#' df2 <- rdb('IMF','CPI',mask='M.DE+FR.PCPIEC_WT')
-#' # Fetch all series along one dimension from dataset 'Consumer Price Index' (CPI) of IMF:
-#' df3 <- rdb('IMF','CPI',mask='M..PCPIEC_WT')
-#' # Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF:
-#' df4 <- rdb('IMF','CPI',mask='M..PCPIEC_IX+PCPIA_IX')
+#' df1 <- rdb('IMF', 'CPI', mask = 'M.DE.PCPIEC_WT')
 #' 
-#' # Use readLines before fromJSON to avoid a proxy failure
+#' # Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF:
+#' df2 <- rdb('IMF', 'CPI', mask = 'M.DE+FR.PCPIEC_WT')
+#' 
+#' # Fetch all series along one dimension from dataset 'Consumer Price Index' (CPI) of IMF:
+#' df3 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_WT')
+#' 
+#' # Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF:
+#' df4 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_IX+PCPIA_IX')
+#' 
+#' ## Use readLines before fromJSON to avoid a proxy failure
 #' # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 #' options(rdbnomics.use_readLines = TRUE)
-#' df1 <- rdb(ids='AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+#' df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 #' # or
-#' df1 <- rdb(ids='AMECO/ZUTN/EA19.1.0.0.0.ZUTN', use_readLines = TRUE)
+#' df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', use_readLines = TRUE)
 #' }
 #' @seealso \code{\link{rdb_by_api_link}}
 #' @export
 rdb <- function(
-  provider_code = NULL, dataset_code = NULL, ids = NULL,
-  dimensions = NULL, mask = NULL,
-  api_base_url = "https://api.db.nomics.world/v21/series?",
+  provider_code = NULL, dataset_code = NULL,
+  ids = NULL, dimensions = NULL, mask = NULL,
   verbose = getOption("rdbnomics.verbose_warning"),
   ...
 ) {
   # Checking 'verbose'
-  stopifnot(!is.null(verbose))
-  stopifnot(is.logical(verbose), length(verbose) == 1)
+  check_argument(verbose, "logical")
+
+  # Setting API url
+  api_base_url <- getOption("rdbnomics.api_base_url")
+  check_argument(api_base_url, "character")
+
+  # Setting API version
+  api_version <- getOption("rdbnomics.api_version")
+  check_argument(api_version, c("numeric", "integer"))
+  authorized_version(api_version)
+
+  api_base_url <- paste0(api_base_url, "/v", api_version, "/series")
 
   # Checking arguments
   provider_code_null <- is.null(provider_code)
@@ -101,16 +119,25 @@ rdb <- function(
       )
     }
 
-    stopifnot(is.character(dimensions), length(dimensions) == 1)
-    stopifnot(is.character(provider_code), length(provider_code) == 1)
-    stopifnot(is.character(dataset_code), length(dataset_code) == 1)
+    check_argument(dimensions, "character", not_null = FALSE)
+    check_argument(provider_code, "character", not_null = FALSE)
+    check_argument(dataset_code, "character", not_null = FALSE)
 
-    api_link <- paste0(
-      api_base_url,
-      "provider_code=", provider_code,
-      "&dataset_code=", dataset_code,
-      "&dimensions=", dimensions
-    )
+    if (api_version == 21) {
+      api_link <- paste0(
+        api_base_url,
+        "?provider_code=", provider_code,
+        "&dataset_code=", dataset_code,
+        "&dimensions=", dimensions
+      )
+    } else if (api_version == 22) {
+      api_link <- paste0(
+        api_base_url, "/", provider_code, "/", dataset_code,
+        "?observations=1&dimensions=", dimensions
+      )
+    } else {
+      stop(paste0("Don't know what to do for API version ", api_version, "."))
+    }
 
     return(rdb_by_api_link(api_link, ...))
   }
@@ -126,9 +153,9 @@ rdb <- function(
       )
     }
 
-    stopifnot(is.character(mask), length(mask) == 1)
-    stopifnot(is.character(provider_code), length(provider_code) == 1)
-    stopifnot(is.character(dataset_code), length(dataset_code) == 1)
+    check_argument(mask, "character", not_null = FALSE)
+    check_argument(provider_code, "character", not_null = FALSE)
+    check_argument(dataset_code, "character", not_null = FALSE)
 
     mcp <- getOption("rdbnomics.mask_compatible_providers")
     mcp_null <- is.null(mcp)
@@ -149,12 +176,22 @@ rdb <- function(
       }
     }
 
-    api_link <- paste0(
-      api_base_url,
-      "provider_code=", provider_code,
-      "&dataset_code=", dataset_code,
-      "&series_code_mask=", mask
-    )
+    if (api_version == 21) {
+      api_link <- paste0(
+        api_base_url,
+        "?provider_code=", provider_code,
+        "&dataset_code=", dataset_code,
+        "&series_code_mask=", mask
+      )
+    } else if (api_version == 22) {
+      api_link <- paste0(
+        api_base_url, "/", provider_code, "/", dataset_code,
+        "/", mask, "?observations=1"
+      )
+    } else {
+      stop(paste0("Don't know what to do for API version ", api_version, "."))
+    }
+
     return(rdb_by_api_link(api_link, ...))
   }
 
@@ -173,9 +210,18 @@ rdb <- function(
 
     stopifnot(is.character(ids), length(ids) > 0)
 
-    api_link <- paste0(
-      api_base_url, "series_ids=", paste(ids, collapse = ",")
-    )
+    if (api_version == 21) {
+      api_link <- paste0(
+        api_base_url, "?series_ids=", paste(ids, collapse = ",")
+      ) 
+    } else if (api_version == 22) {
+      api_link <- paste0(
+        api_base_url, "?observations=1&series_ids=", paste(ids, collapse = ",")
+      )
+    } else {
+      stop(paste0("Don't know what to do for API version ", api_version, "."))
+    }
+
     return(rdb_by_api_link(api_link, ...))
   }
 

@@ -18,7 +18,7 @@ test_that("use_readLines is NULL", {
   expect_error(rdb_by_api_link("url", NULL))
 })
 
-test_that("use_readLines lenght is greater than one or equal to zero", {
+test_that("use_readLines length is greater than one or equal to zero", {
   expect_error(rdb_by_api_link("url", c(TRUE, FALSE)))
   expect_error(rdb_by_api_link("url", logical()))
 })

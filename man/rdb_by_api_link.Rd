@@ -15,7 +15,7 @@ the data are requested and read with the base function \code{readLines}.
 This can be used to get round the error \code{Could not resolve host: api.db.nomics.world}.}
 }
 \value{
-A data.frame.
+A \code{data.frame}.
 }
 \description{
 \code{rdb_by_api_link} downloads data series from
@@ -33,17 +33,17 @@ The API link is given on the
 # Fetch two series from different datasets of different providers:
 df1 <- rdb_by_api_link(
   paste0(
-    'https://api.db.nomics.world/v21/',
-    'series?series_ids=AMECO/ZUTN/EA19.1.0.0.0.ZUTN,IMF/CPI/A.AT.PCPIT_IX'
+    'https://api.db.nomics.world/v22/',
+    'series?observations=1&series_ids=AMECO/ZUTN/EA19.1.0.0.0.ZUTN,IMF/CPI/A.AT.PCPIT_IX'
   )
 )
 
-# Fetch one series from dataset 'Doing Business' of WB provider:
+# Fetch one series from the dataset 'Doing Business' of WB provider:
 df2 <- rdb_by_api_link(
   paste0(
-    'https://api.db.nomics.world/v21/',
-    'series?dimensions=\%7B\%22country\%22\%3A\%5B\%22FR\%22\%2C\%22IT\%22\%2C\%22ES\%22\%5D\%2C\%22',
-    'indicator\%22\%3A\%5B\%22IC.REG.PROC.FE.NO\%22\%5D\%7D&provider_code=WB&dataset_code=DB&format=json'
+    'https://api.db.nomics.world/v22/series/WB/DB?dimensions=\%7B\%22',
+    'indicator\%22\%3A\%5B\%22IC.REG.PROC.FE.NO\%22\%5D\%7D&q=Doing\%20Business',
+    '&observations=1&format=json&align_periods=1&offset=0&facets=0'
   )
 )
 
@@ -52,17 +52,17 @@ df2 <- rdb_by_api_link(
 options(rdbnomics.use_readLines = TRUE)
 df2 <- rdb_by_api_link(
   paste0(
-    'https://api.db.nomics.world/v21/',
-    'series?dimensions=\%7B\%22country\%22\%3A\%5B\%22FR\%22\%2C\%22IT\%22\%2C\%22ES\%22\%5D\%2C\%22',
-    'indicator\%22\%3A\%5B\%22IC.REG.PROC.FE.NO\%22\%5D\%7D&provider_code=WB&dataset_code=DB&format=json'
+    'https://api.db.nomics.world/v22/series/WB/DB?dimensions=\%7B\%22',
+    'indicator\%22\%3A\%5B\%22IC.REG.PROC.FE.NO\%22\%5D\%7D&q=Doing\%20Business',
+    '&observations=1&format=json&align_periods=1&offset=0&facets=0'
   )
 )
 # or
 df2 <- rdb_by_api_link(
   paste0(
-    'https://api.db.nomics.world/v21/',
-    'series?dimensions=\%7B\%22country\%22\%3A\%5B\%22FR\%22\%2C\%22IT\%22\%2C\%22ES\%22\%5D\%2C\%22',
-    'indicator\%22\%3A\%5B\%22IC.REG.PROC.FE.NO\%22\%5D\%7D&provider_code=WB&dataset_code=DB&format=json'
+    'https://api.db.nomics.world/v22/series/WB/DB?dimensions=\%7B\%22',
+    'indicator\%22\%3A\%5B\%22IC.REG.PROC.FE.NO\%22\%5D\%7D&q=Doing\%20Business',
+    '&observations=1&format=json&align_periods=1&offset=0&facets=0'
   ),
   use_readLines = TRUE
 )
@@ -71,3 +71,4 @@ df2 <- rdb_by_api_link(
 \seealso{
 \code{\link{rdb}}
 }
+

@@ -18,7 +18,7 @@ LazyData: true
 Imports:
     jsonlite,
     data.table
-RoxygenNote: 6.1.1
+RoxygenNote: 5.0.1
 Suggests:
     knitr,
     rmarkdown,

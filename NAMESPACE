@@ -2,5 +2,7 @@
 
 export(rdb)
 export(rdb_by_api_link)
+export(rdb_last_updates)
+export(rdb_providers)
 import(data.table)
 import(jsonlite)
