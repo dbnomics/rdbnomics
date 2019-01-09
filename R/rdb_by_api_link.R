@@ -13,7 +13,7 @@
 #' @param use_readLines Logical (default \code{FALSE}). If \code{TRUE}, then
 #' the data are requested and read with the base function \code{readLines}.
 #' This can be used to get round the error \code{Could not resolve host: api.db.nomics.world}.
-#' @return A \code{data.frame}.
+#' @return A \code{data.frame} or a \code{data.table}.
 #' @examples
 #' \dontrun{
 #' # Fetch two series from different datasets of different providers:
@@ -137,19 +137,7 @@ rdb_by_api_link <- function(
   # Expanding list columns
   DBdata <- deploy(DBdata)
   # Transforming date format and timestamp format
-  DBdata[
-    ,
-    (colnames(DBdata)) := lapply(.SD, function(x) {
-      if (date_format(x)) {
-        return(as.Date(x))
-      }
-      if (timestamp_format(x)) {
-        return(as.POSIXct(x, tz = "GMT", format = "%Y-%m-%dT%H:%M:%OSZ"))
-      }
-      x
-    }),
-    .SDcols = colnames(DBdata)
-  ]
+  transform_date_timestamp(DBdata)
 
   # Modifying column names
   data.table::setnames(DBdata, "period", "original_period")

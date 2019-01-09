@@ -15,7 +15,7 @@ the data are requested and read with the base function \code{readLines}.
 This can be used to get round the error \code{Could not resolve host: api.db.nomics.world}.}
 }
 \value{
-A \code{data.frame}.
+A \code{data.frame} or a \code{data.table}.
 }
 \description{
 \code{rdb_by_api_link} downloads data series from

@@ -15,7 +15,7 @@ rdb(provider_code = NULL, dataset_code = NULL, ids = NULL,
 
 \item{ids}{Character string. DBnomics code of one or several series.}
 
-\item{dimensions}{Character string (single quoted) or List. DBnomics
+\item{dimensions}{List or character string (single quoted). DBnomics
 code of one or several dimensions in the specified provider and dataset.
 If it is a named list, then the function \code{toJSON} (from the
 package \pkg{jsonlite}) is applied to generate the json object.}
@@ -98,7 +98,7 @@ df3 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_WT')
 # Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF:
 df4 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_IX+PCPIA_IX')
 
-## Use readLines before fromJSON to avoid a proxy failure
+## Use readLines before fromJSON to avoid a proxy failure (in some cases)
 # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 options(rdbnomics.use_readLines = TRUE)
 df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')

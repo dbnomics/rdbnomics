@@ -87,7 +87,7 @@ When using the functions `rdb` or `rdb_by_api_link`, you may come across the fol
 Error in open.connection(con, "rb") :
   Could not resolve host: api.db.nomics.world
 ```
-This error is due to a fail of the function `fromJSON`. To get round this situation, you can use the `readLines` function before the `fromJSON` function by setting an option of the package:
+This error is due to a fail of the function `fromJSON`. To get round this situation, you can use the `readLines` function before the `fromJSON` function by setting an option of the package :
 ```r
 options(rdbnomics.use_readLines = TRUE)
 

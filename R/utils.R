@@ -15,8 +15,12 @@ read_lines <- function(x, y, run = 0) {
           suppressMessages(suppressWarnings(utils::setInternet2(TRUE)))
         }
       }
-
-      y <- suppressWarnings(readLines(y))
+      
+      if (getOption("rdbnomics.verbose_warning_readLines")) {
+        y <- readLines(y)
+      } else {
+        y <- suppressWarnings(readLines(y))
+      }
     }
     jsonlite::fromJSON(y)
   }, error = function(e) {
@@ -31,7 +35,9 @@ read_lines <- function(x, y, run = 0) {
 #-------------------------------------------------------------------------------
 # deploy
 deploy <- function(DT, columns = NULL, reference_column = "value") {
-  stopifnot(data.table::is.data.table(DT))
+  if (!data.table::is.data.table(DT)) {
+    stop("DT is not a data.table.")
+  }
 
   if (nrow(DT) <= 0) { return(DT) }
   if (ncol(DT) <= 0) { return(DT) }
@@ -109,7 +115,12 @@ dataframe_to_columns <- function(x) {
   if (length(has_dataframe) <= 0) { return(x) }
 
   for (i in names(has_dataframe)) {
+    # cols <- colnames(x[[i]])
     x <- cbind(x, x[[i]])
+    # names(x)[(ncol(x) - length(cols) + 1):ncol(x)] <- paste(
+    #   i, cols,
+    #   sep = "_"
+    # )
     x[[i]] <- NULL
   }
 
@@ -137,9 +148,20 @@ get_version <- function(x) {
 # authorized_version
 authorized_version <- function(x) {
   versions <- getOption("rdbnomics.authorized_api_version")
-  stopifnot(!is.null(versions))
-  stopifnot(inherits(versions, c("numeric", "integer")))
-  stopifnot(length(versions) > 0)
+
+  name <- deparse(substitute(versions))
+  if (is.null(versions)) {
+    stop(paste0(name, " cannot be NULL."))
+  }
+  if (!inherits(versions, c("numeric", "integer"))) {
+    stop(
+      paste0(name, " must be of class 'integer' or 'numeric'.")
+    )
+  }
+  if (length(versions) <= 0) {
+    stop(paste0(name, " must be of length greater than 0."))
+  }
+  
   if (x %notin% versions) {
     stop(
       paste0(
@@ -161,6 +183,17 @@ date_format <- function(x) {
 timestamp_format <- function(x) {
   sum(
     grepl(
+      "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+      x
+    )
+  ) == length(x)
+}
+
+#-------------------------------------------------------------------------------
+# timestamp_format2
+timestamp_format2 <- function(x) {
+  sum(
+    grepl(
       "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]+Z$",
       x
     )
@@ -170,9 +203,18 @@ timestamp_format <- function(x) {
 #-------------------------------------------------------------------------------
 # stopifnot_logical
 check_argument <- function(x, type, len = TRUE, n = 1, not_null = TRUE) {
-  if (not_null) { stopifnot(!is.null(x)) }
-  stopifnot(inherits(x, type))
-  if (len) { stopifnot(length(x) == n) }
+  name <- deparse(substitute(x))
+  if (not_null) {
+    if (is.null(x)) { stop(paste0(name, " cannot be NULL.")) }
+  }
+  if (!inherits(x, type)) {
+    stop(
+      paste0(name, " must be of class '", paste0(type, collapse = "', '"), "'.")
+    )
+  }
+  if (len) {
+    if (length(x) != n) { stop(paste0(name, " must be of length ", n, ".")) }
+  }
   invisible()
 }
 
@@ -180,12 +222,8 @@ check_argument <- function(x, type, len = TRUE, n = 1, not_null = TRUE) {
 # to_json_if_list
 to_json_if_list <- function(x) {
   if (inherits(x, "list")) {
-    if (is.null(names(x))) {
-      stop("The list 'dimensions' must be named.")
-    }
-    if (length(x) <= 0) {
-      stop("The list 'dimensions' is empty.")
-    }
+    if (is.null(names(x))) { stop("The list 'dimensions' must be named.") }
+    if (length(x) <= 0) { stop("The list 'dimensions' is empty.") }
     nm <- names(x)
     nm <- no_empty_char(nm)
     if (length(x) != length(nm)) {
@@ -194,4 +232,29 @@ to_json_if_list <- function(x) {
     return(jsonlite::toJSON(x))
   }
   x
+}
+
+#-------------------------------------------------------------------------------
+# transform_date_timestamp
+transform_date_timestamp <- function(DT) {
+  timezone <- getOption("rdbnomics.timestamp_tz")
+  check_argument(timezone, "character")
+
+  DT[
+    ,
+    (colnames(DT)) := lapply(.SD, function(x) {
+      if (date_format(x)) {
+        return(as.Date(x))
+      }
+      if (timestamp_format(x)) {
+        return(as.POSIXct(x, tz = timezone, format = "%Y-%m-%dT%H:%M:%SZ"))
+      }
+      if (timestamp_format2(x)) {
+        return(as.POSIXct(x, tz = timezone, format = "%Y-%m-%dT%H:%M:%OSZ"))
+      }
+      x
+    }),
+    .SDcols = colnames(DT)
+  ]
+  invisible()
 }

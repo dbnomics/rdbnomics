@@ -2,14 +2,14 @@
 % Please edit documentation in R/rdb_last_updates.R
 \name{rdb_last_updates}
 \alias{rdb_last_updates}
-\title{Download list of last DBnomics updates.}
+\title{Download informations about the last DBnomics updates.}
 \usage{
 rdb_last_updates(all = FALSE,
   use_readLines = getOption("rdbnomics.use_readLines"))
 }
 \arguments{
 \item{all}{Logical (default \code{FALSE}). If \code{TRUE}, then the entire
-dataset of the last updates are retrieved.}
+dataset of the last updates is retrieved.}
 
 \item{use_readLines}{Logical (default \code{FALSE}). If \code{TRUE}, then
 the data are requested and read with the base function \code{readLines}.
@@ -19,19 +19,35 @@ This can be used to get round the error \code{Could not resolve host: api.db.nom
 A \code{data.frame} or a \code{data.table}.
 }
 \description{
-\code{rdb_last_updates} downloads the last updates from
+\code{rdb_last_updates} downloads informations about the last updates from
 \href{https://db.nomics.world/}{DBnomics}.
 }
 \details{
 By default, the function returns a \code{data.frame} (or a \code{data.table})
 containing the last 100 updates from
-\href{https://db.nomics.world/}{DBnomics} with others informations.
+\href{https://db.nomics.world/}{DBnomics} with additional informations.
 }
 \examples{
 \dontrun{
 rdb_last_updates()
+#>            code         converted_at               indexed_at ...
+#> 1: CONSTRUCTION 2019-01-09T05:46:48Z 2019-01-09T05:48:05.764Z ...
+#> 2:       IRESCB 2019-01-09T05:46:48Z 2019-01-09T05:48:05.764Z ...
+#> 3:     IREURCUR 2019-01-09T05:46:48Z 2019-01-09T05:48:05.764Z ...
+#> 4:     IROLOBE2 2019-01-09T05:46:48Z 2019-01-09T05:48:05.764Z ...
+#> 5:     IROLOYLD 2019-01-09T05:46:48Z 2019-01-09T05:48:05.764Z ...
+#> 6:     IRTRCERT 2019-01-09T05:46:48Z 2019-01-09T05:48:05.764Z ...
+#> ...
 
 rdb_last_updates(all = TRUE)
+#>            code         converted_at               indexed_at ...
+#> 1: CONSTRUCTION 2019-01-09T05:46:48Z 2019-01-09T05:48:05.764Z ...
+#> 2:       IRESCB 2019-01-09T05:46:48Z 2019-01-09T05:48:05.764Z ...
+#> 3:     IREURCUR 2019-01-09T05:46:48Z 2019-01-09T05:48:05.764Z ...
+#> 4:     IROLOBE2 2019-01-09T05:46:48Z 2019-01-09T05:48:05.764Z ...
+#> 5:     IROLOYLD 2019-01-09T05:46:48Z 2019-01-09T05:48:05.764Z ...
+#> 6:     IRTRCERT 2019-01-09T05:46:48Z 2019-01-09T05:48:05.764Z ...
+#> ...
 }
 }
 \seealso{

@@ -13,7 +13,7 @@
 #' @param provider_code Character string. DBnomics code of the provider.
 #' @param dataset_code Character string. DBnomics code of the dataset.
 #' @param ids Character string. DBnomics code of one or several series.
-#' @param dimensions Character string (single quoted) or List. DBnomics
+#' @param dimensions List or character string (single quoted). DBnomics
 #' code of one or several dimensions in the specified provider and dataset.
 #' If it is a named list, then the function \code{toJSON} (from the
 #' package \pkg{jsonlite}) is applied to generate the json object.
@@ -78,7 +78,7 @@
 #' # Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF:
 #' df4 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_IX+PCPIA_IX')
 #' 
-#' ## Use readLines before fromJSON to avoid a proxy failure
+#' ## Use readLines before fromJSON to avoid a proxy failure (in some cases)
 #' # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 #' options(rdbnomics.use_readLines = TRUE)
 #' df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
@@ -141,10 +141,8 @@ rdb <- function(
 
     if (api_version == 21) {
       api_link <- paste0(
-        api_base_url,
-        "?provider_code=", provider_code,
-        "&dataset_code=", dataset_code,
-        "&dimensions=", dimensions
+        api_base_url, "?provider_code=", provider_code,
+        "&dataset_code=", dataset_code, "&dimensions=", dimensions
       )
     } else if (api_version == 22) {
       api_link <- paste0(
@@ -178,7 +176,22 @@ rdb <- function(
     mcp_not_null <- !mcp_null
 
     if (mcp_not_null) {
-      stopifnot(is.character(mcp), length(mcp) > 0)
+      if (!is.character(mcp)) {
+        stop(
+          paste0(
+            "The vector of providers compatible with the argument 'mask' ",
+            "must be of class 'character'."
+          )
+        )
+      }
+      if (length(mcp) <= 0) {
+        stop(
+          paste0(
+            "The vector of providers compatible with the argument 'mask' ",
+            "is empty."
+          )
+        )
+      }
 
       if (provider_code %notin% mcp) {
         stop(
@@ -194,10 +207,8 @@ rdb <- function(
 
     if (api_version == 21) {
       api_link <- paste0(
-        api_base_url,
-        "?provider_code=", provider_code,
-        "&dataset_code=", dataset_code,
-        "&series_code_mask=", mask
+        api_base_url, "?provider_code=", provider_code,
+        "&dataset_code=", dataset_code, "&series_code_mask=", mask
       )
     } else if (api_version == 22) {
       api_link <- paste0(
@@ -224,7 +235,12 @@ rdb <- function(
       }
     }
 
-    stopifnot(is.character(ids), length(ids) > 0)
+    if (!is.character(ids)) {
+      stop("'ids' must be of class 'character'.")
+    }
+    if (length(ids) <= 0) {
+      stop("'ids' is empty.")
+    }
 
     if (api_version == 21) {
       api_link <- paste0(

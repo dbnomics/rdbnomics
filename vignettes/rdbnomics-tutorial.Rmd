@@ -486,7 +486,7 @@ Error in open.connection(con, "rb") :
   Could not resolve host: api.db.nomics.world
 ```
 
-This error is due to a fail of the function `fromJSON`. To get round this situation, you can use the `readLines` function before the `fromJSON` function by setting an option of the package:
+This error is due to a fail of the function `fromJSON`. To get round this situation, you can use the `readLines` function before the `fromJSON` function by setting an option of the package :
 
 ```{r, eval = FALSE}
 options(rdbnomics.use_readLines = TRUE)

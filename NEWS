@@ -6,6 +6,7 @@ Changes in version 0.4.4
 - Add appendix to the vignette "rdbnomics-tutorial.Rmd".
 - New function "rdb_providers" to return the available providers.
 - New function "rdb_last_updates" to show the last updates.
+- Dates and timestamps are transformed using as.Date and as.POSIXct.
 
 Changes in version 0.4.3
 
