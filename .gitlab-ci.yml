@@ -1,7 +1,7 @@
 build_markdown_v1: # to test R Markdown v1 without pandoc, must install knitr and rmarkdown
   image: jangorecki/r-base-dev
   script:
-    - R -e 'install.packages(c("curl", jsonlite", "data.table", "dplyr", "magrittr", "ggplot2", "DT", "testthat", "knitr", "rmarkdown"))'
+    - R -e 'install.packages(c("curl", "jsonlite", "data.table", "dplyr", "magrittr", "ggplot2", "DT", "testthat", "knitr", "rmarkdown"))'
     - R CMD build .
     - PKG_FILE_NAME=$(ls -1t *.tar.gz | head -n 1)
     - R CMD check "${PKG_FILE_NAME}" --no-manual --as-cran
