@@ -26,3 +26,8 @@ test_that("use_readLines length is greater than one or equal to zero", {
 test_that("use_readLines is not a logical", {
   expect_error(rdb_by_api_link("url", "TRUE"))
 })
+
+test_that("curl_config is not a curl_handle object or a named list", {
+  expect_error(rdb_by_api_link("url", curl_config = TRUE))
+  expect_error(rdb_by_api_link("url", curl_config = list(1)))
+})

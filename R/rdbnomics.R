@@ -5,7 +5,7 @@
 #' @docType package
 #' @name rdbnomics
 #' 
-#' @import jsonlite data.table
+#' @import curl jsonlite data.table
 #' 
 NULL
 

@@ -1,7 +1,7 @@
 Package: rdbnomics
 Type: Package
 Title: Download DBnomics Data
-Version: 0.4.4
+Version: 0.4.5
 Authors@R: c(person("Thomas", "Brand", role = c("aut"),
                      email = "thomas.brand@cepremap.org"),
              person("Sebastien", "Galais", role = c("cre", "ctb"),
@@ -16,6 +16,7 @@ BugReports: https://github.com/dbnomics/rdbnomics/issues
 Encoding: UTF-8
 LazyData: true
 Imports:
+    curl,
     jsonlite,
     data.table
 RoxygenNote: 6.1.1

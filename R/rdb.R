@@ -21,10 +21,9 @@
 #' in the specified provider and dataset.
 #' @param verbose Logical (default \code{getOption("rdbnomics.verbose_warning")}).
 #' Show warnings of the function.
-#' @param ... Arguments to be passed to \code{\link{rdb_by_api_link}}. For
-#' example, you can set \code{use_readLines = TRUE} to request and read the data
-#' with the base function \code{readLines}. This can be used to get round the error
-#' \code{Could not resolve host: api.db.nomics.world}.
+#' @param ... Arguments to be passed to \code{\link{rdb_by_api_link}}. These 
+#' arguments concern proxy configuration. See \code{\link{rdb_by_api_link}}
+#' for details.
 #' @return A \code{data.frame} or a \code{data.table}.
 #' @examples
 #' \dontrun{
@@ -78,11 +77,26 @@
 #' # Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF:
 #' df4 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_IX+PCPIA_IX')
 #' 
-#' ## Use readLines before fromJSON to avoid a proxy failure (in some cases)
+#' 
+#' ## Use a specific proxy to fetch the data
+#' # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+#' h <- curl::new_handle(
+#'   proxy = "<proxy>",
+#'   proxyport = <port>,
+#'   proxyusername = "<username>",
+#'   proxypassword = "<password>"
+#' )
+#' options(rdbnomics.curl_config = h)
+#' df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+#' # or to use once
+#' df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', curl_config = h)
+#' 
+#' 
+#' ## Use R default connection to avoid a proxy failure (in some cases)
 #' # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 #' options(rdbnomics.use_readLines = TRUE)
 #' df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
-#' # or
+#' # or to use once
 #' df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', use_readLines = TRUE)
 #' }
 #' @seealso \code{\link{rdb_by_api_link}}

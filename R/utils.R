@@ -4,12 +4,13 @@
 }
 
 #-------------------------------------------------------------------------------
-# read_lines
-read_lines <- function(x, y, run = 0) {
+# get_data
+get_data <- function(x, userl, curl_args, run = 0) {
   if (run > 0) { Sys.sleep(getOption("rdbnomics.sleep_run")) }
   
   tryCatch({
-    if (x) {
+    if (userl) {
+      # Only readLines
       if (as.numeric(R.Version()$major) >= 3) {
         if (as.numeric(R.Version()$minor) < 2) {
           suppressMessages(suppressWarnings(utils::setInternet2(TRUE)))
@@ -17,15 +18,59 @@ read_lines <- function(x, y, run = 0) {
       }
       
       if (getOption("rdbnomics.verbose_warning_readLines")) {
-        y <- readLines(y)
+        response <- try(readLines(x), silent = TRUE)
       } else {
-        y <- suppressWarnings(readLines(y))
+        response <- try(suppressWarnings(readLines(x)), silent = TRUE)
+      }
+
+      if (inherits(response, "try-error")) {
+        stop("BAD REQUEST", call. = FALSE)
+      } else {
+        jsonlite::fromJSON(response)
+      }
+    } else {
+      # With curl
+      if (!is.null(curl_args)) {
+        if (inherits(curl_args, "curl_handle")) {
+          curl_args <- list(handle = curl_args)
+        }
+        if (!inherits(curl_args, "list")) {
+          stop(
+            paste0(
+              "Argument 'curl_config' or option 'rdbnomics.curl_config' can ",
+              "only be of class 'curl_handle' or 'list'."
+            ),
+            call. = FALSE
+          )
+        }
+        if (inherits(curl_args, "list")) {
+          if (is.null(names(curl_args))) {
+            stop("The list 'curl_config' must be named.", call. = FALSE)
+          }
+          if (length(curl_args) <= 0) {
+            stop("The list 'curl_config' is empty.", call. = FALSE)
+          }
+          nm <- names(curl_args)
+          nm <- no_empty_char(nm)
+          if (length(curl_args) != length(nm)) {
+            stop("All elements of 'curl_config' must be named.", call. = FALSE)
+          }
+        }
+      }
+
+      response <- do.call(curl::curl_fetch_memory, c(list(url = x), curl_args))
+      check_x <- curl::parse_headers(response$headers)
+      check_x <- utils::head(check_x, 1)
+      if (grepl(getOption("rdbnomics.http_ok"), toupper(check_x))) {
+        response <- rawToChar(response$content)
+        jsonlite::fromJSON(response)
+      } else {
+        stop(check_x, call. = FALSE)
       }
     }
-    jsonlite::fromJSON(y)
   }, error = function(e) {
     if (run < getOption("rdbnomics.try_run")) {
-      read_lines(x, y, run = run + 1)
+      get_data(x, userl, curl_args, run = run + 1)
     } else {
       stop(e)
     }
@@ -97,7 +142,7 @@ list_has_dataframe <- function(x) {
 #-------------------------------------------------------------------------------
 # no_empty_char
 no_empty_char <- function(x) {
-  if (inherits(x, "character") & length(x) > 1) {
+  if (inherits(x, "character")) {
     x <- x[x != "" & !is.na(x)]
   }
   x
@@ -173,35 +218,33 @@ authorized_version <- function(x) {
 }
 
 #-------------------------------------------------------------------------------
+# trim
+trim <- function(x) {
+  gsub("^[[:blank:]]+|[[:blank:]]+$", "", x)
+}
+
+#-------------------------------------------------------------------------------
 # date_format
 date_format <- function(x) {
-  sum(grepl("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", x)) == length(x)
+  x <- no_empty_char(x)
+  if (length(x) <= 0) {
+    return(FALSE)
+  }
+  sum(grepl("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", trim(x)), na.rm = TRUE) == length(x)
 }
 
 #-------------------------------------------------------------------------------
 # timestamp_format
-timestamp_format <- function(x) {
-  sum(
-    grepl(
-      "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
-      x
-    )
-  ) == length(x)
+timestamp_format <- function(x, y) {
+  x <- no_empty_char(x)
+  if (length(x) <= 0) {
+    return(FALSE)
+  }
+  sum(grepl(y, trim(x)), na.rm = TRUE) == length(x)
 }
 
 #-------------------------------------------------------------------------------
-# timestamp_format2
-timestamp_format2 <- function(x) {
-  sum(
-    grepl(
-      "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]+Z$",
-      x
-    )
-  ) == length(x)
-}
-
-#-------------------------------------------------------------------------------
-# stopifnot_logical
+# check_argument
 check_argument <- function(x, type, len = TRUE, n = 1, not_null = TRUE) {
   name <- deparse(substitute(x))
   if (not_null) {
@@ -240,17 +283,34 @@ transform_date_timestamp <- function(DT) {
   timezone <- getOption("rdbnomics.timestamp_tz")
   check_argument(timezone, "character")
 
+  from_timestamp <- c(
+    "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+    "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]+Z$",
+    "^[0-9]{4}-[0-9]{2}-[0-9]{2}[[:blank:]]+[0-9]{2}:[0-9]{2}:[0-9]{2}$"
+  )
+
+  to_timestamp <- c(
+    "%Y-%m-%dT%H:%M:%SZ",
+    "%Y-%m-%dT%H:%M:%OSZ",
+    "%Y-%m-%d %H:%M:%S"
+  )
+
   DT[
     ,
     (colnames(DT)) := lapply(.SD, function(x) {
-      if (date_format(x)) {
-        return(as.Date(x))
-      }
-      if (timestamp_format(x)) {
-        return(as.POSIXct(x, tz = timezone, format = "%Y-%m-%dT%H:%M:%SZ"))
-      }
-      if (timestamp_format2(x)) {
-        return(as.POSIXct(x, tz = timezone, format = "%Y-%m-%dT%H:%M:%OSZ"))
+      if (inherits(x, "character")) {
+        if (date_format(x)) {
+          return(suppressWarnings(as.Date(x)))
+        }
+        for (i in seq_along(from_timestamp)) {
+          if (timestamp_format(x, from_timestamp[i])) {
+            return(
+              suppressWarnings(
+                as.POSIXct(x, tz = timezone, format = to_timestamp[i])
+              )
+            )
+          }
+        }
       }
       x
     }),
