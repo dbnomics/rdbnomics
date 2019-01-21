@@ -1,3 +1,7 @@
+.onAttach <- function(libname, pkgname) {
+  packageStartupMessage("Visit <https://db.nomics.world>.")
+}
+
 .onLoad <- function(libname, pkgname) {
   # To ensure backward compatibility
   pkg <- getNamespace(pkgname)
@@ -18,8 +22,10 @@
   # Package options
   op <- options()
   op.rdbnomics <- list(
-    rdbnomics.mask_compatible_providers = c(
-      "BIS", "ECB", "Eurostat", "FED", "ILO", "IMF", "INSEE", "OECD", "WTO"
+    rdbnomics = c(
+      "api_base_url", "api_version", "authorized_api_version", "curl_config", 
+      "http_ok", "sleep_run", "timestamp_tz", "try_run", "use_readLines",
+      "verbose_warning", "verbose_warning_readLines"
     ),
     rdbnomics.use_readLines = FALSE,
     rdbnomics.sleep_run = 1L,

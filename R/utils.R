@@ -318,3 +318,24 @@ transform_date_timestamp <- function(DT) {
   ]
   invisible()
 }
+
+#-------------------------------------------------------------------------------
+# avoid_partial_argument
+avoid_partial_argument <- function(x) {
+  x <- as.list(x)
+  x <- names(x)
+  x <- no_empty_char(x)
+  if (is.null(x)) {
+    return(invisible())
+  }
+  if (length(x) <= 0) {
+    return(invisible())
+  }
+
+  args_ok <- c(names(formals(rdb)), names(formals(rdb_by_api_link)))
+  args_ok <- args_ok[args_ok %notin% c("...", "api_link")]
+  if (length(setdiff(x, args_ok)) > 0) {
+    stop("Please avoid partial argument matching.", call. = FALSE)
+  }
+  invisible()
+}

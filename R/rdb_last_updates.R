@@ -14,14 +14,14 @@
 #' through the default R internet connection. This can be used to get round the
 #' error \code{Could not resolve host: api.db.nomics.world}.
 #' @param curl_config Curl_handle or list (default \code{NULL}). If not
-#' \code{NULL}, it is used for setting up a specific proxy connection. This
-#' setup is passed to the function \code{curl_fetch_memory} of the package
+#' \code{NULL}, it is used to set up a specific proxy connection. This
+#' configuration is passed to the function \code{curl_fetch_memory} of the package
 #' \pkg{curl}. If it is a \code{curl_handle} object then it is considered to
 #' be the argument \code{handle} of \code{curl_fetch_memory}. In the case of a
-#' list, the names of the object elements are the names of the arguments of
+#' list, the names of the object are the names of the arguments of
 #' \code{curl_fetch_memory}. It means that \code{curl_config = h} is
-#' equivalent to \code{curl_config = list(handle = h)}. For
-#' \code{curl_fetch_memory} arguments see
+#' equivalent to \code{curl_config = list(handle = h)}.  
+#' For \code{curl_fetch_memory} arguments see
 #' \code{\link[curl]{curl_fetch}}.
 #' For available curl options see \code{\link[curl]{curl_options}},
 #' \code{names(curl_options())} and

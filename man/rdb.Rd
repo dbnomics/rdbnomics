@@ -23,8 +23,7 @@ package \pkg{jsonlite}) is applied to generate the json object.}
 \item{mask}{Character string. DBnomics code of one or several masks
 in the specified provider and dataset.}
 
-\item{verbose}{Logical (default \code{getOption("rdbnomics.verbose_warning")}).
-Show warnings of the function.}
+\item{verbose}{Logical (default \code{TRUE}). Show warnings of the function.}
 
 \item{...}{Arguments to be passed to \code{\link{rdb_by_api_link}}. These 
 arguments concern proxy configuration. See \code{\link{rdb_by_api_link}}
@@ -41,7 +40,7 @@ A \code{data.frame} or a \code{data.table}.
 \details{
 This function gives you access to hundreds of millions data series from
 \href{https://api.db.nomics.world/}{DBnomics API} (documentation about
-the API can be found \href{https://api.db.nomics.world/apidocs}{here}).
+the API can be found \href{https://api.db.nomics.world/v22/apidocs}{here}).
 The code of each series is given on the
 \href{https://db.nomics.world/}{DBnomics website}.
 }
@@ -50,6 +49,8 @@ The code of each series is given on the
 ## By ids
 # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+# or when no argument names are given (provider_code -> ids)
+df1 <- rdb('AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 
 # Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 df2 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'AMECO/ZUTN/DNK.1.0.0.0.ZUTN'))
@@ -83,10 +84,12 @@ dim <- paste0(
 df3 <- rdb('WB', 'DB', dimensions = dim)
 
 
-## By mask (only for some providers, check the list here :
-# https://git.nomics.world/dbnomics/dbnomics-api/blob/master/dbnomics_api/application.cfg.)
+## By mask
 # Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF:
 df1 <- rdb('IMF', 'CPI', mask = 'M.DE.PCPIEC_WT')
+# or when no argument names are given except provider_code and dataset_code
+# (ids -> mask)
+df1 <- rdb('IMF', 'CPI', 'M.DE.PCPIEC_WT')
 
 # Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF:
 df2 <- rdb('IMF', 'CPI', mask = 'M.DE+FR.PCPIEC_WT')

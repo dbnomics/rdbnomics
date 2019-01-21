@@ -6,7 +6,7 @@
 #'
 #' This function gives you access to hundreds of millions data series from
 #' \href{https://api.db.nomics.world/}{DBnomics API} (documentation about
-#' the API can be found \href{https://api.db.nomics.world/apidocs}{here}).
+#' the API can be found \href{https://api.db.nomics.world/v22/apidocs}{here}).
 #' The code of each series is given on the
 #' \href{https://db.nomics.world/}{DBnomics website}.
 #'
@@ -19,8 +19,7 @@
 #' package \pkg{jsonlite}) is applied to generate the json object.
 #' @param mask Character string. DBnomics code of one or several masks
 #' in the specified provider and dataset.
-#' @param verbose Logical (default \code{getOption("rdbnomics.verbose_warning")}).
-#' Show warnings of the function.
+#' @param verbose Logical (default \code{TRUE}). Show warnings of the function.
 #' @param ... Arguments to be passed to \code{\link{rdb_by_api_link}}. These 
 #' arguments concern proxy configuration. See \code{\link{rdb_by_api_link}}
 #' for details.
@@ -30,6 +29,8 @@
 #' ## By ids
 #' # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 #' df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+#' # or when no argument names are given (provider_code -> ids)
+#' df1 <- rdb('AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 #' 
 #' # Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 #' df2 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'AMECO/ZUTN/DNK.1.0.0.0.ZUTN'))
@@ -63,10 +64,12 @@
 #' df3 <- rdb('WB', 'DB', dimensions = dim)
 #' 
 #' 
-#' ## By mask (only for some providers, check the list here :
-#' # https://git.nomics.world/dbnomics/dbnomics-api/blob/master/dbnomics_api/application.cfg.)
+#' ## By mask
 #' # Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF:
 #' df1 <- rdb('IMF', 'CPI', mask = 'M.DE.PCPIEC_WT')
+#' # or when no argument names are given except provider_code and dataset_code
+#' # (ids -> mask)
+#' df1 <- rdb('IMF', 'CPI', 'M.DE.PCPIEC_WT')
 #' 
 #' # Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF:
 #' df2 <- rdb('IMF', 'CPI', mask = 'M.DE+FR.PCPIEC_WT')
@@ -107,6 +110,10 @@ rdb <- function(
   verbose = getOption("rdbnomics.verbose_warning"),
   ...
 ) {
+  # Avoid partial argument names
+  fcall <- sys.call()
+  avoid_partial_argument(fcall)
+
   # Checking 'verbose'
   check_argument(verbose, "logical")
 
@@ -137,6 +144,76 @@ rdb <- function(
   ids_null <- is.null(ids)
   ids_not_null <- !ids_null
 
+  # provider_code is considered as ids in some cases
+  if (
+    provider_code_not_null & dataset_code_null & dimensions_null & mask_null &
+    ids_null
+  ) {
+    fcall <- sys.call()
+    fcall <- as.list(fcall)
+    fcall <- names(fcall)
+
+    modif_arg <- FALSE
+    if (is.null(fcall)) {
+      modif_arg <- TRUE
+    }
+    if (!is.null(fcall)) {
+      fcall <- no_empty_char(fcall)
+      fcall <- fcall[fcall %notin% names(formals(rdb_by_api_link))]
+      if (length(fcall) <= 0) {
+        modif_arg <- TRUE
+      }
+    }
+
+    if (modif_arg) {
+      ids <- provider_code
+      provider_code <- NULL
+
+      provider_code_null <- TRUE
+      provider_code_not_null <- !provider_code_null
+
+      ids_null <- FALSE
+      ids_not_null <- !ids_null
+    }
+  }
+
+  # ids is considered as mask in some cases
+  if (
+    provider_code_not_null & dataset_code_not_null & dimensions_null &
+    mask_null & ids_not_null
+  ) {
+    fcall <- sys.call()
+    fcall <- as.list(fcall)
+    fcall <- names(fcall)
+
+    modif_arg <- FALSE
+    if (is.null(fcall)) {
+      modif_arg <- TRUE
+    }
+    if (!is.null(fcall)) {
+      fcall <- no_empty_char(fcall)
+      fcall <- fcall[fcall %notin% names(formals(rdb_by_api_link))]
+      if (
+        identical(fcall, "provider_code") | identical(fcall, "dataset_code") |
+        identical(sort(fcall), c("dataset_code", "provider_code")) |
+        identical(fcall, character())
+      ) {
+        modif_arg <- TRUE
+      }
+    }
+
+    if (modif_arg) {
+      mask <- ids
+      ids <- NULL
+    
+      mask_null <- FALSE
+      mask_not_null <- !mask_null
+      
+      ids_null <- TRUE
+      ids_not_null <- !ids_null
+    }
+  }
+
   # By dimensions
   if (dimensions_not_null) {
     if (provider_code_null | dataset_code_null) {
@@ -154,12 +231,12 @@ rdb <- function(
     check_argument(dataset_code, "character", not_null = FALSE)
 
     if (api_version == 21) {
-      api_link <- paste0(
+      link <- paste0(
         api_base_url, "?provider_code=", provider_code,
         "&dataset_code=", dataset_code, "&dimensions=", dimensions
       )
     } else if (api_version == 22) {
-      api_link <- paste0(
+      link <- paste0(
         api_base_url, "/", provider_code, "/", dataset_code,
         "?observations=1&dimensions=", dimensions
       )
@@ -167,7 +244,7 @@ rdb <- function(
       stop(paste0("Don't know what to do for API version ", api_version, "."))
     }
 
-    return(rdb_by_api_link(api_link, ...))
+    return(rdb_by_api_link(api_link = link, ...))
   }
 
   # By mask
@@ -185,47 +262,13 @@ rdb <- function(
     check_argument(provider_code, "character", not_null = FALSE)
     check_argument(dataset_code, "character", not_null = FALSE)
 
-    mcp <- getOption("rdbnomics.mask_compatible_providers")
-    mcp_null <- is.null(mcp)
-    mcp_not_null <- !mcp_null
-
-    if (mcp_not_null) {
-      if (!is.character(mcp)) {
-        stop(
-          paste0(
-            "The vector of providers compatible with the argument 'mask' ",
-            "must be of class 'character'."
-          )
-        )
-      }
-      if (length(mcp) <= 0) {
-        stop(
-          paste0(
-            "The vector of providers compatible with the argument 'mask' ",
-            "is empty."
-          )
-        )
-      }
-
-      if (provider_code %notin% mcp) {
-        stop(
-          paste0(
-            "To use the argument 'mask', the provider must be in the ",
-            "vector : '",
-            paste0(mcp, collapse = "', '"),
-            "'."
-          )
-        )
-      }
-    }
-
     if (api_version == 21) {
-      api_link <- paste0(
+      link <- paste0(
         api_base_url, "?provider_code=", provider_code,
         "&dataset_code=", dataset_code, "&series_code_mask=", mask
       )
     } else if (api_version == 22) {
-      api_link <- paste0(
+      link <- paste0(
         api_base_url, "/", provider_code, "/", dataset_code,
         "/", mask, "?observations=1"
       )
@@ -233,7 +276,7 @@ rdb <- function(
       stop(paste0("Don't know what to do for API version ", api_version, "."))
     }
 
-    return(rdb_by_api_link(api_link, ...))
+    return(rdb_by_api_link(api_link = link, ...))
   }
 
   # By ids
@@ -257,18 +300,18 @@ rdb <- function(
     }
 
     if (api_version == 21) {
-      api_link <- paste0(
+      link <- paste0(
         api_base_url, "?series_ids=", paste(ids, collapse = ",")
       ) 
     } else if (api_version == 22) {
-      api_link <- paste0(
+      link <- paste0(
         api_base_url, "?observations=1&series_ids=", paste(ids, collapse = ",")
       )
     } else {
       stop(paste0("Don't know what to do for API version ", api_version, "."))
     }
 
-    return(rdb_by_api_link(api_link, ...))
+    return(rdb_by_api_link(api_link = link, ...))
   }
 
   stop("Please provide correct 'dimensions', 'mask' or 'ids'.")

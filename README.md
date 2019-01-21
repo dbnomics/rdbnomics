@@ -43,7 +43,12 @@ df2 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'AMECO/ZUTN/DNK.1.0.0.0.ZUTN'
 df3 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'IMF/CPI/A.AT.PCPIT_IX'))
 ```
 
-Fetch time series by `mask` (only for some providers, check the <a href="https://git.nomics.world/dbnomics/dbnomics-api/blob/master/dbnomics_api/application.cfg" target="_blank">list</a>) :
+In the event that you only use the argument `ids`, you can drop it and run :
+```r
+df <- rdb('AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+```
+
+Fetch time series by `mask` :
 ```r
 # Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF:
 df1 <- rdb('IMF', 'CPI', mask = 'M.DE.PCPIEC_WT')
@@ -56,6 +61,11 @@ df3 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_WT')
 
 # Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF:
 df4 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_IX+PCPIA_IX')
+```
+
+In the event that you only use the arguments `provider_code`, `dataset_code` and `mask`, you can drop the name `mask` and run :
+```r
+df <- rdb('IMF', 'CPI', 'M.DE.PCPIEC_WT')
 ```
 
 Fetch time series by `dimensions` :
@@ -91,11 +101,11 @@ To get round this situation, you have two options :
 
 1. configure **curl** to use a specific and authorized proxy.
 
-2. use the default R internet connection i.e. the Internet Explorer proxy setting defined in *internet2.dll*.
+2. use the default R internet connection i.e. the Internet Explorer proxy defined in *internet2.dll*.
 
-### Set up **curl** to use a specific and authorized proxy
-In **rdbnomics**, by default the function `curl_fetch_memory` (of the package **curl**) is used to fetch the data. If a specific proxy must be used, it is possible to set it up permanently with the package option `rdbnomics.curl_config` or on the fly through the argument `curl_config`. Thus the object is passed to the argument `handle` of the `curl_fetch_memory` function.  
-To see the available parameters, run `names(curl_options())` in R or visit the website <a href="https://curl.haxx.se/libcurl/c/curl_easy_setopt.html" target="_blank">https://curl.haxx.se/libcurl/c/curl_easy_setopt.html</a>. Once they are chosen, you define them as follows :
+### Configure **curl** to use a specific and authorized proxy
+In **rdbnomics**, by default the function `curl_fetch_memory` (of the package **curl**) is used to fetch the data. If a specific proxy must be used, it is possible to define it permanently with the package option `rdbnomics.curl_config` or on the fly through the argument `curl_config`. In that way the object is passed to the argument `handle` of the `curl_fetch_memory` function.  
+To see the available parameters, run `names(curl_options())` in *R* or visit the website <a href="https://curl.haxx.se/libcurl/c/curl_easy_setopt.html" target="_blank">https://curl.haxx.se/libcurl/c/curl_easy_setopt.html</a>. Once they are chosen, you define them as follows :
 ```r
 h <- curl::new_handle(
   proxy = "<proxy>",
@@ -105,19 +115,19 @@ h <- curl::new_handle(
 )
 options(rdbnomics.curl_config = h)
 ```
-When fetching the data, the command `curl_fetch_memory(url = <...>, handle = h)` is executed. In the event that you want to set up others arguments, use :
+When fetching the data, the command `curl_fetch_memory(url = <...>, handle = h)` is executed. In the event that you want to add others arguments, use :
 ```r
 options(rdbnomics.curl_config = list(handle = h, arg = <...>))
 ```
-After setting up the option, just use the standard functions of **rdbnomics** :
+After configuration, just use the standard functions of **rdbnomics** :
 ```r
 df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 ```
-This option of the package can be reset by executing :
+This option of the package can be disabled :
 ```r
 options(rdbnomics.curl = NULL)
 ```
-If a complete configuration is not needed but just an "on the fly" execution, then use :
+If a complete configuration is not needed but just an "on the fly" execution, then use the argument `curl_config` of the functions `rdb` and `rdb_...` :
 ```r
 h <- curl::new_handle(
   proxy = "<proxy>",
@@ -137,7 +147,7 @@ And then use the standard function as follows :
 ```r
 df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 ```
-This configuration can be reset by executing :
+This configuration can be disabled :
 ```r
 options(rdbnomics.use_readLines = FALSE)
 ```
