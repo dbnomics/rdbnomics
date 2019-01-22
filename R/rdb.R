@@ -110,10 +110,6 @@ rdb <- function(
   verbose = getOption("rdbnomics.verbose_warning"),
   ...
 ) {
-  # Avoid partial argument names
-  fcall <- sys.call()
-  avoid_partial_argument(fcall)
-
   # Checking 'verbose'
   check_argument(verbose, "logical")
 
@@ -150,20 +146,7 @@ rdb <- function(
     ids_null
   ) {
     fcall <- sys.call()
-    fcall <- as.list(fcall)
-    fcall <- names(fcall)
-
-    modif_arg <- FALSE
-    if (is.null(fcall)) {
-      modif_arg <- TRUE
-    }
-    if (!is.null(fcall)) {
-      fcall <- no_empty_char(fcall)
-      fcall <- fcall[fcall %notin% names(formals(rdb_by_api_link))]
-      if (length(fcall) <= 0) {
-        modif_arg <- TRUE
-      }
-    }
+    modif_arg <- call_ok(fcall)
 
     if (modif_arg) {
       ids <- provider_code
@@ -183,24 +166,7 @@ rdb <- function(
     mask_null & ids_not_null
   ) {
     fcall <- sys.call()
-    fcall <- as.list(fcall)
-    fcall <- names(fcall)
-
-    modif_arg <- FALSE
-    if (is.null(fcall)) {
-      modif_arg <- TRUE
-    }
-    if (!is.null(fcall)) {
-      fcall <- no_empty_char(fcall)
-      fcall <- fcall[fcall %notin% names(formals(rdb_by_api_link))]
-      if (
-        identical(fcall, "provider_code") | identical(fcall, "dataset_code") |
-        identical(sort(fcall), c("dataset_code", "provider_code")) |
-        identical(fcall, character())
-      ) {
-        modif_arg <- TRUE
-      }
-    }
+    modif_arg <- call_ok(fcall)
 
     if (modif_arg) {
       mask <- ids

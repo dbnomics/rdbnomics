@@ -339,3 +339,35 @@ avoid_partial_argument <- function(x) {
   }
   invisible()
 }
+
+#-------------------------------------------------------------------------------
+# correct_argument
+correct_argument <- function() {
+  args_ok <- c(names(formals(rdb)), names(formals(rdb_by_api_link)))
+  args_ok[args_ok %notin% c("...", "api_link")]
+}
+
+#-------------------------------------------------------------------------------
+# call_ok
+call_ok <- function(x) {
+  x <- as.list(x)
+  x <- names(x)
+
+  modif_arg <- FALSE
+  if (is.null(x)) {
+    modif_arg <- TRUE
+  }
+  if (!is.null(x)) {
+    x <- no_empty_char(x)
+    if (length(x) <= 0) {
+      modif_arg <- TRUE
+    } else {
+      x <- pmatch(x, correct_argument(), duplicates.ok = TRUE)
+      if (sum(is.na(x)) <= 0) {
+        modif_arg <- TRUE
+      }
+    }
+  }
+
+  modif_arg
+}
