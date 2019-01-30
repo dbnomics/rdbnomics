@@ -6,7 +6,11 @@
 #-------------------------------------------------------------------------------
 # get_data
 get_data <- function(x, userl, curl_args, run = 0) {
-  if (run > 0) { Sys.sleep(getOption("rdbnomics.sleep_run")) }
+  if (run > 0) {
+    sys_sleep <- getOption("rdbnomics.sleep_run")
+    check_argument(sys_sleep, c("integer", "numeric"))
+    Sys.sleep(sys_sleep)
+  }
   
   tryCatch({
     if (userl) {
@@ -17,7 +21,9 @@ get_data <- function(x, userl, curl_args, run = 0) {
         }
       }
       
-      if (getOption("rdbnomics.verbose_warning_readLines")) {
+      verb_warn_rl <- getOption("rdbnomics.verbose_warning_readLines")
+      check_argument(verb_warn_rl, "logical")
+      if (verb_warn_rl) {
         response <- try(readLines(x), silent = TRUE)
       } else {
         response <- try(suppressWarnings(readLines(x)), silent = TRUE)
@@ -61,7 +67,10 @@ get_data <- function(x, userl, curl_args, run = 0) {
       response <- do.call(curl::curl_fetch_memory, c(list(url = x), curl_args))
       check_x <- curl::parse_headers(response$headers)
       check_x <- utils::head(check_x, 1)
-      if (grepl(getOption("rdbnomics.http_ok"), toupper(check_x))) {
+
+      http_ok <- getOption("rdbnomics.http_ok")
+      check_argument(http_ok, "character")
+      if (grepl(http_ok, toupper(check_x))) {
         response <- rawToChar(response$content)
         jsonlite::fromJSON(response)
       } else {
@@ -69,7 +78,21 @@ get_data <- function(x, userl, curl_args, run = 0) {
       }
     }
   }, error = function(e) {
-    if (run < getOption("rdbnomics.try_run")) {
+    try_run <- getOption("rdbnomics.try_run")
+    check_argument(try_run, c("integer", "numeric"))
+    
+    myerror <- try(
+      grepl("'curl_config'", e$message) |
+      grepl("BAD[[:blank:]]+REQUEST", toupper(e$message)),
+      silent = TRUE
+    )
+    if (!inherits(myerror, "try-error")) {
+      if (myerror) {
+        try_run <- -1L
+      }
+    }
+
+    if (run < try_run) {
       get_data(x, userl, curl_args, run = run + 1)
     } else {
       stop(e)
@@ -81,7 +104,7 @@ get_data <- function(x, userl, curl_args, run = 0) {
 # deploy
 deploy <- function(DT, columns = NULL, reference_column = "value") {
   if (!data.table::is.data.table(DT)) {
-    stop("DT is not a data.table.")
+    stop("DT is not a data.table.", call. = FALSE)
   }
 
   if (nrow(DT) <= 0) { return(DT) }
@@ -180,7 +203,7 @@ get_version <- function(x) {
   } else if ("version" %in% names(x$`_meta`)) {
     api_version <- numeric_version(x$`_meta`$version)
   } else {
-    stop("Can't find the version.")
+    stop("Can't find the version.", call. = FALSE)
   }
   api_version <- unlist(api_version)
   api_version <- api_version[api_version != 0]
@@ -193,25 +216,28 @@ get_version <- function(x) {
 # authorized_version
 authorized_version <- function(x) {
   versions <- getOption("rdbnomics.authorized_api_version")
+  check_argument(versions, c("integer", "numeric"), len = FALSE)
 
   name <- deparse(substitute(versions))
   if (is.null(versions)) {
-    stop(paste0(name, " cannot be NULL."))
+    stop(paste0(name, " cannot be NULL."), call. = FALSE)
   }
   if (!inherits(versions, c("numeric", "integer"))) {
     stop(
-      paste0(name, " must be of class 'integer' or 'numeric'.")
+      paste0(name, " must be of class 'integer' or 'numeric'."),
+      call. = FALSE
     )
   }
   if (length(versions) <= 0) {
-    stop(paste0(name, " must be of length greater than 0."))
+    stop(paste0(name, " must be of length greater than 0."), call. = FALSE)
   }
   
   if (x %notin% versions) {
     stop(
       paste0(
         "Only versions ", paste0(versions, collapse = ", "), " are supported."
-      )
+      ),
+      call. = FALSE
     )
   }
   invisible()
@@ -248,15 +274,20 @@ timestamp_format <- function(x, y) {
 check_argument <- function(x, type, len = TRUE, n = 1, not_null = TRUE) {
   name <- deparse(substitute(x))
   if (not_null) {
-    if (is.null(x)) { stop(paste0(name, " cannot be NULL.")) }
+    if (is.null(x)) { stop(paste0(name, " cannot be NULL."), call. = FALSE) }
   }
   if (!inherits(x, type)) {
     stop(
-      paste0(name, " must be of class '", paste0(type, collapse = "', '"), "'.")
+      paste0(
+        name, " must be of class '", paste0(type, collapse = "', '"), "'."
+      ),
+      call. = FALSE
     )
   }
   if (len) {
-    if (length(x) != n) { stop(paste0(name, " must be of length ", n, ".")) }
+    if (length(x) != n) {
+      stop(paste0(name, " must be of length ", n, "."), call. = FALSE)
+    }
   }
   invisible()
 }
@@ -265,12 +296,16 @@ check_argument <- function(x, type, len = TRUE, n = 1, not_null = TRUE) {
 # to_json_if_list
 to_json_if_list <- function(x) {
   if (inherits(x, "list")) {
-    if (is.null(names(x))) { stop("The list 'dimensions' must be named.") }
-    if (length(x) <= 0) { stop("The list 'dimensions' is empty.") }
+    if (is.null(names(x))) {
+      stop("The list 'dimensions' must be named.", call. = FALSE)
+    }
+    if (length(x) <= 0) {
+      stop("The list 'dimensions' is empty.", call. = FALSE)
+    }
     nm <- names(x)
     nm <- no_empty_char(nm)
     if (length(x) != length(nm)) {
-      stop("All elements of 'dimensions' must be named.")
+      stop("All elements of 'dimensions' must be named.", call. = FALSE)
     }
     return(jsonlite::toJSON(x))
   }

@@ -20,13 +20,7 @@
   )
 
   # Package options
-  op <- options()
-  op.rdbnomics <- list(
-    rdbnomics = c(
-      "api_base_url", "api_version", "authorized_api_version", "curl_config", 
-      "http_ok", "sleep_run", "timestamp_tz", "try_run", "use_readLines",
-      "verbose_warning", "verbose_warning_readLines"
-    ),
+  opts <- list(
     rdbnomics.use_readLines = FALSE,
     rdbnomics.sleep_run = 1L,
     rdbnomics.try_run = 2L,
@@ -37,8 +31,17 @@
     rdbnomics.verbose_warning_readLines = FALSE,
     rdbnomics.timestamp_tz = "GMT",
     rdbnomics.http_ok = "200[[:blank:]]+OK$",
-    rdbnomics.curl_config = NULL
+    rdbnomics.curl_config = NULL,
+    rdbnomics.rdb_no_arg = TRUE
   )
+  opts <- append(
+    opts,
+    list(rdbnomics = sort(gsub("rdbnomics\\.", "", names(opts)))),
+    0
+  )
+
+  op <- options()
+  op.rdbnomics <- opts
   toset <- !(names(op.rdbnomics) %in% names(op))
   if(any(toset)) options(op.rdbnomics[toset])
   invisible()

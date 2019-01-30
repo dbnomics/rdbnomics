@@ -9,24 +9,27 @@ rdb(provider_code = NULL, dataset_code = NULL, ids = NULL,
   verbose = getOption("rdbnomics.verbose_warning"), ...)
 }
 \arguments{
-\item{provider_code}{Character string. DBnomics code of the provider.}
+\item{provider_code}{Character string (default \code{NULL}). DBnomics code
+of the provider.}
 
-\item{dataset_code}{Character string. DBnomics code of the dataset.}
+\item{dataset_code}{Character string (default \code{NULL}). DBnomics code
+of the dataset.}
 
-\item{ids}{Character string. DBnomics code of one or several series.}
+\item{ids}{Character string (default \code{NULL}). DBnomics code of one or
+several series.}
 
-\item{dimensions}{List or character string (single quoted). DBnomics
-code of one or several dimensions in the specified provider and dataset.
+\item{dimensions}{List or character string (single quoted)  (default \code{NULL}).
+DBnomics code of one or several dimensions in the specified provider and dataset.
 If it is a named list, then the function \code{toJSON} (from the
 package \pkg{jsonlite}) is applied to generate the json object.}
 
-\item{mask}{Character string. DBnomics code of one or several masks
-in the specified provider and dataset.}
+\item{mask}{Character string (default \code{NULL}). DBnomics code of one or
+several masks in the specified provider and dataset.}
 
 \item{verbose}{Logical (default \code{TRUE}). Show warnings of the function.}
 
 \item{...}{Arguments to be passed to \code{\link{rdb_by_api_link}}. These 
-arguments concern proxy configuration. See \code{\link{rdb_by_api_link}}
+arguments concern connection configuration. See \code{\link{rdb_by_api_link}}
 for details.}
 }
 \value{
@@ -42,35 +45,41 @@ This function gives you access to hundreds of millions data series from
 \href{https://api.db.nomics.world/}{DBnomics API} (documentation about
 the API can be found \href{https://api.db.nomics.world/v22/apidocs}{here}).
 The code of each series is given on the
-\href{https://db.nomics.world/}{DBnomics website}.
+\href{https://db.nomics.world/}{DBnomics website}. \cr\cr
+In the event that only the argument \code{ids} is provided (and those in the
+ellipsis \code{...}), the argument name can be dropped. The character string
+vector is directly passed to \code{ids}. \cr
+In the same way, if only \code{provider_code}, \code{dataset_code} and
+\code{mask} are provided then the arguments names can be dropped. The
+last character string is automatically passed to \code{mask}.
 }
 \examples{
 \dontrun{
 ## By ids
-# Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+# Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider :
 df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 # or when no argument names are given (provider_code -> ids)
 df1 <- rdb('AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 
-# Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+# Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider :
 df2 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'AMECO/ZUTN/DNK.1.0.0.0.ZUTN'))
 
-# Fetch two series from different datasets of different providers:
+# Fetch two series from different datasets of different providers :
 df3 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'IMF/CPI/A.AT.PCPIT_IX'))
 
 
 ## By dimensions
-# Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+# Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider :
 df1 <- rdb('AMECO', 'ZUTN', dimensions = list(geo = "ea12"))
 # or
 df1 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12"]}')
 
-# Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+# Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider :
 df2 <- rdb('AMECO', 'ZUTN', dimensions = list(geo = c("ea12", "dnk")))
 # or
 df2 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12", "dnk"]}')
 
-# Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank:
+# Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank :
 dim <- list(
   country = c("DZ", "PE"),
   indicator = c("ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS")
@@ -85,24 +94,23 @@ df3 <- rdb('WB', 'DB', dimensions = dim)
 
 
 ## By mask
-# Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF:
+# Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF :
 df1 <- rdb('IMF', 'CPI', mask = 'M.DE.PCPIEC_WT')
-# or when no argument names are given except provider_code and dataset_code
-# (ids -> mask)
+# or when no argument names are given except provider_code and dataset_code (ids -> mask)
 df1 <- rdb('IMF', 'CPI', 'M.DE.PCPIEC_WT')
 
-# Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF:
+# Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF :
 df2 <- rdb('IMF', 'CPI', mask = 'M.DE+FR.PCPIEC_WT')
 
-# Fetch all series along one dimension from dataset 'Consumer Price Index' (CPI) of IMF:
+# Fetch all series along one dimension from dataset 'Consumer Price Index' (CPI) of IMF :
 df3 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_WT')
 
-# Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF:
+# Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF :
 df4 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_IX+PCPIA_IX')
 
 
 ## Use a specific proxy to fetch the data
-# Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+# Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider :
 h <- curl::new_handle(
   proxy = "<proxy>",
   proxyport = <port>,
@@ -116,7 +124,7 @@ df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', curl_config = h)
 
 
 ## Use R default connection to avoid a proxy failure (in some cases)
-# Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+# Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider :
 options(rdbnomics.use_readLines = TRUE)
 df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 # or to use once

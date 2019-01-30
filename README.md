@@ -27,19 +27,19 @@ library(rdbnomics)
 
 After installation, a vignette is available to the user :
 ```r
-vignette("rdbnomics-tutorial")
+vignette("rdbnomics")
 ```
 
 ## Examples
 Fetch time series by `ids` :
 ```r
-# Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+# Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider :
 df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 
-# Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+# Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider :
 df2 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'AMECO/ZUTN/DNK.1.0.0.0.ZUTN'))
 
-# Fetch two series from different datasets of different providers:
+# Fetch two series from different datasets of different providers :
 df3 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'IMF/CPI/A.AT.PCPIT_IX'))
 ```
 
@@ -50,16 +50,16 @@ df <- rdb('AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 
 Fetch time series by `mask` :
 ```r
-# Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF:
+# Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF :
 df1 <- rdb('IMF', 'CPI', mask = 'M.DE.PCPIEC_WT')
 
-# Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF:
+# Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF :
 df2 <- rdb('IMF', 'CPI', mask = 'M.DE+FR.PCPIEC_WT')
 
-# Fetch all series along one dimension from dataset 'Consumer Price Index' (CPI) of IMF:
+# Fetch all series along one dimension from dataset 'Consumer Price Index' (CPI) of IMF :
 df3 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_WT')
 
-# Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF:
+# Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF :
 df4 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_IX+PCPIA_IX')
 ```
 
@@ -70,17 +70,17 @@ df <- rdb('IMF', 'CPI', 'M.DE.PCPIEC_WT')
 
 Fetch time series by `dimensions` :
 ```r
-# Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+# Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider :
 df1 <- rdb('AMECO', 'ZUTN', dimensions = list(geo = "ea12"))
 # or
 df1 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12"]}')
 
-# Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+# Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider :
 df2 <- rdb('AMECO', 'ZUTN', dimensions = list(geo = c("ea12", "dnk")))
 # or
 df2 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12", "dnk"]}')
 
-# Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank:
+# Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank :
 df3 <- rdb('WB', 'DB', dimensions = list(country = c("DZ", "PE"), indicator = c("ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS")))
 # or
 df3 <- rdb('WB', 'DB', dimensions = '{"country": ["DZ", "PE"], "indicator": ["ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"]}')
@@ -92,12 +92,12 @@ df1 <- rdb_by_api_link('https://api.db.nomics.world/v22/series/WB/DB?dimensions=
 ```
 
 ## Proxy configuration or connection error `Could not resolve host`
-When using the functions `rdb` or `rdb_by_api_link`, you may come across the following error :
+When using the functions `rdb` or `rdb_...`, you may come across the following error :
 ```r
 Error in open.connection(con, "rb") :
   Could not resolve host: api.db.nomics.world
 ```
-To get round this situation, you have two options :
+To get round this situation, you have two possibilities :
 
 1. configure **curl** to use a specific and authorized proxy.
 
@@ -105,7 +105,7 @@ To get round this situation, you have two options :
 
 ### Configure **curl** to use a specific and authorized proxy
 In **rdbnomics**, by default the function `curl_fetch_memory` (of the package **curl**) is used to fetch the data. If a specific proxy must be used, it is possible to define it permanently with the package option `rdbnomics.curl_config` or on the fly through the argument `curl_config`. In that way the object is passed to the argument `handle` of the `curl_fetch_memory` function.  
-To see the available parameters, run `names(curl_options())` in *R* or visit the website <a href="https://curl.haxx.se/libcurl/c/curl_easy_setopt.html" target="_blank">https://curl.haxx.se/libcurl/c/curl_easy_setopt.html</a>. Once they are chosen, you define them as follows :
+To see the available parameters, run `names(curl_options())` in *R* or visit the website <a href="https://curl.haxx.se/libcurl/c/curl_easy_setopt.html" target="_blank">https://curl.haxx.se/libcurl/c/curl_easy_setopt.html</a>. Once they are chosen, you define the curl object as follows :
 ```r
 h <- curl::new_handle(
   proxy = "<proxy>",
@@ -113,33 +113,37 @@ h <- curl::new_handle(
   proxyusername = "<username>",
   proxypassword = "<password>"
 )
+```
+
+#### Set the connection up for a session
+The curl connection can be set up for a session by modifying the following package option :
+```r
 options(rdbnomics.curl_config = h)
 ```
 When fetching the data, the command `curl_fetch_memory(url = <...>, handle = h)` is executed. In the event that you want to add others arguments, use :
 ```r
 options(rdbnomics.curl_config = list(handle = h, arg = <...>))
 ```
-After configuration, just use the standard functions of **rdbnomics** :
+After configuration, just use the standard functions of **rdbnomics** e.g. :
 ```r
 df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 ```
-This option of the package can be disabled :
+This option of the package can be disabled with :
 ```r
 options(rdbnomics.curl = NULL)
 ```
+
+#### Use the connection only for a function call
 If a complete configuration is not needed but just an "on the fly" execution, then use the argument `curl_config` of the functions `rdb` and `rdb_...` :
 ```r
-h <- curl::new_handle(
-  proxy = "<proxy>",
-  proxyport = <port>,
-  proxyusername = "<username>",
-  proxypassword = "<password>"
-)
 df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', curl_config = h)
 ```
 
 ### Use the default R internet connection
-To retrieve the data with the default R internet connection, **rdbnomics** will use the base function `readLines`. To activate this feature, you need to enable an option of the package :
+To retrieve the data with the default R internet connection, **rdbnomics** will use the base function `readLines`.
+
+#### Set the connection up for a session
+To activate this feature for a session, you need to enable an option of the package :
 ```r
 options(rdbnomics.use_readLines = TRUE)
 ```
@@ -147,11 +151,16 @@ And then use the standard function as follows :
 ```r
 df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 ```
-This configuration can be disabled :
+This configuration can be disabled with :
 ```r
 options(rdbnomics.use_readLines = FALSE)
 ```
+
+#### Use the connection only for a function call
 If you just want to do it once, you may use the argument `use_readLines` of the functions `rdb` and `rdb_...` :
 ```r
 df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', use_readLines = TRUE)
 ```
+
+## P.S.
+Visit <a href="https://db.nomics.world/" target="_blank">https://db.nomics.world/</a> !
