@@ -1,6 +1,6 @@
 # rdbnomics 0.4.6
 
-* Internal function `deploy` better handle recursive lists.
+* Internal function `deploy` better handles recursive lists.
 
 # rdbnomics 0.4.5
 
