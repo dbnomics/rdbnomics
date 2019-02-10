@@ -126,50 +126,22 @@ deploy <- function(DT, columns = NULL, reference_column = "value") {
       to_list_length <- length(y[[reference_column]][[1]])
 
       # Transform lists into vectors
-      env <- environment()
-      env$add_col <- NULL
       if (is.null(columns)) {
-        y <- lapply(y, function(v) {
+        for (iv in names(y)) {
+          v <- y[[iv]]
           if (inherits(v, "list")) {
             v <- unlist(v)
             if (length(v) == 1) {
               # New col
-              env$add_col <- append(
-                env$add_col,
-                stats::setNames(list(paste0(trim(v), ",")), trim(v))
-              )
-              v <- "to_rm"
+              y[[iv]] <- paste0(trim(v), ",")
             } else if ((length(v) == to_list_length + 1) | (length(v) == 2)) {
               # New col
-              env$add_col <- append(
-                env$add_col,
-                stats::setNames(
-                  list(paste0(trim(v[1]), ",", utils::tail(v, -1))),
-                  trim(v[1])
-                )
-              )
-              v <- "to_rm"
+              y[[iv]] <- paste0(trim(v[1]), ",", utils::tail(v, -1))
             } else if (length(v) != to_list_length) {
-              v <- paste(unique(v), collapse = ",")
+              y[[iv]] <- paste(unique(v), collapse = ",")
+            } else {
+              y[[iv]] <- v
             }
-          }
-          v
-        })
-
-        if (!is.null(env$add_col)) {
-          if (length(env$add_col) > 0) {
-            to_rm_col <- sapply(y, function(x) {
-              identical(unique(x), "to_rm")
-            })
-            to_rm_col <- to_rm_col[to_rm_col == 1]
-            to_rm_col <- names(to_rm_col)
-            y[to_rm_col] <- NULL
-            env$add_col <- stats::setNames(
-              env$add_col,
-              # paste(to_rm_col, names(env$add_col), sep = "_")
-              to_rm_col
-            )
-            y <- append(y, env$add_col)
           }
         }
       } else {
@@ -366,28 +338,37 @@ transform_date_timestamp <- function(DT) {
     "%Y-%m-%d %H:%M:%S"
   )
 
-  DT[
-    ,
-    (colnames(DT)) := lapply(.SD, function(x) {
-      if (inherits(x, "character")) {
-        if (date_format(x)) {
-          return(suppressWarnings(as.Date(x)))
-        }
-        for (i in seq_along(from_timestamp)) {
-          if (timestamp_format(x, from_timestamp[i])) {
-            return(
-              suppressWarnings(
-                as.POSIXct(x, tz = timezone, format = to_timestamp[i])
+  cols <- copy(colnames(DT))
+  cols <- cols[
+    (tolower(cols) != "observations_attributes") &
+    !grepl("name$", tolower(cols))
+  ]
+
+  if (length(cols) > 0) {
+    DT[
+      ,
+      (cols) := lapply(.SD, function(x) {
+        if (inherits(x, "character")) {
+          if (date_format(x)) {
+            return(suppressWarnings(as.Date(x)))
+          }
+          for (i in seq_along(from_timestamp)) {
+            if (timestamp_format(x, from_timestamp[i])) {
+              return(
+                suppressWarnings(
+                  as.POSIXct(x, tz = timezone, format = to_timestamp[i])
+                )
               )
-            )
+            }
           }
         }
-      }
-      x
-    }),
-    .SDcols = colnames(DT)
-  ]
-  invisible()
+        x
+      }),
+      .SDcols = cols
+    ]
+  }
+
+  invisible(DT)
 }
 
 #-------------------------------------------------------------------------------
