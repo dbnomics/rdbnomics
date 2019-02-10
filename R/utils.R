@@ -126,16 +126,52 @@ deploy <- function(DT, columns = NULL, reference_column = "value") {
       to_list_length <- length(y[[reference_column]][[1]])
 
       # Transform lists into vectors
+      env <- environment()
+      env$add_col <- NULL
       if (is.null(columns)) {
         y <- lapply(y, function(v) {
           if (inherits(v, "list")) {
             v <- unlist(v)
-            if (length(v) != to_list_length) {
-              v <- paste(v, collapse = ",")
+            if (length(v) == 1) {
+              # New col
+              env$add_col <- append(
+                env$add_col,
+                stats::setNames(list(paste0(trim(v), ",")), trim(v))
+              )
+              v <- "to_rm"
+            } else if ((length(v) == to_list_length + 1) | (length(v) == 2)) {
+              # New col
+              env$add_col <- append(
+                env$add_col,
+                stats::setNames(
+                  list(paste0(trim(v[1]), ",", utils::tail(v, -1))),
+                  trim(v[1])
+                )
+              )
+              v <- "to_rm"
+            } else if (length(v) != to_list_length) {
+              v <- paste(unique(v), collapse = ",")
             }
           }
           v
         })
+
+        if (!is.null(env$add_col)) {
+          if (length(env$add_col) > 0) {
+            to_rm_col <- sapply(y, function(x) {
+              identical(unique(x), "to_rm")
+            })
+            to_rm_col <- to_rm_col[to_rm_col == 1]
+            to_rm_col <- names(to_rm_col)
+            y[to_rm_col] <- NULL
+            env$add_col <- stats::setNames(
+              env$add_col,
+              # paste(to_rm_col, names(env$add_col), sep = "_")
+              to_rm_col
+            )
+            y <- append(y, env$add_col)
+          }
+        }
       } else {
         for (i in columns) {
           y[[i]] <- unlist(y[[i]])
