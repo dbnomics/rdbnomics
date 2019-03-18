@@ -1,3 +1,7 @@
+# rdbnomics 0.4.7
+
+* Use of `metadata` from the API to download less data.
+
 # rdbnomics 0.4.6
 
 * Internal function `deploy` better handles recursive lists.

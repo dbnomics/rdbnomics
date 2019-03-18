@@ -30,7 +30,7 @@
 #' @examples
 #' \dontrun{
 #' rdb_last_updates()
-#' 
+#'
 #' rdb_last_updates(all = TRUE)
 #' }
 #' @seealso \code{\link{rdb_providers}}

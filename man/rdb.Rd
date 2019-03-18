@@ -28,7 +28,7 @@ several masks in the specified provider and dataset.}
 
 \item{verbose}{Logical (default \code{TRUE}). Show warnings of the function.}
 
-\item{...}{Arguments to be passed to \code{\link{rdb_by_api_link}}. These 
+\item{...}{Arguments to be passed to \code{\link{rdb_by_api_link}}. These
 arguments concern connection configuration. See \code{\link{rdb_by_api_link}}
 for details.}
 }

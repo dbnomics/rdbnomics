@@ -29,7 +29,7 @@
 #' @param mask Character string (default \code{NULL}). DBnomics code of one or
 #' several masks in the specified provider and dataset.
 #' @param verbose Logical (default \code{TRUE}). Show warnings of the function.
-#' @param ... Arguments to be passed to \code{\link{rdb_by_api_link}}. These 
+#' @param ... Arguments to be passed to \code{\link{rdb_by_api_link}}. These
 #' arguments concern connection configuration. See \code{\link{rdb_by_api_link}}
 #' for details.
 #' @return A \code{data.frame} or a \code{data.table}.
@@ -40,25 +40,25 @@
 #' df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 #' # or when no argument names are given (provider_code -> ids)
 #' df1 <- rdb('AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
-#' 
+#'
 #' # Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider :
 #' df2 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'AMECO/ZUTN/DNK.1.0.0.0.ZUTN'))
-#' 
+#'
 #' # Fetch two series from different datasets of different providers :
 #' df3 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'IMF/CPI/A.AT.PCPIT_IX'))
-#' 
-#' 
+#'
+#'
 #' ## By dimensions
 #' # Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider :
 #' df1 <- rdb('AMECO', 'ZUTN', dimensions = list(geo = "ea12"))
 #' # or
 #' df1 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12"]}')
-#' 
+#'
 #' # Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider :
 #' df2 <- rdb('AMECO', 'ZUTN', dimensions = list(geo = c("ea12", "dnk")))
 #' # or
 #' df2 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12", "dnk"]}')
-#' 
+#'
 #' # Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank :
 #' dim <- list(
 #'   country = c("DZ", "PE"),
@@ -71,24 +71,24 @@
 #'   '"indicator": ["ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"]}'
 #' )
 #' df3 <- rdb('WB', 'DB', dimensions = dim)
-#' 
-#' 
+#'
+#'
 #' ## By mask
 #' # Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF :
 #' df1 <- rdb('IMF', 'CPI', mask = 'M.DE.PCPIEC_WT')
 #' # or when no argument names are given except provider_code and dataset_code (ids -> mask)
 #' df1 <- rdb('IMF', 'CPI', 'M.DE.PCPIEC_WT')
-#' 
+#'
 #' # Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF :
 #' df2 <- rdb('IMF', 'CPI', mask = 'M.DE+FR.PCPIEC_WT')
-#' 
+#'
 #' # Fetch all series along one dimension from dataset 'Consumer Price Index' (CPI) of IMF :
 #' df3 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_WT')
-#' 
+#'
 #' # Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF :
 #' df4 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_IX+PCPIA_IX')
-#' 
-#' 
+#'
+#'
 #' ## Use a specific proxy to fetch the data
 #' # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider :
 #' h <- curl::new_handle(
@@ -101,8 +101,8 @@
 #' df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 #' # or to use once
 #' df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', curl_config = h)
-#' 
-#' 
+#'
+#'
 #' ## Use R default connection to avoid a proxy failure (in some cases)
 #' # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider :
 #' options(rdbnomics.use_readLines = TRUE)
@@ -130,6 +130,12 @@ rdb <- function(
   check_argument(api_version, c("numeric", "integer"))
   authorized_version(api_version)
 
+  # Setting API metadata
+  metadata <- getOption("rdbnomics.metadata")
+  check_argument(metadata, "logical")
+  metadata <- as.numeric(metadata)
+
+  # Building API base url
   api_base_url <- paste0(api_base_url, "/v", api_version, "/series")
 
   # Checking arguments
@@ -141,10 +147,10 @@ rdb <- function(
 
   dimensions_null <- is.null(dimensions)
   dimensions_not_null <- !dimensions_null
-  
+
   mask_null <- is.null(mask)
   mask_not_null <- !mask_null
-  
+
   ids_null <- is.null(ids)
   ids_not_null <- !ids_null
 
@@ -179,10 +185,10 @@ rdb <- function(
     if (modif_arg) {
       mask <- ids
       ids <- NULL
-    
+
       mask_null <- FALSE
       mask_not_null <- !mask_null
-      
+
       ids_null <- TRUE
       ids_not_null <- !ids_null
     }
@@ -213,7 +219,7 @@ rdb <- function(
     } else if (api_version == 22) {
       link <- paste0(
         api_base_url, "/", provider_code, "/", dataset_code,
-        "?observations=1&dimensions=", dimensions
+        "?metadata=", metadata, "&observations=1&dimensions=", dimensions
       )
     } else {
       stop(
@@ -249,7 +255,7 @@ rdb <- function(
     } else if (api_version == 22) {
       link <- paste0(
         api_base_url, "/", provider_code, "/", dataset_code,
-        "/", mask, "?observations=1"
+        "/", mask, "?metadata=", metadata, "&observations=1"
       )
     } else {
       stop(
@@ -284,10 +290,11 @@ rdb <- function(
     if (api_version == 21) {
       link <- paste0(
         api_base_url, "?series_ids=", paste(ids, collapse = ",")
-      ) 
+      )
     } else if (api_version == 22) {
       link <- paste0(
-        api_base_url, "?observations=1&series_ids=", paste(ids, collapse = ",")
+        api_base_url, "?metadata=", metadata, "&observations=1&series_ids=",
+        paste(ids, collapse = ",")
       )
     } else {
       stop(
