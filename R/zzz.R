@@ -32,7 +32,8 @@
     rdbnomics.timestamp_tz = "GMT",
     rdbnomics.http_ok = "200[[:blank:]]+OK$",
     rdbnomics.curl_config = NULL,
-    rdbnomics.rdb_no_arg = TRUE
+    rdbnomics.rdb_no_arg = TRUE,
+    rdbnomics.metadata = FALSE
   )
   opts <- append(
     opts,
@@ -43,6 +44,6 @@
   op <- options()
   op.rdbnomics <- opts
   toset <- !(names(op.rdbnomics) %in% names(op))
-  if(any(toset)) options(op.rdbnomics[toset])
+  if (any(toset)) options(op.rdbnomics[toset])
   invisible()
 }

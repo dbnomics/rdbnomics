@@ -11,7 +11,7 @@ get_data <- function(x, userl, curl_args, run = 0) {
     check_argument(sys_sleep, c("integer", "numeric"))
     Sys.sleep(sys_sleep)
   }
-  
+
   tryCatch({
     if (userl) {
       # Only readLines
@@ -20,7 +20,7 @@ get_data <- function(x, userl, curl_args, run = 0) {
           suppressMessages(suppressWarnings(utils::setInternet2(TRUE)))
         }
       }
-      
+
       verb_warn_rl <- getOption("rdbnomics.verbose_warning_readLines")
       check_argument(verb_warn_rl, "logical")
       if (verb_warn_rl) {
@@ -80,7 +80,7 @@ get_data <- function(x, userl, curl_args, run = 0) {
   }, error = function(e) {
     try_run <- getOption("rdbnomics.try_run")
     check_argument(try_run, c("integer", "numeric"))
-    
+
     myerror <- try(
       grepl("'curl_config'", e$message) |
       grepl("BAD[[:blank:]]+REQUEST", toupper(e$message)),
@@ -134,7 +134,7 @@ deploy <- function(DT, columns = NULL, reference_column = "value") {
             if (length(v) == 1) {
               # New col
               y[[iv]] <- paste0(trim(v), ",")
-            } else if ((length(v) == to_list_length + 1) | (length(v) == 2)) {
+            } else if ( (length(v) == to_list_length + 1) | (length(v) == 2) ) {
               # New col
               y[[iv]] <- paste0(trim(v[1]), ",", utils::tail(v, -1))
             } else if (length(v) != to_list_length) {
@@ -239,7 +239,7 @@ authorized_version <- function(x) {
   if (length(versions) <= 0) {
     stop(paste0(name, " must be of length greater than 0."), call. = FALSE)
   }
-  
+
   if (x %notin% versions) {
     stop(
       paste0(
