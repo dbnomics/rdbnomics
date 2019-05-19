@@ -163,5 +163,113 @@ If you just want to do it once, you may use the argument `use_readLines` of the 
 df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', use_readLines = TRUE)
 ```
 
+## Transform the `data.table` object into a `xts` object
+For some analysis, it is more convenient to have a `xts` object instead of a `data.table` object. To transform
+it, you can use the following functions :
+```r
+library(rdbnomics)
+
+to_xts <- function(
+  x,
+  needed_columns = c("period", "series_code", "series_name", "value"),
+  series_columns = c("series_code", "series_name")
+) {
+  if (is.null(x)) {
+    return(NULL)
+  }
+
+  all_cols <- length(setdiff(needed_columns, colnames(x))) != 0
+  if (all_cols) {
+    stop(
+      paste0(
+        "To export as a xts object, some columns are missing. Needed columns ",
+        "are \u0022", paste0(needed_columns, collapse = "\u0022, \u0022"),
+        "\u0022"
+      ),
+      call. = FALSE
+    )
+  }
+
+  x <- x[, .SD, .SDcols = needed_columns]
+  data.table::setcolorder(x, needed_columns)
+
+  attr_names <- NULL
+  if (!is.null(series_columns)) {
+    attr_names <- unique(x[, .SD, .SDcols = series_columns])
+  }
+
+  if (nrow(x) > 0) {
+    x <- data.table::dcast.data.table(
+      x, period ~ series_code,
+      value.var = "value"
+    )
+  } else {
+    orig <- Sys.Date() - as.numeric(Sys.Date())
+    x <- data.table(
+      period = as.Date(numeric(), origin = orig),
+      no_code = numeric()
+    )
+  }
+  x <- data.table::as.xts.data.table(x)
+  xts::xtsAttributes(x) <- list(codename = attr_names)
+
+  x
+}
+
+rdb("IMF", "CPI", mask = "M.DE+FR.PCPIEC_WT")
+#>      @frequency dataset_code               dataset_name          indexed_at original_period     period
+#>   1:    monthly          CPI Consumer Price Index (CPI) 2019-05-19 08:19:35         1996-01 1996-01-01
+#>   2:    monthly          CPI Consumer Price Index (CPI) 2019-05-19 08:19:35         1996-02 1996-02-01
+#>             ...          ...                        ...                 ...             ...        ...
+#> 569:    monthly          CPI Consumer Price Index (CPI) 2019-05-19 08:19:35         2019-02 2019-02-01
+#> 570:    monthly          CPI Consumer Price Index (CPI) 2019-05-19 08:19:35         2019-03 2019-03-01
+
+to_xts(rdb("IMF", "CPI", mask = "M.DE+FR.PCPIEC_WT"))
+#>            M.DE.PCPIEC_WT M.FR.PCPIEC_WT
+#> 1995-01-01             NA           20.0
+#> 1995-02-01             NA           20.0
+#>        ...            ...            ...
+#> 2019-02-01          30.10           25.8
+#> 2019-03-01          30.10           25.8
+```
+
+In the `xts` object, the series codes are used as column names. If you prefer
+the series names (or apply a function to them), you can utilize the function :
+```r
+rdb_rename_xts <- function(x, fun = NULL, ...) {
+  nm <- xts::xtsAttributes(x)$codename
+  cols <- nm$series_name[match(names(x), nm$series_code)]
+  if (is.null(fun)) {
+    names(x) <- cols
+  } else {
+    names(x) <- sapply(X = cols, FUN = fun, ..., USE.NAMES = FALSE)
+  }
+  x
+}
+
+library(magrittr)
+
+rdb("IMF", "CPI", mask = "M.DE+FR.PCPIEC_WT") %>%
+  to_xts() %>%
+  rdb_rename_xts()
+#>            Monthly – Germany – Communication, Weight Monthly – France – Communication, Weight
+#> 1995-01-01                                        NA                                     20.0
+#> 1995-02-01                                        NA                                     20.0
+#>        ...                                       ...                                      ...
+#> 2019-02-01                                     30.10                                     25.8
+#> 2019-03-01                                     30.10                                     25.8
+
+
+rdb("IMF", "CPI", mask = "M.DE+FR.PCPIEC_WT") %>%
+  to_xts() %>%
+  rdb_rename_xts(stringr::word, start = 3)
+#>            Germany France
+#> 1995-01-01      NA   20.0
+#> 1995-02-01      NA   20.0
+#>        ...     ...    ...
+#> 2019-02-01   30.10   25.8
+#> 2019-03-01   30.10   25.8
+```
+
 ## P.S.
 Visit <a href="https://db.nomics.world/" target="_blank">https://db.nomics.world/</a> !
