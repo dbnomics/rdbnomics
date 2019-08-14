@@ -26,14 +26,19 @@
     rdbnomics.try_run = 2L,
     rdbnomics.verbose_warning = TRUE,
     rdbnomics.api_base_url = "https://api.db.nomics.world",
+    rdbnomics.editor_base_url = "https://editor.nomics.world",
     rdbnomics.api_version = 22,
+    rdbnomics.editor_version = 1,
     rdbnomics.authorized_api_version = c(21, 22),
     rdbnomics.verbose_warning_readLines = FALSE,
     rdbnomics.timestamp_tz = "GMT",
     rdbnomics.http_ok = "200[[:blank:]]+OK$",
     rdbnomics.curl_config = NULL,
     rdbnomics.rdb_no_arg = TRUE,
-    rdbnomics.metadata = FALSE
+    rdbnomics.metadata = TRUE,
+    rdbnomics.filters = NULL,
+    rdbnomics.progress_bar = TRUE,
+    rdbnomics.translate_codes = TRUE
   )
   opts <- append(
     opts,

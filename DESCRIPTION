@@ -1,11 +1,11 @@
 Package: rdbnomics
 Type: Package
 Title: Download DBnomics Data
-Version: 0.4.7
-Authors@R: c(person("Thomas", "Brand", role = c("aut"),
-                     email = "thomas.brand@cepremap.org"),
-             person("Sebastien", "Galais", role = c("cre", "ctb"),
-                     email = "s915.stem@gmail.com"))
+Version: 0.5.0
+Authors@R: c(person("Sebastien", "Galais", role = c("cre", "ctb"),
+                     email = "s915.stem@gmail.com"),
+             person("Thomas", "Brand", role = c("aut"),
+                     email = "thomas.brand@cepremap.org"))
 Description: R access to hundreds of millions data series from DBnomics API
     (<https://db.nomics.world/>).
 Depends:

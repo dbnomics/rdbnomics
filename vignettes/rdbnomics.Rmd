@@ -1,6 +1,6 @@
 ---
 title: "DBnomics R client"
-author: "Thomas Brand^[CEPREMAP], S&eacute;bastien Galais^[Banque de France]"
+author: "S&eacute;bastien Galais^[Banque de France, [https://github.com/s915](https://github.com/s915)], Thomas Brand^[CEPREMAP]"
 output:
   html_document:
     highlight: default
@@ -35,10 +35,10 @@ h4.date { /* Header 4 - and the author and data headers use this too  */
 }
 </style>
 
-# DBnomics : the world's economic database
+# DBnomics: the world's economic database
 
 You can explore all the economic data from different providers by following the link [db.nomics.world](https://db.nomics.world)  
-(*N.B. : in the examples, data have already been retrieved on january 5<sup>th</sup> 2019*).
+(*N.B.: in the examples, data have already been retrieved on august 14<sup>th</sup> 2019*).
 
 [![](dbnomics001.png)](https://db.nomics.world)
 
@@ -184,7 +184,7 @@ ggplot(df, aes(x = period, y = value, color = series_code)) +
   dbnomics()
 ```
 
-In the event that you only use the argument `ids`, you can drop it and run :
+In the event that you only use the argument `ids`, you can drop it and run:
 ```{r, eval = FALSE}
 df <- rdb('AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 ```
@@ -259,7 +259,7 @@ ggplot(df, aes(x = period, y = value, color = series_code)) +
   dbnomics()
 ```
 
-In the event that you only use the arguments `provider_code`, `dataset_code` and `mask`, you can drop the name `mask` and run :
+In the event that you only use the arguments `provider_code`, `dataset_code` and `mask`, you can drop the name `mask` and run:
 ```{r, eval = FALSE}
 df <- rdb('IMF', 'CPI', 'M.DE.PCPIEC_WT')
 ```
@@ -406,7 +406,7 @@ ggplot(df, aes(x = period, y = value, color = series_name)) +
 
 # Fetch time series found on the web site
 
-When you don't know the codes of the dimensions, provider, dataset or series, you can :
+When you don't know the codes of the dimensions, provider, dataset or series, you can:
 
 - go to the page of a dataset on [DBnomics website](https://db.nomics.world), for example [Doing Business](https://db.nomics.world/WB/DB),  
 
@@ -487,13 +487,13 @@ ggplot(df, aes(x = period, y = value, color = series_name)) +
 
 # Proxy configuration or connection error `Could not resolve host`
 
-When using the functions `rdb` or `rdb_...`, you may come across the following error :
+When using the functions `rdb` or `rdb_...`, you may come across the following error:
 ```{r, eval = FALSE}
 Error in open.connection(con, "rb") :
   Could not resolve host: api.db.nomics.world
 ```
 
-To get round this situation, you have two options :
+To get round this situation, you have two options:
 
 1. configure **curl** to use a specific and authorized proxy.
 
@@ -501,10 +501,14 @@ To get round this situation, you have two options :
 
 ## Configure **curl** to use a specific and authorized proxy
 
-In **rdbnomics**, by default the function `curl_fetch_memory` (of the package **curl**) is used to fetch the data. If a specific proxy must be used, it is possible to define it permanently with the package option `rdbnomics.curl_config` or on the fly through the argument `curl_config`. In that way the object is passed to the argument `handle` of the `curl_fetch_memory` function.  
-To see the available parameters, run `names(curl_options())` in *R* or visit the website <a href="https://curl.haxx.se/libcurl/c/curl_easy_setopt.html" target="_blank">https://curl.haxx.se/libcurl/c/curl_easy_setopt.html</a>. Once they are chosen, you define the curl object as follows :
+In **rdbnomics**, by default the function `curl_fetch_memory` (of the package **curl**) is used to fetch the data. If a specific proxy must be used, it is possible to define it permanently with the package option `rdbnomics.curl_config` or on the fly through the argument `curl_config`. In that way:
+
+- if the object is of class `curl_handle` then it is passed to the argument `handle` of the `curl_fetch_memory` function,
+- if the object is a named list then the elements are passed to the connection (the `curl_handle` object created internally with `new_handle()`) with `handle_setopt()` before using `curl_fetch_memory`.
+
+To see the available parameters, run `names(curl_options())` in *R* or visit the website <a href="https://curl.haxx.se/libcurl/c/curl_easy_setopt.html" target="_blank">https://curl.haxx.se/libcurl/c/curl_easy_setopt.html</a>. Once they are chosen, you define the curl object as follows:
 ```{r, eval = FALSE}
-h <- curl::new_handle(
+h <- list(
   proxy = "<proxy>",
   proxyport = <port>,
   proxyusername = "<username>",
@@ -514,26 +518,29 @@ h <- curl::new_handle(
 
 ### Set the connection up for a session
 
-The curl connection can be set up for a session by modifying the following package option :
+The curl connection can be set up for a session by modifying the following package option:
 ```{r, eval = FALSE}
 options(rdbnomics.curl_config = h)
 ```
-When fetching the data, the command `curl_fetch_memory(url = <...>, handle = h)` is executed. In the event that you want to add others arguments, use :
+When fetching the data, the following command is executed:
 ```{r, eval = FALSE}
-options(rdbnomics.curl_config = list(handle = h, arg = <...>))
+hndl <- curl::new_handle()
+curl::handle_setopt(hndl, .list = getOption("rdbnomics.curl_config"))
+curl::curl_fetch_memory(url = <...>, handle = hndl)
 ```
-After configuration, just use the standard functions of **rdbnomics** e.g. :
+
+After configuration, just use the standard functions of **rdbnomics** e.g.:
 ```{r, eval = FALSE}
 df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 ```
-This option of the package can be disabled with :
+This option of the package can be disabled with:
 ```{r, eval = FALSE}
 options(rdbnomics.curl = NULL)
 ```
 
 ### Use the connection only for a function call
 
-If a complete configuration is not needed but just an "on the fly" execution, then use the argument `curl_config` of the functions `rdb` and `rdb_...` :
+If a complete configuration is not needed but just an "on the fly" execution, then use the argument `curl_config` of the functions `rdb` and `rdb_...`:
 ```{r, eval = FALSE}
 df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', curl_config = h)
 ```
@@ -544,24 +551,92 @@ To retrieve the data with the default R internet connection, **rdbnomics** will 
 
 ### Set the connection up for a session
 
-To activate this feature for a session, you need to enable an option of the package :
+To activate this feature for a session, you need to enable an option of the package:
 ```{r, eval = FALSE}
 options(rdbnomics.use_readLines = TRUE)
 ```
-And then use the standard function as follows :
+And then use the standard function as follows:
 ```{r, eval = FALSE}
 df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 ```
-This configuration can be disabled with :
+This configuration can be disabled with:
 ```{r, eval = FALSE}
 options(rdbnomics.use_readLines = FALSE)
 ```
 
 ### Use the connection only for a function call
 
-If you just want to do it once, you may use the argument `use_readLines` of the functions `rdb` and `rdb_...` :
+If you just want to do it once, you may use the argument `use_readLines` of the functions `rdb` and `rdb_...`:
 ```{r, eval = FALSE}
 df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', use_readLines = TRUE)
+```
+
+# Transform time series with filters
+The **rdbnomics** package can interact with the *Time Series Editor* of DBnomics to transform time series by applying filters to them.  
+Available filters are listed on the filters page [https://editor.nomics.world/filters](https://editor.nomics.world/filters).
+The *Time Series Editor* is usable via the web interface but you can call it directly from *R*.  
+
+Here is an example of how to proceed to interpolate two annual time series with a monthly frequency, using a spline interpolation:
+
+```{r, eval = FALSE}
+filters <- list(
+  code = "interpolate",
+  parameters = list(frequency = "monthly", method = "spline")
+)
+```
+The request is then:
+```{r, eval = FALSE}
+df <- rdb(
+  ids = c("AMECO/ZUTN/EA19.1.0.0.0.ZUTN", "AMECO/ZUTN/DNK.1.0.0.0.ZUTN"),
+  filters = filters
+)
+```
+
+If you want to apply more than one filter, the `filters` argument will be a list of valid filters:
+
+```{r, eval = FALSE}
+filters <- list(
+  list(
+    code = "interpolate",
+    parameters = list(frequency = "monthly", method = "spline")
+  ),
+  list(
+    code = "aggregate",
+    parameters = list(frequency = "bi-annual", method = "end_of_period")
+  )
+)
+
+df <- rdb(
+  ids = c("AMECO/ZUTN/EA19.1.0.0.0.ZUTN", "AMECO/ZUTN/DNK.1.0.0.0.ZUTN"),
+  filters = filters
+)
+```
+
+The data.frame columns change a little bit when filters are used. There are two new columns:
+
+- `period_middle_day`: the middle day of `original_period` (can be useful when you compare graphically interpolated series and original ones),
+- `filtered` (boolean): `TRUE` if the series is filtered, `FALSE` otherwise.
+
+The content of two columns are modified:
+
+- `series_code`: same as before for original series, but the suffix `_filtered` is added for filtered series
+- `series_name`: same as before for original series, but the suffix ` (filtered)` is added for filtered series
+
+```{r, eval = TRUE, echo = FALSE}
+df <- rdbnomics:::rdbnomics_df013
+```
+
+```{r, echo = FALSE}
+df %>%
+  arrange(filtered, series_name, period) %>%
+  reorder_cols() %>%
+  display_table()
+```
+
+```{r, fig.align = 'center'}
+ggplot(filter(df, !is.na(value)), aes(x = period, y = value, color = series_name)) +
+  geom_line(size = 1) +
+  dbnomics()
 ```
 
 # Appendix

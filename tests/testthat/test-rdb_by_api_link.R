@@ -31,3 +31,9 @@ test_that("curl_config is not a curl_handle object or a named list", {
   expect_error(rdb_by_api_link("url", curl_config = TRUE))
   expect_error(rdb_by_api_link("url", curl_config = list(1)))
 })
+
+test_that("filters is not a valid list", {
+  expect_error(rdb_by_api_link("url", filters = TRUE))
+  expect_error(rdb_by_api_link("url", filters = list()))
+  expect_error(rdb_by_api_link("url", filters = list(code = "interpolate", parameter = NULL)))
+})

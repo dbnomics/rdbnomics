@@ -5,7 +5,7 @@
 
 #-------------------------------------------------------------------------------
 # get_data
-get_data <- function(x, userl, curl_args, run = 0) {
+get_data <- function(x, userl, curl_args, headers = NULL, opt = NULL, run = 0) {
   if (run > 0) {
     sys_sleep <- getOption("rdbnomics.sleep_run")
     check_argument(sys_sleep, c("integer", "numeric"))
@@ -64,7 +64,22 @@ get_data <- function(x, userl, curl_args, run = 0) {
         }
       }
 
-      response <- do.call(curl::curl_fetch_memory, c(list(url = x), curl_args))
+      try(curl::handle_reset(tmp_curl), silent = TRUE)
+      if (!list_has_curl_handle(curl_args)) {
+        tmp_curl <- list(handle = curl::new_handle())
+        if (!is.null(curl_args)) {
+          handle_setopt(tmp_curl$handle, .list = curl_args)
+        }
+      } else {
+        tmp_curl <- curl_args
+      }
+
+      if (!is.null(headers) & !is.null(opt)) {
+        handle_setheaders(tmp_curl$handle, .list = headers)
+        handle_setopt(tmp_curl$handle, .list = opt)
+      }
+
+      response <- do.call(curl::curl_fetch_memory, c(list(url = x), tmp_curl))
       check_x <- curl::parse_headers(response$headers)
       check_x <- utils::head(check_x, 1)
 
@@ -72,9 +87,31 @@ get_data <- function(x, userl, curl_args, run = 0) {
       check_argument(http_ok, "character")
       if (grepl(http_ok, toupper(check_x))) {
         response <- rawToChar(response$content)
+
+        if (!is.null(jsonlite::fromJSON(response)$errors)) {
+          stop(
+            "\n",
+            jsonlite::fromJSON(response)$errors$message, " : ",
+            jsonlite::fromJSON(response)$errors$provider_code, "/",
+            jsonlite::fromJSON(response)$errors$dataset_code, "/",
+            jsonlite::fromJSON(response)$errors$series_code,
+            call. = FALSE
+          )
+        }
+
         jsonlite::fromJSON(response)
       } else {
-        stop(check_x, call. = FALSE)
+        errormessage <- try(
+          paste0(
+            "\n", check_x,
+            "\n", jsonlite::fromJSON(rawToChar(response$content))$error
+          ),
+          silent = TRUE
+        )
+        if (inherits(errormessage, "try-error")) {
+          errormessage <- paste0("\n", check_x)
+        }
+        stop(errormessage, call. = FALSE)
       }
     }
   }, error = function(e) {
@@ -93,7 +130,7 @@ get_data <- function(x, userl, curl_args, run = 0) {
     }
 
     if (run < try_run) {
-      get_data(x, userl, curl_args, run = run + 1)
+      get_data(x, userl, curl_args, headers = headers, opt = opt, run = run + 1)
     } else {
       stop(e)
     }
@@ -422,4 +459,188 @@ call_ok <- function(x) {
   }
 
   modif_arg
+}
+
+#-------------------------------------------------------------------------------
+# remove_columns
+remove_columns <- function(DT, x, expr = FALSE) {
+  if (expr) {
+    cols <- grep(x, colnames(DT), value = TRUE)
+  } else {
+    cols <- intersect(x, colnames(DT))
+  }
+  if (length(cols) > 0) {
+    DT[, (cols) := NULL]
+  }
+  invisible(DT)
+}
+
+#-------------------------------------------------------------------------------
+# reduce_to_one
+reduce_to_one <- function(DT) {
+  x <- DT[
+    ,
+    lapply(.SD, function(y) {
+      length(unique(y))
+    })
+  ]
+  x <- as.list(x)
+  x <- Filter(function(y){ y > 1 }, x)
+  x <- names(x)
+  DT[, (x) := NULL]
+  invisible(DT)
+}
+
+#-------------------------------------------------------------------------------
+# filter_type
+filter_type <- function(x) {
+  test <- tryCatch({
+    res <- "ko"
+    n <- length(x)
+    y <- sapply(x, filter_ok)
+    y <- sum(y, na.rm = TRUE)
+    if (y == n) {
+      res <- "list"
+    }
+    res
+  }, error = function(e) {
+    "ko"
+  })
+
+  if (test == "ko") {
+    test <- tryCatch({
+      res <- filter_ok(x)
+      if (res) {
+        res <- "notlist"
+      } else {
+        res <- "ko"
+      }
+      res
+    }, error = function(e) {
+      "ko"
+    })
+  }
+
+  test
+}
+
+#-------------------------------------------------------------------------------
+# filter_ok
+filter_ok <- function(x) {
+  tryCatch({
+    res <- FALSE
+    nm1 <- names(x)
+    nm2 <- names(x$parameters)
+    if (identical(nm1, c("code", "parameters"))) {
+      if (is.null(nm2)) {
+        res <- TRUE
+      }
+      if (identical(nm2, c("frequency", "method"))) {
+        res <- TRUE
+      }
+    }
+    res
+  }, error = function(e) {
+    FALSE
+  })
+}
+
+#-------------------------------------------------------------------------------
+# get_geo_colname
+get_geo_colname <- function(x) {
+  y <- try(
+    {
+      expr <- "dimensions_label[s]*\\."
+
+      elt <- grep(expr, names(unlist(x)), value = TRUE)
+      if (is.null(x$dataset$code)) {
+        codes <- gsub(".*/|\\..*", "", elt)
+      } else {
+        codes <- x$dataset$code
+        if (length(codes) == 1) {
+          codes <- rep(codes, length(elt))
+        }
+      }
+
+      lapply(seq_along(elt), function(i) {
+        z <- elt[i]
+
+        ref_elt <- gsub(".*\\.", "", z)
+        elt_ <- gsub('\\.', '"]][["', z)
+        elt_ <- paste0('[["', elt_, '"]]')
+        c(codes[i], ref_elt, eval(parse(text = paste0("x", elt_))))
+      })
+    },
+    silent = TRUE
+  )
+  if (inherits(y, "try-error")) {
+    return(NULL)
+  }
+  y
+}
+
+#-------------------------------------------------------------------------------
+# get_geo_names
+get_geo_names <- function(x, colname) {
+  y <- try(
+    {
+      codes <- sapply(colname, `[[`, 1)
+      codes <- unique(codes)
+
+      nm <- sapply(colname, `[[`, 2)
+      nm <- unique(nm)
+
+      expr <- paste0(
+        "(", paste0(codes, collapse = "|"), ")*",
+        "\\.dimensions_value[s]*_label[s]*\\.(",
+        paste0(nm, collapse = "|"),
+        "){1}\\."
+      )
+
+      elt <- grep(expr, names(unlist(x)), value = TRUE)
+      for (y in nm) {
+        elt <- gsub(paste0(y, '\\..*'), y, elt)
+      }
+      elt <- unique(elt)
+
+      codes <- sapply(colname, `[[`, 1)
+
+      lapply(seq_along(elt), function(i) {
+        z <- elt[i]
+        elt_ <- gsub('\\.', '"]][["', z)
+        elt_ <- paste0('[["', elt_, '"]]')
+        x <- eval(parse(text = paste0("x", elt_)))
+        suppressWarnings(
+          setnames(
+            data.table(X1 = codes[i], X2 = names(x), X3 = unname(unlist(x))),
+            c("dataset_code", colname[[i]][2:3])
+          )
+        )
+      })
+    },
+    silent = TRUE
+  )
+  if (inherits(y, "try-error")) {
+    return(NULL)
+  }
+  y
+}
+
+#-------------------------------------------------------------------------------
+# list_has_curl_handle
+list_has_curl_handle <- function(x) {
+  if (is.null(x)) {
+    return(FALSE)
+  }
+  if (!inherits(x, "list")) {
+    return(FALSE)
+  }
+  y <- sapply(x, inherits, what = "curl_handle")
+  y <- sum(y, na.rm = TRUE)
+  y <- y > 0
+  if (y) {
+    TRUE
+  } else {
+    FALSE
+  }
 }
