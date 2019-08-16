@@ -128,15 +128,6 @@ h <- list(
 )
 options(rdbnomics.curl_config = h)
 df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
-# or
-h <- curl::new_handle(
-  proxy = "<proxy>",
-  proxyport = <port>,
-  proxyusername = "<username>",
-  proxypassword = "<password>"
-)
-options(rdbnomics.curl_config = h)
-df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 # or to use once
 options(rdbnomics.curl_config = NULL)
 df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', curl_config = h)

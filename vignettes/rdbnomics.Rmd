@@ -619,8 +619,8 @@ The data.frame columns change a little bit when filters are used. There are two 
 
 The content of two columns are modified:
 
-- `series_code`: same as before for original series, but the suffix `_filtered` is added for filtered series
-- `series_name`: same as before for original series, but the suffix ` (filtered)` is added for filtered series
+- `series_code`: same as before for original series, but the suffix `_filtered` is added for filtered series;
+- `series_name`: same as before for original series, but the suffix ` (filtered)` is added for filtered series.
 
 ```{r, eval = TRUE, echo = FALSE}
 df <- rdbnomics:::rdbnomics_df013

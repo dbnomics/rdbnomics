@@ -93,21 +93,6 @@ df2 <- rdb_by_api_link(
     '&observations=1&format=json&align_periods=1&offset=0&facets=0'
   )
 )
-# or
-h <- curl::new_handle(
-  proxy = "<proxy>",
-  proxyport = <port>,
-  proxyusername = "<username>",
-  proxypassword = "<password>"
-)
-options(rdbnomics.curl_config = h)
-df2 <- rdb_by_api_link(
-  paste0(
-    'https://api.db.nomics.world/v22/series/WB/DB?dimensions=\%7B\%22',
-    'indicator\%22\%3A\%5B\%22IC.REG.PROC.FE.NO\%22\%5D\%7D&q=Doing\%20Business',
-    '&observations=1&format=json&align_periods=1&offset=0&facets=0'
-  )
-)
 # or to use once
 df2 <- rdb_by_api_link(
   paste0(
