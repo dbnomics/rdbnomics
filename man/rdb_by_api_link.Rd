@@ -35,12 +35,12 @@ For available curl options see \code{\link[curl]{curl_options}},
 \code{names(curl_options())} and
 \href{https://curl.haxx.se/libcurl/c/curl_easy_setopt.html}{libcurl}.}
 
-\item{filters}{Named list (default \code{NULL}). This argument must be a named
+\item{filters}{List (default \code{NULL}). This argument must be a named
 list for one filter because the function \code{toJSON} of the package \pkg{jsonlite}
 is used before sending the request to the server. For multiple filters,
 you have to provide a list of valid filters (see examples).\cr
-A valid filter is a named list with an element \code{code}, a character string,
-and an element \code{parameters}, a named list with elements \code{frequency}
+A valid filter is a named list with an element \code{code} which is a character string,
+and an element \code{parameters} which is a named list with elements \code{frequency}
 and \code{method} or a NULL.}
 }
 \value{

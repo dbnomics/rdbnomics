@@ -207,14 +207,14 @@ df <- rdb(
 )
 ```
 
-The data.frame columns change a little bit when filters are used. There are two new columns:
+The `data.table` columns change a little bit when filters are used. There are two new columns:
 
-- `period_middle_day`: the middle day of `original_period` (can be useful when you compare graphically interpolated series and original ones),
+- `period_middle_day`: the middle day of `original_period` (can be useful when you compare graphically interpolated series and original ones).
 - `filtered` (boolean): `TRUE` if the series is filtered, `FALSE` otherwise.
 
 The content of two columns are modified:
 
-- `series_code`: same as before for original series, but the suffix `_filtered` is added for filtered series;
+- `series_code`: same as before for original series, but the suffix `_filtered` is added for filtered series.
 - `series_name`: same as before for original series, but the suffix ` (filtered)` is added for filtered series.
 
 ## Transform the `data.table` object into a `xts` object

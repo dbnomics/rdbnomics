@@ -28,14 +28,14 @@
 #' package \pkg{jsonlite}) is applied to generate the json object.
 #' @param mask Character string (default \code{NULL}). DBnomics code of one or
 #' several masks in the specified provider and dataset.
-#' @param verbose Logical (default \code{NULL}). Show warnings of the function.
-#' @param filters Named list (default \code{TRUE}). This argument must be a named
+#' @param filters List (default \code{NULL}). This argument must be a named
 #' list for one filter because the function \code{toJSON} of the package \pkg{jsonlite}
 #' is used before sending the request to the server. For multiple filters,
 #' you have to provide a list of valid filters (see examples).\cr
-#' A valid filter is a named list with an element \code{code}, a character string,
-#' and an element \code{parameters}, a named list with elements \code{frequency}
+#' A valid filter is a named list with an element \code{code} which is a character string,
+#' and an element \code{parameters} which is a named list with elements \code{frequency}
 #' and \code{method} or a NULL.
+#' @param verbose Logical (default \code{FALSE}). Show warnings of the function.
 #' @param ... Arguments to be passed to \code{\link{rdb_by_api_link}}. These
 #' arguments concern connection configuration. See \code{\link{rdb_by_api_link}}
 #' for details.
