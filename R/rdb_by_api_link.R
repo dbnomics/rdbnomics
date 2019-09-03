@@ -365,6 +365,14 @@ rdb_by_api_link <- function(
           "series_code"
         )
       )
+      try(
+        {
+          cols_to_remove <- sapply(additional_geo_column, `[[`, 2)
+          tmpdata <- remove_columns(tmpdata, cols_to_remove)
+          rm(cols_to_remove)
+        },
+        silent = TRUE
+      )
       tmpdata <- remove_columns(tmpdata, "^observation", expr = TRUE)
       # The aim is to keep only unique informations
       tmpdata <- unique(tmpdata)
