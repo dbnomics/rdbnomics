@@ -38,7 +38,7 @@ h4.date { /* Header 4 - and the author and data headers use this too  */
 # DBnomics: the world's economic database
 
 You can explore all the economic data from different providers by following the link [db.nomics.world](https://db.nomics.world)  
-(*N.B.: in the examples, data have already been retrieved on august 14<sup>th</sup> 2019*).
+(*N.B.: in the examples, data have already been retrieved on september 5<sup>th</sup> 2019*).
 
 [![](dbnomics001.png)](https://db.nomics.world)
 
@@ -612,14 +612,14 @@ df <- rdb(
 )
 ```
 
-The data.frame columns change a little bit when filters are used. There are two new columns:
+The `data.table` columns change a little bit when filters are used. There are two new columns:
 
-- `period_middle_day`: the middle day of `original_period` (can be useful when you compare graphically interpolated series and original ones),
+- `period_middle_day`: the middle day of `original_period` (can be useful when you compare graphically interpolated series and original ones).
 - `filtered` (boolean): `TRUE` if the series is filtered, `FALSE` otherwise.
 
 The content of two columns are modified:
 
-- `series_code`: same as before for original series, but the suffix `_filtered` is added for filtered series;
+- `series_code`: same as before for original series, but the suffix `_filtered` is added for filtered series.
 - `series_name`: same as before for original series, but the suffix ` (filtered)` is added for filtered series.
 
 ```{r, eval = TRUE, echo = FALSE}
