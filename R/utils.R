@@ -68,15 +68,15 @@ get_data <- function(x, userl, curl_args, headers = NULL, opt = NULL, run = 0) {
       if (!list_has_curl_handle(curl_args)) {
         tmp_curl <- list(handle = curl::new_handle())
         if (!is.null(curl_args)) {
-          handle_setopt(tmp_curl$handle, .list = curl_args)
+          curl::handle_setopt(tmp_curl$handle, .list = curl_args)
         }
       } else {
         tmp_curl <- curl_args
       }
 
       if (!is.null(headers) & !is.null(opt)) {
-        handle_setheaders(tmp_curl$handle, .list = headers)
-        handle_setopt(tmp_curl$handle, .list = opt)
+        curl::handle_setheaders(tmp_curl$handle, .list = headers)
+        curl::handle_setopt(tmp_curl$handle, .list = opt)
       }
 
       response <- do.call(curl::curl_fetch_memory, c(list(url = x), tmp_curl))
