@@ -129,7 +129,7 @@ When fetching the data, the following command is executed:
 ```r
 hndl <- curl::new_handle()
 curl::handle_setopt(hndl, .list = getOption("rdbnomics.curl_config"))
-curl:curl_fetch_memory(url = <...>, handle = hndl)
+curl::curl_fetch_memory(url = <...>, handle = hndl)
 ```
 After configuration, just use the standard functions of **rdbnomics** e.g.:
 ```r
