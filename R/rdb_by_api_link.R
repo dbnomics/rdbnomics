@@ -273,6 +273,14 @@ rdb_by_api_link <- function(
   DBdata <- data.table::rbindlist(DBdata, use.names = TRUE, fill = TRUE)
   # Expanding list columns
   DBdata <- deploy(DBdata)
+  # To reproduce the Python module, we copy the 'value' element
+  DBdata[
+    ,
+    original_value := format(
+      value, scientific = FALSE, decimal.mark = ".", big.mark = "", trim = TRUE,
+      drop0trailing = TRUE
+    )
+  ]
   # Transforming date format and timestamp format
   transform_date_timestamp(DBdata)
 
@@ -354,15 +362,22 @@ rdb_by_api_link <- function(
       request <- dataframe_to_columns(request$filter_results$series)
       data.table::setDT(request)
       request <- deploy(request)
-      request <- transform_date_timestamp(request)
+      request[
+        ,
+        original_value := format(
+          value, scientific = FALSE, decimal.mark = ".", big.mark = "",
+          trim = TRUE, drop0trailing = TRUE
+        )
+      ]
+      transform_date_timestamp(request)
 
       # Some columns from the original dataset will be replaced by the
       # filtered dataset
       tmpdata <- remove_columns(
         tmpdata,
         c(
-          "@frequency", "original_period", "period", "value", "indexed_at",
-          "series_code"
+          "@frequency", "original_period", "period", "value", "original_value",
+          "indexed_at", "series_code"
         )
       )
       try(
