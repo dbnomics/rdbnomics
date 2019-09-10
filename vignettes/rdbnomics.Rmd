@@ -38,7 +38,7 @@ h4.date { /* Header 4 - and the author and data headers use this too  */
 # DBnomics: the world's economic database
 
 You can explore all the economic data from different providers by following the link [db.nomics.world](https://db.nomics.world)  
-(*N.B.: in the examples, data have already been retrieved on september 5<sup>th</sup> 2019*).
+(*N.B.: in the examples, data have already been retrieved on september 10<sup>th</sup> 2019*).
 
 [![](dbnomics001.png)](https://db.nomics.world)
 
@@ -443,11 +443,11 @@ ggplot(df, aes(x = period, y = value, color = series_name)) +
 
 On the cart page of the [DBnomics website](https://db.nomics.world), click on "*Copy API link*" and copy-paste it as an argument of the `rdb_by_api_link` function. Please note that when you update your cart, you have to copy this link again, because the link itself contains the ids of the series in the cart.
 <center>
-![](dbnomics004.png)
+![](dbnomics005.png)
 </center>
   
 ```{r, eval = FALSE}
-df <- rdb_by_api_link("https://api.db.nomics.world/v22/series?series_ids=BOE%2F8745%2FLPMB23A%2CBOE%2F8745%2FLPMB26A&observations=1&format=json&align_periods=1") %>%
+df <- rdb_by_api_link("https://api.db.nomics.world/v22/series?observations=1&series_ids=BOE/6008/RPMTDDC,BOE/6231/RPMTBVE") %>%
   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
@@ -462,7 +462,7 @@ df %<>%
       function(y) {
         paste0(
           paste0(
-            strsplit(y, "approvals ")[[1]], collapse = "approvals\n"
+            strsplit(y, "institutions' ")[[1]], collapse = "institutions'\n"
           ),
           "\n"
         )
@@ -501,10 +501,7 @@ To get round this situation, you have two options:
 
 ## Configure **curl** to use a specific and authorized proxy
 
-In **rdbnomics**, by default the function `curl_fetch_memory` (of the package **curl**) is used to fetch the data. If a specific proxy must be used, it is possible to define it permanently with the package option `rdbnomics.curl_config` or on the fly through the argument `curl_config`. In that way:
-
-- if the object is of class `curl_handle` then it is passed to the argument `handle` of the `curl_fetch_memory` function,
-- if the object is a named list then the elements are passed to the connection (the `curl_handle` object created internally with `new_handle()`) with `handle_setopt()` before using `curl_fetch_memory`.
+In **rdbnomics**, by default the function `curl_fetch_memory` (of the package **curl**) is used to fetch the data. If a specific proxy must be used, it is possible to define it permanently with the package option `rdbnomics.curl_config` or on the fly through the argument `curl_config`. Because the object is a named list, its elements are passed to the connection (the `curl_handle` object created internally with `new_handle()`) with `handle_setopt()` before using `curl_fetch_memory`.
 
 To see the available parameters, run `names(curl_options())` in *R* or visit the website <a href="https://curl.haxx.se/libcurl/c/curl_easy_setopt.html" target="_blank">https://curl.haxx.se/libcurl/c/curl_easy_setopt.html</a>. Once they are chosen, you define the curl object as follows:
 ```{r, eval = FALSE}

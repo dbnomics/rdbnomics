@@ -39,7 +39,7 @@
 #' @param ... Arguments to be passed to \code{\link{rdb_by_api_link}}. These
 #' arguments concern connection configuration. See \code{\link{rdb_by_api_link}}
 #' for details.
-#' @return A \code{data.frame} or a \code{data.table}.
+#' @return A \code{data.table}.
 #' @examples
 #' \dontrun{
 #' ## By ids

@@ -14,19 +14,11 @@
 #' the data are requested and read with the base function \code{readLines} i.e.
 #' through the default R internet connection. This can be used to get round the
 #' error \code{Could not resolve host: api.db.nomics.world}.
-#' @param curl_config Curl_handle or named list (default \code{NULL}). If not
+#' @param curl_config Named list (default \code{NULL}). If not
 #' \code{NULL}, it is used to configure a proxy connection. This
 #' configuration is passed to the function \code{curl_fetch_memory} of the package
-#' \pkg{curl}. If it is a \code{curl_handle} object then it is considered to
-#' be the argument \code{handle} of \code{curl_fetch_memory}. In the case of a
-#' list, two cases are considered. If an element of the list is a \code{curl_handle}
-#' object then the names of the object are the arguments names of
-#' \code{curl_fetch_memory} (except \code{url} of course). It means that
-#' \code{curl_config = h} is equivalent to
-#' \code{curl_config = list(handle = h)}.
-#' If none of the elements is a \code{curl_handle} object then a temporary
-#' \code{curl_handle} object is created internally with options equal to
-#' \code{curl_config}.\cr
+#' \pkg{curl}. A temporary \code{curl_handle} object is created internally
+#' with arguments equal to the provided list in \code{curl_config}.\cr
 #' For \code{curl_fetch_memory} arguments see \code{\link[curl]{curl_fetch}}.
 #' For available curl options see \code{\link[curl]{curl_options}},
 #' \code{names(curl_options())} and
@@ -38,7 +30,7 @@
 #' A valid filter is a named list with an element \code{code} which is a character string,
 #' and an element \code{parameters} which is a named list with elements \code{frequency}
 #' and \code{method} or a NULL.
-#' @return A \code{data.frame} or a \code{data.table}.
+#' @return A \code{data.table}.
 #' @examples
 #' \dontrun{
 #' # Fetch two series from different datasets of different providers :

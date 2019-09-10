@@ -42,7 +42,7 @@ arguments concern connection configuration. See \code{\link{rdb_by_api_link}}
 for details.}
 }
 \value{
-A \code{data.frame} or a \code{data.table}.
+A \code{data.table}.
 }
 \description{
 \code{rdb} downloads data series from
