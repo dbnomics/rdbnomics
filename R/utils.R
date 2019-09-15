@@ -585,38 +585,42 @@ get_geo_names <- function(x, colname) {
   y <- try(
     {
       codes <- sapply(colname, `[[`, 1)
-      codes <- unique(codes)
-
       nm <- sapply(colname, `[[`, 2)
-      nm <- unique(nm)
 
-      expr <- paste0(
-        "(", paste0(codes, collapse = "|"), ")*",
-        "\\.dimensions_value[s]*_label[s]*\\.(",
-        paste0(nm, collapse = "|"),
-        "){1}\\."
-      )
-
-      elt <- grep(expr, names(unlist(x)), value = TRUE)
-      for (y in nm) {
-        elt <- gsub(paste0(y, '\\..*'), y, elt)
-      }
-      elt <- unique(elt)
-
-      codes <- sapply(colname, `[[`, 1)
-
-      lapply(seq_along(elt), function(i) {
-        z <- elt[i]
-        elt_ <- gsub('\\.', '"]][["', z)
-        elt_ <- paste0('[["', elt_, '"]]')
-        x <- eval(parse(text = paste0("x", elt_)))
-        suppressWarnings(
-          setnames(
-            data.table(X1 = codes[i], X2 = names(x), X3 = unname(unlist(x))),
-            c("dataset_code", colname[[i]][2:3])
-          )
+      DTs <- lapply(seq_along(codes), function(i) {
+        expr <- paste0(
+          "(", paste0(codes[i], collapse = "|"), ")*",
+          "\\.dimensions_value[s]*_label[s]*\\.(",
+          paste0(nm[i], collapse = "|"),
+          "){1}\\."
         )
+
+        elt <- grep(expr, names(unlist(x)), value = TRUE)
+        for (y in nm) {
+          elt <- gsub(paste0(y, '\\..*'), y, elt)
+        }
+        elt <- unique(elt)
+
+        if (length(elt) > 0) {
+          elt_ <- gsub('\\.', '"]][["', elt)
+          elt_ <- paste0('[["', elt_, '"]]')
+          y <- eval(parse(text = paste0("x", elt_)))
+          suppressWarnings(
+            setnames(
+              data.table(X1 = codes[i], X2 = names(y), X3 = unname(unlist(y))),
+              c("dataset_code", colname[[i]][2:3])
+            )[]
+          )
+        } else {
+          NULL
+        }
       })
+      DTs <- Filter(Negate(is.null), DTs)
+      if (length(DTs) <= 0) {
+        NULL
+      } else {
+        DTs
+      }
     },
     silent = TRUE
   )
