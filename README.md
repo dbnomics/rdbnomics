@@ -22,7 +22,7 @@ library(rdbnomics)
 To install `rdbnomics` from github:
 
 ```r
-remotes::install_github("dbnomics/rdbnomics", build = TRUE, build_opts = c("--no-resave-data", "--no-manual"), force = TRUE)
+remotes::install_github("dbnomics/rdbnomics", build_vignettes = TRUE, force = TRUE)
 library(rdbnomics)
 ```
 
