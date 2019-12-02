@@ -99,7 +99,7 @@ scale_colour_discrete <- function(...) {
 
 knitr::opts_chunk$set(dev.args = list(bg = "transparent"))
 
-dbnomics <- function() {
+dbnomics <- function(...) {
   list(
     scale_x_date(expand = c(0, 0)),
     scale_y_continuous(labels = function(x) { format(x, big.mark = " ") }),
@@ -114,6 +114,7 @@ dbnomics <- function() {
       plot.background = element_rect(fill = "transparent", colour = NA),
       legend.title = element_blank()
     ),
+    theme(...),
     annotate(
       geom = "text", label = "DBnomics <https://db.nomics.world>", 
       x = structure(Inf, class = "Date"), y = -Inf,
@@ -148,7 +149,7 @@ display_table <- function(DT) {
 ```
 
 ```{r, eval = FALSE}
-df <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN') %>%
+df <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN") %>%
   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
@@ -189,13 +190,13 @@ ggplot(df, aes(x = period, y = value, color = series_code)) +
 
 In the event that you only use the argument `ids`, you can drop it and run:
 ```{r, eval = FALSE}
-df <- rdb('AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+df <- rdb("AMECO/ZUTN/EA19.1.0.0.0.ZUTN")
 ```
 
 ## Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider
 
 ```{r, eval = FALSE}
-df <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'AMECO/ZUTN/DNK.1.0.0.0.ZUTN')) %>%
+df <- rdb(ids = c("AMECO/ZUTN/EA19.1.0.0.0.ZUTN", "AMECO/ZUTN/DNK.1.0.0.0.ZUTN")) %>%
   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
@@ -219,7 +220,7 @@ ggplot(df, aes(x = period, y = value, color = series_code)) +
 ## Fetch two series from different datasets of different providers
 
 ```{r, eval = FALSE}
-df <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'Eurostat/une_rt_q/Q.SA.TOTAL.PC_ACT.T.EA19')) %>%
+df <- rdb(ids = c("AMECO/ZUTN/EA19.1.0.0.0.ZUTN", "Eurostat/une_rt_q/Q.SA.TOTAL.PC_ACT.T.EA19")) %>%
   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
@@ -245,7 +246,7 @@ The code mask notation is a very concise way to select one or many time series a
 
 ## Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF
 ```{r, eval = FALSE}
-df <- rdb('IMF', 'CPI', mask = 'M.DE.PCPIEC_WT') %>%
+df <- rdb("IMF", "CPI", mask = "M.DE.PCPIEC_WT") %>%
   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
@@ -267,14 +268,14 @@ ggplot(df, aes(x = period, y = value, color = series_code)) +
 
 In the event that you only use the arguments `provider_code`, `dataset_code` and `mask`, you can drop the name `mask` and run:
 ```{r, eval = FALSE}
-df <- rdb('IMF', 'CPI', 'M.DE.PCPIEC_WT')
+df <- rdb("IMF", "CPI", "M.DE.PCPIEC_WT")
 ```
 
 ## Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF
 
 You just have to add a `+` between two different values of a dimension.
 ```{r, eval = FALSE}
-df <- rdb('IMF', 'CPI', mask = 'M.DE+FR.PCPIEC_WT') %>%
+df <- rdb("IMF", "CPI", mask = "M.DE+FR.PCPIEC_WT") %>%
   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
@@ -298,7 +299,7 @@ ggplot(df, aes(x = period, y = value, color = series_code)) +
 ## Fetch all series along one dimension from dataset 'Consumer Price Index' (CPI) of IMF
 
 ```{r, eval = FALSE}
-df <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_WT') %>%
+df <- rdb("IMF", "CPI", mask = "M..PCPIEC_WT") %>%
   filter(!is.na(value)) %>%
   arrange(desc(period), REF_AREA) %>%
   head(100)
@@ -316,7 +317,7 @@ df %>%
 ## Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF
 
 ```{r, eval = FALSE}
-df <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_IX+PCPIA_IX') %>%
+df <- rdb("IMF", "CPI", mask = "M..PCPIEC_IX+PCPIA_IX") %>%
   filter(!is.na(value)) %>%
   group_by(INDICATOR) %>%
   top_n(n = 50, wt = period)
@@ -337,10 +338,10 @@ Searching by `dimensions` is a less concise way to select time series than using
 ## Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider
 
 ```{r, eval = FALSE}
-df <- rdb('AMECO', 'ZUTN', dimensions = list(geo = "ea19")) %>%
+df <- rdb("AMECO", "ZUTN", dimensions = list(geo = "ea19")) %>%
   filter(!is.na(value))
 # or
-# df <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea19"]}') %>%
+# df <- rdb("AMECO", "ZUTN", dimensions = '{"geo": ["ea19"]}') %>%
 #   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
@@ -363,10 +364,10 @@ ggplot(df, aes(x = period, y = value, color = series_code)) +
 ## Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider
 
 ```{r, eval = FALSE}
-df <- rdb('AMECO', 'ZUTN', dimensions = list(geo = c("ea19", "dnk"))) %>%
+df <- rdb("AMECO", "ZUTN", dimensions = list(geo = c("ea19", "dnk"))) %>%
   filter(!is.na(value))
 # or
-# df <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea19", "dnk"]}') %>%
+# df <- rdb("AMECO", "ZUTN", dimensions = '{"geo": ["ea19", "dnk"]}') %>%
 #   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
@@ -390,10 +391,10 @@ ggplot(df, aes(x = period, y = value, color = series_code)) +
 ## Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank
 
 ```{r, eval = FALSE}
-df <- rdb('WB', 'DB', dimensions = list(country = c("DZ", "PE"), indicator = c("ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"))) %>%
+df <- rdb("WB", "DB", dimensions = list(country = c("DZ", "PE"), indicator = c("ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"))) %>%
   filter(!is.na(value))
 # or
-# df <- rdb('WB', 'DB', dimensions = '{"country": ["DZ", "PE"], "indicator": ["ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"]}') %>%
+# df <- rdb("WB", "DB", dimensions = '{"country": ["DZ", "PE"], "indicator": ["ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"]}') %>%
 #   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
@@ -412,6 +413,54 @@ ggplot(df, aes(x = period, y = value, color = series_name)) +
   geom_line(size = 1.2) +
   geom_point(size = 2) +
   dbnomics()
+```
+
+# Fetch time series with a `query`
+The query is a Google-like search that will filter/select time series from a provider's dataset.
+
+## Fetch one series from dataset 'WEO by countries' (WEO) of IMF
+```{r, eval = FALSE}
+df <- rdb("IMF", "WEO", query = "France current account balance percent") %>%
+  filter(!is.na(value))
+```
+```{r, eval = TRUE, echo = FALSE}
+df <- rdbnomics:::rdbnomics_df014
+```
+
+```{r, echo = FALSE}
+df %>%
+  reorder_cols() %>%
+  display_table()
+```
+
+```{r, fig.align = 'center'}
+ggplot(df, aes(x = period, y = value, color = series_name)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
+  dbnomics()
+```
+
+## Fetch series from dataset 'WEO by countries' (WEO) of IMF
+```{r, eval = FALSE}
+df <- rdb("IMF", "WEO", query = "current account balance percent") %>%
+  filter(!is.na(value))
+```
+```{r, eval = TRUE, echo = FALSE}
+df <- rdbnomics:::rdbnomics_df015
+```
+
+```{r, echo = FALSE}
+df %>%
+  reorder_cols() %>%
+  display_table()
+```
+
+```{r, fig.align = 'center'}
+ggplot(df, aes(x = period, y = value, color = `WEO Country`)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
+  ggtitle("Current account balance (% GDP)") +
+  dbnomics(legend.direction = "horizontal")
 ```
 
 # Fetch time series found on the web site
@@ -540,7 +589,7 @@ curl::curl_fetch_memory(url = <...>, handle = hndl)
 
 After configuration, just use the standard functions of **rdbnomics** e.g.:
 ```{r, eval = FALSE}
-df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+df1 <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN")
 ```
 This option of the package can be disabled with:
 ```{r, eval = FALSE}
@@ -551,7 +600,7 @@ options(rdbnomics.curl = NULL)
 
 If a complete configuration is not needed but just an "on the fly" execution, then use the argument `curl_config` of the functions `rdb` and `rdb_...`:
 ```{r, eval = FALSE}
-df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', curl_config = h)
+df1 <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN", curl_config = h)
 ```
 
 ## Use the default R internet connection
@@ -566,7 +615,7 @@ options(rdbnomics.use_readLines = TRUE)
 ```
 And then use the standard function as follows:
 ```{r, eval = FALSE}
-df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+df1 <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN")
 ```
 This configuration can be disabled with:
 ```{r, eval = FALSE}
@@ -577,7 +626,7 @@ options(rdbnomics.use_readLines = FALSE)
 
 If you just want to do it once, you may use the argument `use_readLines` of the functions `rdb` and `rdb_...`:
 ```{r, eval = FALSE}
-df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', use_readLines = TRUE)
+df1 <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN", use_readLines = TRUE)
 ```
 
 # Transform time series with filters
@@ -652,11 +701,10 @@ ggplot(filter(df, !is.na(value)), aes(x = period, y = value, color = series_name
 
 ## ggplot2 function `dbnomics()` used in the vignette
 
-We show the function `dbnomics()` as an information. It's not implemented in the
-package.
+We show the function `dbnomics()` as an information.
 
 ```{r, eval = FALSE}
-dbnomics <- function() {
+dbnomics <- function(...) {
   list(
     scale_x_date(expand = c(0, 0)),
     scale_y_continuous(labels = function(x) { format(x, big.mark = " ") }),
@@ -671,6 +719,7 @@ dbnomics <- function() {
       plot.background = element_rect(fill = "transparent", colour = NA),
       legend.title = element_blank()
     ),
+    theme(...),
     annotate(
       geom = "text", label = "DBnomics <https://db.nomics.world>", 
       x = structure(Inf, class = "Date"), y = -Inf,

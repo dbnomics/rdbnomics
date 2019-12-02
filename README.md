@@ -35,61 +35,70 @@ vignette("rdbnomics")
 Fetch time series by `ids`:
 ```r
 # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+df1 <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN")
 
 # Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-df2 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'AMECO/ZUTN/DNK.1.0.0.0.ZUTN'))
+df2 <- rdb(ids = c("AMECO/ZUTN/EA19.1.0.0.0.ZUTN", "AMECO/ZUTN/DNK.1.0.0.0.ZUTN"))
 
 # Fetch two series from different datasets of different providers:
-df3 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'IMF/CPI/A.AT.PCPIT_IX'))
+df3 <- rdb(ids = c("AMECO/ZUTN/EA19.1.0.0.0.ZUTN", "IMF/CPI/A.AT.PCPIT_IX"))
 ```
 
 In the event that you only use the argument `ids`, you can drop it and run:
 ```r
-df <- rdb('AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+df <- rdb("AMECO/ZUTN/EA19.1.0.0.0.ZUTN")
 ```
 
 Fetch time series by `mask` :
 ```r
 # Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF:
-df1 <- rdb('IMF', 'CPI', mask = 'M.DE.PCPIEC_WT')
+df1 <- rdb("IMF", "CPI", mask = "M.DE.PCPIEC_WT")
 
 # Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF:
-df2 <- rdb('IMF', 'CPI', mask = 'M.DE+FR.PCPIEC_WT')
+df2 <- rdb("IMF", "CPI", mask = "M.DE+FR.PCPIEC_WT")
 
 # Fetch all series along one dimension from dataset 'Consumer Price Index' (CPI) of IMF:
-df3 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_WT')
+df3 <- rdb("IMF", "CPI", mask = "M..PCPIEC_WT")
 
 # Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF:
-df4 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_IX+PCPIA_IX')
+df4 <- rdb("IMF", "CPI", mask = "M..PCPIEC_IX+PCPIA_IX")
 ```
 
 In the event that you only use the arguments `provider_code`, `dataset_code` and `mask`, you can drop the name `mask` and run:
 ```r
-df <- rdb('IMF', 'CPI', 'M.DE.PCPIEC_WT')
+df <- rdb("IMF", "CPI", "M.DE.PCPIEC_WT")
 ```
 
 Fetch time series by `dimensions`:
 ```r
 # Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-df1 <- rdb('AMECO', 'ZUTN', dimensions = list(geo = "ea12"))
+df1 <- rdb("AMECO", "ZUTN", dimensions = list(geo = "ea12"))
 # or
-df1 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12"]}')
+df1 <- rdb("AMECO", "ZUTN", dimensions = '{"geo": ["ea12"]}')
 
 # Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-df2 <- rdb('AMECO', 'ZUTN', dimensions = list(geo = c("ea12", "dnk")))
+df2 <- rdb("AMECO", "ZUTN", dimensions = list(geo = c("ea12", "dnk")))
 # or
-df2 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12", "dnk"]}')
+df2 <- rdb("AMECO", "ZUTN", dimensions = '{"geo": ["ea12", "dnk"]}')
 
 # Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank:
-df3 <- rdb('WB', 'DB', dimensions = list(country = c("DZ", "PE"), indicator = c("ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS")))
+df3 <- rdb("WB", "DB", dimensions = list(country = c("DZ", "PE"), indicator = c("ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS")))
 # or
-df3 <- rdb('WB', 'DB', dimensions = '{"country": ["DZ", "PE"], "indicator": ["ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"]}')
+df3 <- rdb("WB", "DB", dimensions = '{"country": ["DZ", "PE"], "indicator": ["ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"]}')
+```
+
+Fetch time series with a `query`:
+```r
+# Fetch one series from dataset 'WEO by countries' (WEO) of IMF provider:
+df1 <- rdb("IMF", "WEO", query = "France current account balance percent")
+
+# Fetch series from dataset 'WEO by countries' (WEO) of IMF provider:
+df2 <- rdb("IMF", "WEO", query = "current account balance percent")
 ```
 
 Fetch one series from the dataset 'Doing Business' of WB provider with the link:
 ```r
-df1 <- rdb_by_api_link('https://api.db.nomics.world/v22/series/WB/DB?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%7D&q=IC.REG.PROC.FE.NO&observations=1&format=json&align_periods=1&offset=0&facets=0')
+df1 <- rdb_by_api_link("https://api.db.nomics.world/v22/series/WB/DB?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%7D&q=IC.REG.PROC.FE.NO&observations=1&format=json&align_periods=1&offset=0&facets=0")
 ```
 
 ## Proxy configuration or connection error `Could not resolve host`
@@ -130,7 +139,7 @@ curl::curl_fetch_memory(url = <...>, handle = hndl)
 ```
 After configuration, just use the standard functions of **rdbnomics** e.g.:
 ```r
-df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+df1 <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN")
 ```
 This option of the package can be disabled with:
 ```r
@@ -140,7 +149,7 @@ options(rdbnomics.curl = NULL)
 #### Use the connection only for a function call
 If a complete configuration is not needed but just an "on the fly" execution, then use the argument `curl_config` of the functions `rdb` and `rdb_...`:
 ```r
-df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', curl_config = h)
+df1 <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN", curl_config = h)
 ```
 
 ### Use the default R internet connection
@@ -153,7 +162,7 @@ options(rdbnomics.use_readLines = TRUE)
 ```
 And then use the standard function as follows:
 ```r
-df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+df1 <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN")
 ```
 This configuration can be disabled with:
 ```r
@@ -163,7 +172,7 @@ options(rdbnomics.use_readLines = FALSE)
 #### Use the connection only for a function call
 If you just want to do it once, you may use the argument `use_readLines` of the functions `rdb` and `rdb_...`:
 ```r
-df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', use_readLines = TRUE)
+df1 <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN", use_readLines = TRUE)
 ```
 
 ## Transform time series with filters

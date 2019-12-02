@@ -1,3 +1,8 @@
+# rdbnomics 0.5.1
+
+* New argument 'query' for function `rdb()`.
+* Small class correction for R 3.1.
+
 # rdbnomics 0.5.0
 
 * New filters tool from <https://editor.nomics.world/filters>.

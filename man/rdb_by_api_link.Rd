@@ -54,17 +54,17 @@ The API link is given on the
 # Fetch two series from different datasets of different providers :
 df1 <- rdb_by_api_link(
   paste0(
-    'https://api.db.nomics.world/v22/',
-    'series?observations=1&series_ids=AMECO/ZUTN/EA19.1.0.0.0.ZUTN,IMF/CPI/A.AT.PCPIT_IX'
+    "https://api.db.nomics.world/v22/",
+    "series?observations=1&series_ids=AMECO/ZUTN/EA19.1.0.0.0.ZUTN,IMF/CPI/A.AT.PCPIT_IX"
   )
 )
 
 # Fetch one series from the dataset 'Doing Business' of WB provider :
 df2 <- rdb_by_api_link(
   paste0(
-    'https://api.db.nomics.world/v22/series/WB/DB?dimensions=\%7B\%22',
-    'indicator\%22\%3A\%5B\%22IC.REG.PROC.FE.NO\%22\%5D\%7D&q=Doing\%20Business',
-    '&observations=1&format=json&align_periods=1&offset=0&facets=0'
+    "https://api.db.nomics.world/v22/series/WB/DB?dimensions=\%7B\%22",
+    "indicator\%22\%3A\%5B\%22IC.REG.PROC.FE.NO\%22\%5D\%7D&q=Doing\%20Business",
+    "&observations=1&format=json&align_periods=1&offset=0&facets=0"
   )
 )
 
@@ -80,17 +80,17 @@ h <- list(
 options(rdbnomics.curl_config = h)
 df2 <- rdb_by_api_link(
   paste0(
-    'https://api.db.nomics.world/v22/series/WB/DB?dimensions=\%7B\%22',
-    'indicator\%22\%3A\%5B\%22IC.REG.PROC.FE.NO\%22\%5D\%7D&q=Doing\%20Business',
-    '&observations=1&format=json&align_periods=1&offset=0&facets=0'
+    "https://api.db.nomics.world/v22/series/WB/DB?dimensions=\%7B\%22",
+    "indicator\%22\%3A\%5B\%22IC.REG.PROC.FE.NO\%22\%5D\%7D&q=Doing\%20Business",
+    "&observations=1&format=json&align_periods=1&offset=0&facets=0"
   )
 )
 # or to use once
 df2 <- rdb_by_api_link(
   paste0(
-    'https://api.db.nomics.world/v22/series/WB/DB?dimensions=\%7B\%22',
-    'indicator\%22\%3A\%5B\%22IC.REG.PROC.FE.NO\%22\%5D\%7D&q=Doing\%20Business',
-    '&observations=1&format=json&align_periods=1&offset=0&facets=0'
+    "https://api.db.nomics.world/v22/series/WB/DB?dimensions=\%7B\%22",
+    "indicator\%22\%3A\%5B\%22IC.REG.PROC.FE.NO\%22\%5D\%7D&q=Doing\%20Business",
+    "&observations=1&format=json&align_periods=1&offset=0&facets=0"
   ),
   curl_config = h
 )
@@ -101,17 +101,17 @@ df2 <- rdb_by_api_link(
 options(rdbnomics.use_readLines = TRUE)
 df2 <- rdb_by_api_link(
   paste0(
-    'https://api.db.nomics.world/v22/series/WB/DB?dimensions=\%7B\%22',
-    'indicator\%22\%3A\%5B\%22IC.REG.PROC.FE.NO\%22\%5D\%7D&q=Doing\%20Business',
-    '&observations=1&format=json&align_periods=1&offset=0&facets=0'
+    "https://api.db.nomics.world/v22/series/WB/DB?dimensions=\%7B\%22",
+    "indicator\%22\%3A\%5B\%22IC.REG.PROC.FE.NO\%22\%5D\%7D&q=Doing\%20Business",
+    "&observations=1&format=json&align_periods=1&offset=0&facets=0"
   )
 )
 # or to use once
 df2 <- rdb_by_api_link(
   paste0(
-    'https://api.db.nomics.world/v22/series/WB/DB?dimensions=\%7B\%22',
-    'indicator\%22\%3A\%5B\%22IC.REG.PROC.FE.NO\%22\%5D\%7D&q=Doing\%20Business',
-    '&observations=1&format=json&align_periods=1&offset=0&facets=0'
+    "https://api.db.nomics.world/v22/series/WB/DB?dimensions=\%7B\%22",
+    "indicator\%22\%3A\%5B\%22IC.REG.PROC.FE.NO\%22\%5D\%7D&q=Doing\%20Business",
+    "&observations=1&format=json&align_periods=1&offset=0&facets=0"
   ),
   use_readLines = TRUE
 )
@@ -120,7 +120,7 @@ df2 <- rdb_by_api_link(
 ## Apply filter(s) to the series
 # One filter
 df3 <- rdb_by_api_link(
-  'https://api.db.nomics.world/v22/series/IMF/WEO/ABW.BCA?observations=1',
+  "https://api.db.nomics.world/v22/series/IMF/WEO/ABW.BCA?observations=1",
   filters = list(
     code = "interpolate",
     parameters = list(frequency = "daily", method = "spline")
@@ -129,7 +129,7 @@ df3 <- rdb_by_api_link(
 
 # Two filters
 df3 <- rdb_by_api_link(
-  'https://api.db.nomics.world/v22/series/IMF/WEO/ABW.BCA?observations=1',
+  "https://api.db.nomics.world/v22/series/IMF/WEO/ABW.BCA?observations=1",
   filters = list(
     list(
       code = "interpolate",
