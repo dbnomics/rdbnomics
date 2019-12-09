@@ -475,10 +475,10 @@ When you don't know the codes of the dimensions, provider, dataset or series, yo
 - click on "*Copy API link*" in the menu of the "*Download*" button,
 ![](dbnomics003.png)  
 
-- use the `rdb_by_api_link` function such as below.  
+- use the `rdb(url = ...)` function such as below.  
 
 ```{r, eval = FALSE}
-df <- rdb_by_api_link("https://api.db.nomics.world/v22/series/WB/DB?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%7D&q=IC.REG.PROC.FE.NO&observations=1&format=json&align_periods=1&offset=0&facets=0") %>%
+df <- rdb(url = "https://api.db.nomics.world/v22/series/WB/DB?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%7D&q=IC.REG.PROC.FE.NO&observations=1&format=json&align_periods=1&offset=0&facets=0") %>%
   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
@@ -501,13 +501,13 @@ ggplot(df, aes(x = period, y = value, color = series_name)) +
 
 # Fetch time series from the cart
 
-On the cart page of the [DBnomics website](https://db.nomics.world), click on "*Copy API link*" and copy-paste it as an argument of the `rdb_by_api_link` function. Please note that when you update your cart, you have to copy this link again, because the link itself contains the ids of the series in the cart.
+On the cart page of the [DBnomics website](https://db.nomics.world), click on "*Copy API link*" and copy-paste it as an argument of the `rdb(url = ...)` function. Please note that when you update your cart, you have to copy this link again, because the link itself contains the ids of the series in the cart.
 <center>
 ![](dbnomics005.png)
 </center>
   
 ```{r, eval = FALSE}
-df <- rdb_by_api_link("https://api.db.nomics.world/v22/series?observations=1&series_ids=BOE/6008/RPMTDDC,BOE/6231/RPMTBVE") %>%
+df <- rdb(url = "https://api.db.nomics.world/v22/series?observations=1&series_ids=BOE/6008/RPMTDDC,BOE/6231/RPMTBVE") %>%
   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
@@ -548,7 +548,7 @@ ggplot(df, aes(x = period, y = value, color = series_name)) +
 
 # Proxy configuration or connection error `Could not resolve host`
 
-When using the functions `rdb` or `rdb_...`, you may come across the following error:
+When using the function `rdb`, you may come across the following error:
 ```{r, eval = FALSE}
 Error in open.connection(con, "rb") :
   Could not resolve host: api.db.nomics.world
@@ -598,7 +598,7 @@ options(rdbnomics.curl = NULL)
 
 ### Use the connection only for a function call
 
-If a complete configuration is not needed but just an "on the fly" execution, then use the argument `curl_config` of the functions `rdb` and `rdb_...`:
+If a complete configuration is not needed but just an "on the fly" execution, then use the argument `curl_config` of the function `rdb`:
 ```{r, eval = FALSE}
 df1 <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN", curl_config = h)
 ```
@@ -624,7 +624,7 @@ options(rdbnomics.use_readLines = FALSE)
 
 ### Use the connection only for a function call
 
-If you just want to do it once, you may use the argument `use_readLines` of the functions `rdb` and `rdb_...`:
+If you just want to do it once, you may use the argument `use_readLines` of the function `rdb`:
 ```{r, eval = FALSE}
 df1 <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN", use_readLines = TRUE)
 ```

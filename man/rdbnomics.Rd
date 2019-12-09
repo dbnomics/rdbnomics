@@ -3,7 +3,6 @@
 \docType{package}
 \name{rdbnomics}
 \alias{rdbnomics}
-\alias{rdbnomics-package}
 \title{Package rdbnomics}
 \description{
 DBnomics R client.

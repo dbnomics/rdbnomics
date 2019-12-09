@@ -4,10 +4,12 @@
 \alias{rdb_by_api_link}
 \title{Download DBnomics data using API link.}
 \usage{
-rdb_by_api_link(api_link,
+rdb_by_api_link(
+  api_link,
   use_readLines = getOption("rdbnomics.use_readLines"),
   curl_config = getOption("rdbnomics.curl_config"),
-  filters = getOption("rdbnomics.filters"))
+  filters = getOption("rdbnomics.filters")
+)
 }
 \arguments{
 \item{api_link}{Character string. DBnomics API link of the search.}

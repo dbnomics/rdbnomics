@@ -2,12 +2,13 @@
 #'
 #' \code{dbnomics} is a simple ggplot2 theme for drawing nicer graphs. We do not
 #' recommend to use it. It has been included in the package to avoid errors
-#' from the vignette examples.
+#' when reproducing the vignette examples.
 #'
 #' @param ... Arguments to be passed to \code{theme}.
 #' 
 #' @examples
 #' \dontrun{
+#' library(magrittr)
 #' library(ggplot2)
 #' 
 #' rdb("IMF", "WEO", query = "France current account balance percent") %>%

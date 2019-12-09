@@ -4,9 +4,11 @@
 \alias{rdb_last_updates}
 \title{Download informations about the last DBnomics updates.}
 \usage{
-rdb_last_updates(all = FALSE,
+rdb_last_updates(
+  all = FALSE,
   use_readLines = getOption("rdbnomics.use_readLines"),
-  curl_config = getOption("rdbnomics.curl_config"))
+  curl_config = getOption("rdbnomics.curl_config")
+)
 }
 \arguments{
 \item{all}{Logical (default \code{FALSE}). If \code{TRUE}, then the full

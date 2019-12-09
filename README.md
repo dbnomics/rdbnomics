@@ -98,11 +98,11 @@ df2 <- rdb("IMF", "WEO", query = "current account balance percent")
 
 Fetch one series from the dataset 'Doing Business' of WB provider with the link:
 ```r
-df1 <- rdb_by_api_link("https://api.db.nomics.world/v22/series/WB/DB?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%7D&q=IC.REG.PROC.FE.NO&observations=1&format=json&align_periods=1&offset=0&facets=0")
+df1 <- rdb(url = "https://api.db.nomics.world/v22/series/WB/DB?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%7D&q=IC.REG.PROC.FE.NO&observations=1&format=json&align_periods=1&offset=0&facets=0")
 ```
 
 ## Proxy configuration or connection error `Could not resolve host`
-When using the functions `rdb` or `rdb_...`, you may come across the following error:
+When using the function `rdb`, you may come across the following error:
 ```r
 Error in open.connection(con, "rb") :
   Could not resolve host: api.db.nomics.world
@@ -147,7 +147,7 @@ options(rdbnomics.curl = NULL)
 ```
 
 #### Use the connection only for a function call
-If a complete configuration is not needed but just an "on the fly" execution, then use the argument `curl_config` of the functions `rdb` and `rdb_...`:
+If a complete configuration is not needed but just an "on the fly" execution, then use the argument `curl_config` of the function `rdb`:
 ```r
 df1 <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN", curl_config = h)
 ```
@@ -170,7 +170,7 @@ options(rdbnomics.use_readLines = FALSE)
 ```
 
 #### Use the connection only for a function call
-If you just want to do it once, you may use the argument `use_readLines` of the functions `rdb` and `rdb_...`:
+If you just want to do it once, you may use the argument `use_readLines` of the function `rdb`:
 ```r
 df1 <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN", use_readLines = TRUE)
 ```
