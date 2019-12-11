@@ -37,7 +37,7 @@ h4.date { /* Header 4 - and the author and data headers use this too  */
 
 # DBnomics: the world's economic database
 
-You can explore all the economic data from different providers by following the link [db.nomics.world](https://db.nomics.world)  
+Explore all the economic data from different providers (national and international statistical institutes, central banks, etc.), for free, following the link [db.nomics.world](https://db.nomics.world)  
 (*N.B.: in the examples, data have already been retrieved on september 23<sup>rd</sup> 2019*).
 
 [![](dbnomics001.png)](https://db.nomics.world)
@@ -156,7 +156,7 @@ df <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN") %>%
 df <- rdbnomics:::rdbnomics_df001
 ```
 
-In such data.frame (data.table or tibble), you will always find at least nine columns:
+In such data.frame (data.table or tibble), you will always find at least ten columns:
 
 - `provider_code`
 - `dataset_code`
@@ -182,7 +182,7 @@ df %>%
 ```
 
 ```{r, fig.align = 'center'}
-ggplot(df, aes(x = period, y = value, color = series_code)) +
+ggplot(df, aes(x = period, y = value, color = series_name)) +
   geom_line(size = 1.2) +
   geom_point(size = 2) +
   dbnomics()
@@ -211,7 +211,7 @@ df %>%
 ```
 
 ```{r, fig.align = 'center'}
-ggplot(df, aes(x = period, y = value, color = series_code)) +
+ggplot(df, aes(x = period, y = value, color = series_name)) +
   geom_line(size = 1.2) +
   geom_point(size = 2) +
   dbnomics()
@@ -235,18 +235,18 @@ df %>%
 ```
 
 ```{r, fig.align = 'center'}
-ggplot(df, aes(x = period, y = value, color = series_code)) +
+ggplot(df, aes(x = period, y = value, color = series_name)) +
   geom_line(size = 1.2) +
   geom_point(size = 2) +
-  dbnomics()
+  dbnomics(legend.text = element_text(size = 7))
 ```
 
 # Fetch time series by `mask`
 The code mask notation is a very concise way to select one or many time series at once.
 
-## Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF
+## Fetch one series from dataset 'Balance of Payments' (BOP) of IMF
 ```{r, eval = FALSE}
-df <- rdb("IMF", "CPI", mask = "M.DE.PCPIEC_WT") %>%
+df <- rdb("IMF", "BOP", mask = "A.FR.BCA_BP6_EUR") %>%
   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
@@ -260,7 +260,7 @@ df %>%
 ```
 
 ```{r, fig.align = 'center'}
-ggplot(df, aes(x = period, y = value, color = series_code)) +
+ggplot(df, aes(x = period, y = value, color = series_name)) +
   geom_step(size = 1.2) +
   geom_point(size = 2) +
   dbnomics()
@@ -268,14 +268,14 @@ ggplot(df, aes(x = period, y = value, color = series_code)) +
 
 In the event that you only use the arguments `provider_code`, `dataset_code` and `mask`, you can drop the name `mask` and run:
 ```{r, eval = FALSE}
-df <- rdb("IMF", "CPI", "M.DE.PCPIEC_WT")
+df <- rdb("IMF", "BOP", "A.FR.BCA_BP6_EUR")
 ```
 
-## Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF
+## Fetch two series from dataset 'Balance of Payments' (BOP) of IMF
 
 You just have to add a `+` between two different values of a dimension.
 ```{r, eval = FALSE}
-df <- rdb("IMF", "CPI", mask = "M.DE+FR.PCPIEC_WT") %>%
+df <- rdb("IMF", "BOP", mask = "A.FR+ES.BCA_BP6_EUR") %>%
   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
@@ -290,16 +290,16 @@ df %>%
 ```
 
 ```{r, fig.align = 'center'}
-ggplot(df, aes(x = period, y = value, color = series_code)) +
+ggplot(df, aes(x = period, y = value, color = series_name)) +
   geom_step(size = 1.2) +
   geom_point(size = 2) +
   dbnomics()
 ```
 
-## Fetch all series along one dimension from dataset 'Consumer Price Index' (CPI) of IMF
+## Fetch all series along one dimension from dataset 'Balance of Payments' (BOP) of IMF
 
 ```{r, eval = FALSE}
-df <- rdb("IMF", "CPI", mask = "M..PCPIEC_WT") %>%
+df <- rdb("IMF", "BOP", mask = "A..BCA_BP6_EUR") %>%
   filter(!is.na(value)) %>%
   arrange(desc(period), REF_AREA) %>%
   head(100)
@@ -314,10 +314,10 @@ df %>%
   display_table()
 ```
 
-## Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF
+## Fetch series along multiple dimensions from dataset 'Balance of Payments' (BOP) of IMF
 
 ```{r, eval = FALSE}
-df <- rdb("IMF", "CPI", mask = "M..PCPIEC_IX+PCPIA_IX") %>%
+df <- rdb("IMF", "BOP", mask = "A.FR.BCA_BP6_EUR+IA_BP6_EUR") %>%
   filter(!is.na(value)) %>%
   group_by(INDICATOR) %>%
   top_n(n = 50, wt = period)
@@ -355,7 +355,7 @@ df %>%
 ```
 
 ```{r, fig.align = 'center'}
-ggplot(df, aes(x = period, y = value, color = series_code)) +
+ggplot(df, aes(x = period, y = value, color = series_name)) +
   geom_line(size = 1.2) +
   geom_point(size = 2) +
   dbnomics()
@@ -382,7 +382,7 @@ df %>%
 ```
 
 ```{r, fig.align = 'center'}
-ggplot(df, aes(x = period, y = value, color = series_code)) +
+ggplot(df, aes(x = period, y = value, color = series_name)) +
   geom_line(size = 1.2) +
   geom_point(size = 2) +
   dbnomics()
@@ -475,10 +475,10 @@ When you don't know the codes of the dimensions, provider, dataset or series, yo
 - click on "*Copy API link*" in the menu of the "*Download*" button,
 ![](dbnomics003.png)  
 
-- use the `rdb(url = ...)` function such as below.  
+- use the `rdb(api_link = ...)` function such as below.  
 
 ```{r, eval = FALSE}
-df <- rdb(url = "https://api.db.nomics.world/v22/series/WB/DB?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%7D&q=IC.REG.PROC.FE.NO&observations=1&format=json&align_periods=1&offset=0&facets=0") %>%
+df <- rdb(api_link = "https://api.db.nomics.world/v22/series/WB/DB?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%7D&q=IC.REG.PROC.FE.NO&observations=1&format=json&align_periods=1&offset=0&facets=0") %>%
   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
@@ -501,13 +501,13 @@ ggplot(df, aes(x = period, y = value, color = series_name)) +
 
 # Fetch time series from the cart
 
-On the cart page of the [DBnomics website](https://db.nomics.world), click on "*Copy API link*" and copy-paste it as an argument of the `rdb(url = ...)` function. Please note that when you update your cart, you have to copy this link again, because the link itself contains the ids of the series in the cart.
+On the cart page of the [DBnomics website](https://db.nomics.world), click on "*Copy API link*" and copy-paste it as an argument of the `rdb(api_link = ...)` function. Please note that when you update your cart, you have to copy this link again, because the link itself contains the ids of the series in the cart.
 <center>
 ![](dbnomics005.png)
 </center>
   
 ```{r, eval = FALSE}
-df <- rdb(url = "https://api.db.nomics.world/v22/series?observations=1&series_ids=BOE/6008/RPMTDDC,BOE/6231/RPMTBVE") %>%
+df <- rdb(api_link = "https://api.db.nomics.world/v22/series?observations=1&series_ids=BOE/6008/RPMTDDC,BOE/6231/RPMTBVE") %>%
   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
@@ -542,7 +542,6 @@ df %>%
 ggplot(df, aes(x = period, y = value, color = series_name)) +
   geom_line(size = 1.2) +
   geom_point(size = 2) +
-  scale_y_continuous(labels = function(x) { format(x, big.mark = " ") }) +
   dbnomics()
 ```
 

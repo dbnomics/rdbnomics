@@ -1,7 +1,7 @@
 # rdbnomics 0.5.1
 
 * New argument 'query' for function `rdb()`.
-* New argument 'url' for function `rdb()` to replace `rdb_by_api_link()`.
+* New argument 'api_link' for function `rdb()` to replace `rdb_by_api_link()`.
 * Small class correction for R 3.1.
 
 # rdbnomics 0.5.0

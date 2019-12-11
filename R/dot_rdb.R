@@ -1,4 +1,4 @@
-rdb_url <- function(
+.rdb <- function(
   api_link,
   use_readLines = getOption("rdbnomics.use_readLines"),
   curl_config = getOption("rdbnomics.curl_config"),

@@ -132,9 +132,9 @@ rdb_by_api_link <- function(
   curl_config = getOption("rdbnomics.curl_config"),
   filters = getOption("rdbnomics.filters")
 ) {
-  .Deprecated("rdb(url = ...)", old = "rdb_by_api_link(...)")
+  .Deprecated("rdb(api_link = ...)", old = "rdb_by_api_link(api_link = ...)")
 
-  rdb_url(
+  .rdb(
     api_link = api_link,
     use_readLines = use_readLines,
     curl_config = curl_config,
