@@ -66,7 +66,7 @@ df4 <- rdb("IMF", "BOP", mask = "A.FR.BCA_BP6_EUR+IA_BP6_EUR")
 
 In the event that you only use the arguments `provider_code`, `dataset_code` and `mask`, you can drop the name `mask` and run:
 ```r
-df <- rdb("IMF", "BOP", "A.FR.BCA_BP6_EUR")
+df4 <- rdb("IMF", "BOP", "A.FR.BCA_BP6_EUR")
 ```
 
 Fetch time series by `dimensions`:
@@ -99,6 +99,11 @@ df2 <- rdb("IMF", "WEO", query = "current account balance percent")
 Fetch one series from the dataset 'Doing Business' of WB provider with the link:
 ```r
 df1 <- rdb(api_link = "https://api.db.nomics.world/v22/series/WB/DB?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%7D&q=IC.REG.PROC.FE.NO&observations=1&format=json&align_periods=1&offset=0&facets=0")
+```
+
+In the event that you only use the argument `api_link`, you can drop the name and run:
+```r
+df1 <- rdb("https://api.db.nomics.world/v22/series/WB/DB?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%7D&q=IC.REG.PROC.FE.NO&observations=1&format=json&align_periods=1&offset=0&facets=0")
 ```
 
 ## Proxy configuration or connection error `Could not resolve host`

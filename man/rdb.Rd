@@ -170,6 +170,13 @@ df2 <- rdb(
     "&observations=1&format=json&align_periods=1&offset=0&facets=0"
   )
 )
+# or when no argument names are given (provider_code -> api_link)
+df1 <- rdb(
+  paste0(
+    "https://api.db.nomics.world/v22/",
+    "series?observations=1&series_ids=AMECO/ZUTN/EA19.1.0.0.0.ZUTN,IMF/CPI/A.AT.PCPIT_IX"
+  )
+)
 
 
 ## Use a specific proxy to fetch the data

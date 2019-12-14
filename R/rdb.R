@@ -135,6 +135,13 @@
 #'     "&observations=1&format=json&align_periods=1&offset=0&facets=0"
 #'   )
 #' )
+#' # or when no argument names are given (provider_code -> api_link)
+#' df1 <- rdb(
+#'   paste0(
+#'     "https://api.db.nomics.world/v22/",
+#'     "series?observations=1&series_ids=AMECO/ZUTN/EA19.1.0.0.0.ZUTN,IMF/CPI/A.AT.PCPIT_IX"
+#'   )
+#' )
 #' 
 #' 
 #' ## Use a specific proxy to fetch the data
@@ -188,8 +195,7 @@
 #' @export
 rdb <- function(
   provider_code = NULL, dataset_code = NULL,
-  ids = NULL, dimensions = NULL, mask = NULL, query = NULL,
-  api_link = NULL,
+  ids = NULL, dimensions = NULL, mask = NULL, query = NULL, api_link = NULL,
   filters = getOption("rdbnomics.filters"),
   use_readLines = getOption("rdbnomics.use_readLines"),
   curl_config = getOption("rdbnomics.curl_config"),
@@ -237,6 +243,29 @@ rdb <- function(
   api_link_null <- is.null(api_link)
   api_link_not_null <- !api_link_null
 
+  # provider_code is considered as api_link in some cases
+  if (
+    provider_code_not_null & dataset_code_null & dimensions_null & mask_null &
+    ids_null & query_null & api_link_null & getOption("rdbnomics.rdb_no_arg")
+  ) {
+    is_http <- grepl("^http(s)*://", tolower(provider_code))
+    if (sum(is_http, na.rm = TRUE) > 0) {
+      fcall <- sys.call()
+      modif_arg <- call_ok(fcall)
+
+      if (modif_arg) {
+        api_link <- provider_code
+        provider_code <- NULL
+
+        provider_code_null <- TRUE
+        provider_code_not_null <- !provider_code_null
+
+        api_link_null <- FALSE
+        api_link_not_null <- !api_link_null
+      }
+    }
+  }
+
   # By api_link i.e. .rdb(api_link = api_link)
   if (api_link_not_null) {
     check_argument(api_link, "character", not_null = FALSE)
@@ -259,7 +288,7 @@ rdb <- function(
   # provider_code is considered as ids in some cases
   if (
     provider_code_not_null & dataset_code_null & dimensions_null & mask_null &
-    ids_null & getOption("rdbnomics.rdb_no_arg")
+    ids_null & query_null & api_link_null & getOption("rdbnomics.rdb_no_arg")
   ) {
     fcall <- sys.call()
     modif_arg <- call_ok(fcall)
@@ -279,7 +308,8 @@ rdb <- function(
   # ids is considered as mask in some cases
   if (
     provider_code_not_null & dataset_code_not_null & dimensions_null &
-    mask_null & ids_not_null & getOption("rdbnomics.rdb_no_arg")
+    mask_null & ids_not_null & query_null & api_link_null &
+    getOption("rdbnomics.rdb_no_arg")
   ) {
     fcall <- sys.call()
     modif_arg <- call_ok(fcall)

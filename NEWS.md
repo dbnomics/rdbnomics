@@ -2,6 +2,7 @@
 
 * New argument 'query' for function `rdb()`.
 * New argument 'api_link' for function `rdb()` to replace `rdb_by_api_link()`.
+* New internal function `.rdb()` because `rdb_by_api_link()` is deprecated.
 * Small class correction for R 3.1.
 
 # rdbnomics 0.5.0
