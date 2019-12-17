@@ -1,6 +1,6 @@
 #' DBnomics ggplot2 theme
 #'
-#' \code{dbnomics} is a simple ggplot2 theme for drawing nicer graphs. We do not
+#' \code{dbnomics} is a simple ggplot2 theme for drawing nicer graphics. We do not
 #' recommend to use it. It has been included in the package to avoid errors
 #' when reproducing the vignette examples.
 #'
