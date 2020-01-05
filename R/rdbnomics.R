@@ -1,6 +1,6 @@
 #' Package rdbnomics
 #'
-#' DBnomics R client.
+#' DBnomics R client (<https://db.nomics.world/>).
 #'
 #' @docType package
 #' @name rdbnomics

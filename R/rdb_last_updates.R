@@ -34,6 +34,7 @@
 #' rdb_last_updates(curl_config = list(proxy = "<proxy>", proxyport = <port>))
 #' }
 #' @seealso \code{\link{rdb_providers}}
+#' @author Sebastien Galais
 #' @export
 rdb_last_updates <- function(
   all = FALSE, use_readLines = getOption("rdbnomics.use_readLines"),

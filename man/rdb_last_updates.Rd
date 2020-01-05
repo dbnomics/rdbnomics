@@ -55,3 +55,6 @@ rdb_last_updates(curl_config = list(proxy = "<proxy>", proxyport = <port>))
 \seealso{
 \code{\link{rdb_providers}}
 }
+\author{
+Sebastien Galais
+}

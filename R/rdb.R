@@ -12,6 +12,9 @@
 #' In the event that only the argument \code{ids} is provided (and those in the
 #' ellipsis \code{...}), the argument name can be dropped. The character string
 #' vector is directly passed to \code{ids}. \cr
+#' If only the argument \code{api_link} is provided (and those in the
+#' ellipsis \code{...}), then the argument name can be dropped. The character string
+#' vector is directly passed to \code{api_link}. \cr
 #' In the same way, if only \code{provider_code}, \code{dataset_code} and
 #' \code{mask} are provided then the arguments names can be dropped. The
 #' last character string is automatically passed to \code{mask}.
@@ -31,7 +34,8 @@
 #' several masks in the specified provider and dataset.
 #' @param query Character string (default \code{NULL}). A query to
 #' filter/select series from a provider's dataset.
-#' @param api_link Character string. DBnomics API link of the search.
+#' @param api_link Character string. DBnomics API link of the search. It should
+#' starts with \code{http://} or \code{https://}.
 #' @param filters List (default \code{NULL}). This argument must be a named
 #' list for one filter because the function \code{toJSON} of the package \pkg{jsonlite}
 #' is used before sending the request to the server. For multiple filters,
@@ -192,6 +196,7 @@
 #'   )
 #' )
 #' }
+#' @author Sebastien Galais
 #' @export
 rdb <- function(
   provider_code = NULL, dataset_code = NULL,
@@ -507,8 +512,8 @@ rdb <- function(
   }
 
   stop(
-    "Please provide correct 'dimensions', 'mask', 'ids', 'query', ",
-    "'api_link' or 'filters'.",
+    "Please provide correct 'provider_code', 'dataset_code', 'dimensions', ",
+    "'mask', 'ids', 'query', 'api_link' or 'filters'.",
     call. = FALSE
   )
 }

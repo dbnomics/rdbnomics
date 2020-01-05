@@ -4,10 +4,14 @@
 \alias{dbnomics}
 \title{DBnomics ggplot2 theme}
 \usage{
-dbnomics(...)
+dbnomics(color_palette = "Set1", ...)
 }
 \arguments{
-\item{...}{Arguments to be passed to \code{theme}.}
+\item{color_palette}{Character string (default \code{"Set1"}) to change the
+default color palette. If you want to use the default palette, set it to
+\code{NULL}.}
+
+\item{...}{Arguments to be passed to the function \code{\link[ggplot2]{theme}}.}
 }
 \description{
 \code{dbnomics} is a simple ggplot2 theme for drawing nicer graphics. We do not
@@ -25,4 +29,7 @@ rdb("IMF", "WEO", query = "France current account balance percent") \%>\%
   geom_point(size = 2) +
   dbnomics()
 }
+}
+\author{
+Sebastien Galais
 }

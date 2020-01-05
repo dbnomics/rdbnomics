@@ -1,4 +1,4 @@
-#' Download DBnomics data using API link.
+#' Download DBnomics data using API link (deprecated).
 #'
 #' \code{rdb_by_api_link} downloads data series from
 #' \href{https://db.nomics.world/}{DBnomics}.
@@ -125,6 +125,7 @@
 #' )
 #' }
 #' @seealso \code{\link{rdb}}
+#' @author Sebastien Galais
 #' @export
 rdb_by_api_link <- function(
   api_link,

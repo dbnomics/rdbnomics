@@ -2,7 +2,7 @@
 % Please edit documentation in R/rdb_by_api_link.R
 \name{rdb_by_api_link}
 \alias{rdb_by_api_link}
-\title{Download DBnomics data using API link.}
+\title{Download DBnomics data using API link (deprecated).}
 \usage{
 rdb_by_api_link(
   api_link,
@@ -147,4 +147,7 @@ df3 <- rdb_by_api_link(
 }
 \seealso{
 \code{\link{rdb}}
+}
+\author{
+Sebastien Galais
 }

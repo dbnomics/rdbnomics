@@ -38,7 +38,7 @@ h4.date { /* Header 4 - and the author and data headers use this too  */
 # DBnomics: the world's economic database
 
 Explore all the economic data from different providers (national and international statistical institutes, central banks, etc.), for free, following the link [db.nomics.world](https://db.nomics.world)  
-(*N.B.: in the examples, data have already been retrieved on september 23<sup>rd</sup> 2019*).
+(*N.B.: in the examples, data have already been retrieved on december 11<sup>rd</sup> 2019*).
 
 [![](dbnomics001.png)](https://db.nomics.world)
 
@@ -93,35 +93,58 @@ reorder_cols <- function(x) {
   dplyr::select(x, cols)
 }
 
-scale_colour_discrete <- function(...) {
-  scale_color_brewer(palette = "Set1")
-}
-
 knitr::opts_chunk$set(dev.args = list(bg = "transparent"))
 
-dbnomics <- function(...) {
-  list(
-    scale_x_date(expand = c(0, 0)),
-    scale_y_continuous(labels = function(x) { format(x, big.mark = " ") }),
-    xlab(""),
-    ylab(""),
-    theme_bw(),
-    theme(
-      legend.position = "bottom", legend.direction = "vertical",
-      legend.background = element_rect(fill = "transparent", colour = NA),
-      legend.key = element_blank(),
-      panel.background = element_rect(fill = "transparent", colour = NA),
-      plot.background = element_rect(fill = "transparent", colour = NA),
-      legend.title = element_blank()
+dbnomics <- function(color_palette = "Set1", ...) {
+  # Check if ggplot2 is installed.
+  ggplot2_ok <- try(utils::packageVersion("ggplot2"), silent = TRUE)
+  if (inherits(ggplot2_ok, "try-error")) {
+    stop(
+      "Please run install.packages('ggplot2') to use dbnomics().",
+      call. = FALSE
+    )
+  }
+
+  # DBnomics vignette theme
+  result <- list(
+    ggplot2::scale_x_date(expand = c(0, 0)),
+    ggplot2::scale_y_continuous(
+      labels = function(x) { format(x, big.mark = " ") }
     ),
-    theme(...),
-    annotate(
+    ggplot2::xlab(""),
+    ggplot2::ylab(""),
+    ggplot2::theme_bw(),
+    ggplot2::theme(
+      legend.position = "bottom", legend.direction = "vertical",
+      legend.background = ggplot2::element_rect(
+        fill = "transparent", colour = NA
+      ),
+      legend.key = ggplot2::element_blank(),
+      panel.background = ggplot2::element_rect(
+        fill = "transparent", colour = NA
+      ),
+      plot.background = ggplot2::element_rect(
+        fill = "transparent", colour = NA
+      ),
+      legend.title = ggplot2::element_blank()
+    ),
+    ggplot2::theme(...),
+    ggplot2::annotate(
       geom = "text", label = "DBnomics <https://db.nomics.world>", 
       x = structure(Inf, class = "Date"), y = -Inf,
       hjust = 1.1, vjust = -0.4, col = "grey", 
       fontface = "italic"
     )
   )
+
+  if (!is.null(color_palette)) {
+    result <- c(
+      result,
+      list(ggplot2::scale_color_brewer(palette = color_palette))
+    )
+  }
+
+  result
 }
 
 display_table <- function(DT) {
@@ -708,28 +731,55 @@ ggplot(filter(df, !is.na(value)), aes(x = period, y = value, color = series_name
 We show the function `dbnomics()` as an information.
 
 ```{r, eval = FALSE}
-dbnomics <- function(...) {
-  list(
-    scale_x_date(expand = c(0, 0)),
-    scale_y_continuous(labels = function(x) { format(x, big.mark = " ") }),
-    xlab(""),
-    ylab(""),
-    theme_bw(),
-    theme(
-      legend.position = "bottom", legend.direction = "vertical",
-      legend.background = element_rect(fill = "transparent", colour = NA),
-      legend.key = element_blank(),
-      panel.background = element_rect(fill = "transparent", colour = NA),
-      plot.background = element_rect(fill = "transparent", colour = NA),
-      legend.title = element_blank()
+dbnomics <- function(color_palette = "Set1", ...) {
+  # Check if ggplot2 is installed.
+  ggplot2_ok <- try(utils::packageVersion("ggplot2"), silent = TRUE)
+  if (inherits(ggplot2_ok, "try-error")) {
+    stop(
+      "Please run install.packages('ggplot2') to use dbnomics().",
+      call. = FALSE
+    )
+  }
+
+  # DBnomics vignette theme
+  result <- list(
+    ggplot2::scale_x_date(expand = c(0, 0)),
+    ggplot2::scale_y_continuous(
+      labels = function(x) { format(x, big.mark = " ") }
     ),
-    theme(...),
-    annotate(
+    ggplot2::xlab(""),
+    ggplot2::ylab(""),
+    ggplot2::theme_bw(),
+    ggplot2::theme(
+      legend.position = "bottom", legend.direction = "vertical",
+      legend.background = ggplot2::element_rect(
+        fill = "transparent", colour = NA
+      ),
+      legend.key = ggplot2::element_blank(),
+      panel.background = ggplot2::element_rect(
+        fill = "transparent", colour = NA
+      ),
+      plot.background = ggplot2::element_rect(
+        fill = "transparent", colour = NA
+      ),
+      legend.title = ggplot2::element_blank()
+    ),
+    ggplot2::theme(...),
+    ggplot2::annotate(
       geom = "text", label = "DBnomics <https://db.nomics.world>", 
       x = structure(Inf, class = "Date"), y = -Inf,
       hjust = 1.1, vjust = -0.4, col = "grey", 
       fontface = "italic"
     )
   )
+
+  if (!is.null(color_palette)) {
+    result <- c(
+      result,
+      list(ggplot2::scale_color_brewer(palette = color_palette))
+    )
+  }
+
+  result
 }
 ```

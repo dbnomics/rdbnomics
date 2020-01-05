@@ -5,5 +5,5 @@
 \alias{rdbnomics}
 \title{Package rdbnomics}
 \description{
-DBnomics R client.
+DBnomics R client (<https://db.nomics.world/>).
 }

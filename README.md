@@ -8,7 +8,7 @@
 
 This package provides you access to DBnomics data series. DBnomics is an open-source project with the goal of aggregating the world's economic data in one location, free of charge to the public. DBnomics covers hundreds of millions of series from international and national institutions (Eurostat, World Bank, IMF, ...).
 
-To use this package, you have to provide the codes of the provider, dataset and series you want. You can retrieve them directly on the <a href="https://db.nomics.world/" target="_blank">website</a>. You have access to the API through this <a href="http://api.db.nomics.world/" target="_blank">link</a> and the documentation is <a href="https://api.db.nomics.world/apidocs" target="_blank">here</a>.
+To use this package, you have to provide the codes of the provider, dataset and series you want. You can retrieve them directly on the <a href="https://db.nomics.world/" target="_blank">website</a>. You have access to the API through this <a href="http://api.db.nomics.world/" target="_blank">link</a> and the documentation is <a href="https://api.db.nomics.world/v22/apidocs" target="_blank">here</a>.
 
 DBnomics is hosted on its own <a href="https://git.nomics.world/" target="_blank">gitlab platform</a>. However, in order to install the package more easily, we created a mirror of this package on <a href="https://github.com/dbnomics/rdbnomics" target="_blank">github</a>.
 
@@ -32,7 +32,7 @@ vignette("rdbnomics")
 ```
 
 ## Examples
-Fetch time series by `ids`:
+### Fetch time series by `ids`:
 ```r
 # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 df1 <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN")
@@ -49,7 +49,7 @@ In the event that you only use the argument `ids`, you can drop it and run:
 df <- rdb("AMECO/ZUTN/EA19.1.0.0.0.ZUTN")
 ```
 
-Fetch time series by `mask` :
+### Fetch time series by `mask` :
 ```r
 # Fetch one series from dataset 'Balance of Payments' (BOP) of IMF:
 df1 <- rdb("IMF", "BOP", mask = "A.FR.BCA_BP6_EUR")
@@ -69,7 +69,7 @@ In the event that you only use the arguments `provider_code`, `dataset_code` and
 df4 <- rdb("IMF", "BOP", "A.FR.BCA_BP6_EUR")
 ```
 
-Fetch time series by `dimensions`:
+### Fetch time series by `dimensions`:
 ```r
 # Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 df1 <- rdb("AMECO", "ZUTN", dimensions = list(geo = "ea12"))
@@ -87,7 +87,7 @@ df3 <- rdb("WB", "DB", dimensions = list(country = c("DZ", "PE"), indicator = c(
 df3 <- rdb("WB", "DB", dimensions = '{"country": ["DZ", "PE"], "indicator": ["ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"]}')
 ```
 
-Fetch time series with a `query`:
+### Fetch time series with a `query`:
 ```r
 # Fetch one series from dataset 'WEO by countries' (WEO) of IMF provider:
 df1 <- rdb("IMF", "WEO", query = "France current account balance percent")
@@ -96,7 +96,7 @@ df1 <- rdb("IMF", "WEO", query = "France current account balance percent")
 df2 <- rdb("IMF", "WEO", query = "current account balance percent")
 ```
 
-Fetch one series from the dataset 'Doing Business' of WB provider with the link:
+### Fetch one series from the dataset 'Doing Business' of WB provider with the link:
 ```r
 df1 <- rdb(api_link = "https://api.db.nomics.world/v22/series/WB/DB?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%7D&q=IC.REG.PROC.FE.NO&observations=1&format=json&align_periods=1&offset=0&facets=0")
 ```
@@ -232,6 +232,8 @@ The content of two columns are modified:
 For some analysis, it is more convenient to have a `xts` object instead of a `data.table` object. To transform
 it, you can use the following functions:
 ```r
+library(xts)
+library(data.table)
 library(rdbnomics)
 
 to_xts <- function(
@@ -303,6 +305,8 @@ to_xts(rdb("IMF", "BOP", mask = "A.FR+ES.BCA_BP6_EUR"))
 In the `xts` object, the series codes are used as column names. If you prefer
 the series names (or apply a function to them), you can utilize the function:
 ```r
+library(magrittr)
+
 rdb_rename_xts <- function(x, fun = NULL, ...) {
   nm <- xts::xtsAttributes(x)$codename
   cols <- nm$series_name[match(names(x), nm$series_code)]
@@ -313,8 +317,6 @@ rdb_rename_xts <- function(x, fun = NULL, ...) {
   }
   x
 }
-
-library(magrittr)
 
 rdb("IMF", "BOP", mask = "A.FR+ES.BCA_BP6_EUR") %>%
   to_xts() %>%

@@ -40,7 +40,8 @@ several masks in the specified provider and dataset.}
 \item{query}{Character string (default \code{NULL}). A query to
 filter/select series from a provider's dataset.}
 
-\item{api_link}{Character string. DBnomics API link of the search.}
+\item{api_link}{Character string. DBnomics API link of the search. It should
+starts with \code{http://} or \code{https://}.}
 
 \item{filters}{List (default \code{NULL}). This argument must be a named
 list for one filter because the function \code{toJSON} of the package \pkg{jsonlite}
@@ -86,6 +87,9 @@ The code of each series is given on the
 In the event that only the argument \code{ids} is provided (and those in the
 ellipsis \code{...}), the argument name can be dropped. The character string
 vector is directly passed to \code{ids}. \cr
+If only the argument \code{api_link} is provided (and those in the
+ellipsis \code{...}), then the argument name can be dropped. The character string
+vector is directly passed to \code{api_link}. \cr
 In the same way, if only \code{provider_code}, \code{dataset_code} and
 \code{mask} are provided then the arguments names can be dropped. The
 last character string is automatically passed to \code{mask}.
@@ -227,4 +231,7 @@ df1 <- rdb(
   )
 )
 }
+}
+\author{
+Sebastien Galais
 }
