@@ -696,7 +696,7 @@ df <- rdb(
 )
 ```
 
-The `data.table` columns change a little bit when filters are used. There are two new columns:
+The data.frame (data.table or tibble) columns change a little bit when filters are used. There are two new columns:
 
 - `period_middle_day`: the middle day of `original_period` (can be useful when you compare graphically interpolated series and original ones).
 - `filtered` (boolean): `TRUE` if the series is filtered, `FALSE` otherwise.
