@@ -1,9 +1,15 @@
+# rdbnomics 0.5.2
+
+* Correction of a bug in the internal function `deploy`. The cases
+  `to_list_length = 1` and `to_list_length = 2` are now well handled
+  (@julia.schmidt, 20200205 forum.db.nomics.world).
+
 # rdbnomics 0.5.1
 
 * New argument 'query' for function `rdb()`.
 * New argument 'api_link' for function `rdb()` to replace `rdb_by_api_link()`.
 * New internal function `.rdb()` because `rdb_by_api_link()` is deprecated.
-* New function `dbnomics()` which is used in the vignette (@blu2ego, #2).
+* New function `dbnomics()` which is used in the vignette (@blu2ego, #2 github).
 * Small class correction for R 3.1.
 
 # rdbnomics 0.5.0
@@ -47,7 +53,7 @@
 * New `rdb_last_updates()` shows the last updates.
 * In the functions, dates and timestamps are transformed using `as.Date()` and
   `as.POSIXct()`.
-* `dimensions` in `rdb()` can be a list (@Iwo, #1).
+* `dimensions` in `rdb()` can be a list (@Iwo, #1 gitlab).
 
 # rdbnomics 0.4.3
 

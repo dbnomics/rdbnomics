@@ -168,10 +168,13 @@ deploy <- function(DT, columns = NULL, reference_column = "value") {
           v <- y[[iv]]
           if (inherits(v, "list")) {
             v <- unlist(v)
-            if (length(v) == 1) {
+            if (length(v) == 1 & to_list_length != 1) {
               # New col
               y[[iv]] <- paste0(trim(v), ",")
-            } else if ( (length(v) == to_list_length + 1) | (length(v) == 2) ) {
+            } else if (
+              (length(v) == to_list_length + 1) |
+              (length(v) == 2 & to_list_length != 2)
+            ) {
               # New col
               y[[iv]] <- paste0(trim(v[1]), ",", utils::tail(v, -1))
             } else if (length(v) != to_list_length) {
