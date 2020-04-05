@@ -6,7 +6,7 @@
   the available datasets of the providers (@fmgithub2017, #3 github).
 * Add a clearer error message to the function to_xts() in README (Martin
   Feldkircher, 20200326 email).
-* Update vignette.
+* Update vignette for `rdb_datasets()` and `rdb_dimensions()`.
 
 # rdbnomics 0.5.2
 
