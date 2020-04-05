@@ -651,3 +651,145 @@ list_has_curl_handle <- function(x) {
     FALSE
   }
 }
+
+#-------------------------------------------------------------------------------
+# unpack
+unpack <- function(DT) {
+  if (is.null(DT)) {
+    return(NULL)
+  }
+  if (is.list(DT) & !data.table::is.data.table(DT)) {
+    if (length(DT) <= 0) {
+      return(NULL)
+    }
+  }
+  if (nrow(DT) <= 0) {
+    return(NULL)
+  }
+  data.table::setDT(DT)
+  DT[, k := .I]
+  DT <- split(DT, by = "k")
+  lapply(DT, function(DT_) {
+    if (!("children" %in% colnames(DT_))) {
+      DT_[, k := NULL]
+      DT_[]
+    } else {
+      if (is.null(DT_$children[[1]])) {
+        DT_[, k := NULL]
+        DT_[, .SD, .SDcols = setdiff(colnames(DT_), "children")]
+      } else {
+        lapply(DT_$children, unpack)
+      }
+    }
+  })
+}
+
+#-------------------------------------------------------------------------------
+# rbindlist_recursive
+rbindlist_recursive <- function(l) {
+  if (is.null(l)) {
+    return(NULL)
+  }
+  if (data.table::is.data.table(l)) {
+    return(l)
+  }
+  if (
+    sum(sapply(l, is.data.table), na.rm = TRUE) != length(l)
+  ) {
+    l <- lapply(l, rbindlist_recursive)
+  }
+  data.table::rbindlist(l, use.names = TRUE, fill = TRUE)
+}
+
+#-------------------------------------------------------------------------------
+# check_datasets
+check_datasets <- function(l, run = 1) {
+  if (is.null(l)) {
+    return(l)
+  }
+
+  if (run == 0) {
+    return(l)
+  }
+
+  for (i1 in names(l)) {
+    if (is.null(l[[i1]])) {
+      l[[i1]] <- NULL
+    } else {
+      if (length(l[[i1]]) <= 0) {
+        l[[i1]] <- NULL
+      } else {
+        if (nrow(l[[i1]]) <= 0) {
+          l[[i1]] <- NULL
+        }
+      }
+    }
+  }
+
+  check_datasets(l, run = run - 1)
+}
+
+#-------------------------------------------------------------------------------
+# check_dimensions
+check_dimensions <- function(l, run = 1) {
+  if (is.null(l)) {
+    return(l)
+  }
+  
+  if (run == 0) {
+    return(l)
+  }
+
+  for (i1 in names(l)) {
+    if (length(l[[i1]]) <= 0) {
+      l[[i1]] <- NULL
+    } else {
+      for (i2 in names(l[[i1]])) {
+        if (is.null(l[[i1]][[i2]])) {
+          l[[i1]][[i2]] <- NULL
+        } else {
+          if (length(l[[i1]][[i2]]) <= 0) {
+            l[[i1]][[i2]] <- NULL
+          }
+        }
+      }
+    }
+  }
+
+  check_dimensions(l, run = run - 1)
+}
+
+#-------------------------------------------------------------------------------
+# capital_first
+capital_first <- function(x) {
+  if (is.null(x)) {
+    return(x)
+  }
+
+  if (length(x) <= 0) {
+    return(x)
+  }
+
+  paste0(
+    toupper(substr(x, 1, 1)),
+    tolower(substr(x, 2, nchar(x)))
+  )
+}
+
+#-------------------------------------------------------------------------------
+# new_title
+new_title <- function(x) {
+  if (is.null(x)) {
+    return("unknown")
+  }
+
+  if (length(x) <= 0) {
+    return("unknown")
+  }
+
+  if (x != capital_first(x)) {
+    return(capital_first(x))
+  }
+
+  toupper(x)
+}

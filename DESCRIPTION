@@ -1,7 +1,7 @@
 Package: rdbnomics
 Type: Package
 Title: Download DBnomics Data
-Version: 0.5.2
+Version: 0.6.0
 Authors@R: c(person("Sebastien", "Galais", role = c("cre", "ctb"),
                      email = "s915.stem@gmail.com"),
              person("Thomas", "Brand", role = c("aut"),
@@ -11,15 +11,15 @@ Description: R access to hundreds of millions data series from DBnomics API
 Depends:
     R (>= 3.1.0)
 License: AGPL-3
-URL: https://github.com/dbnomics/rdbnomics
-BugReports: https://github.com/dbnomics/rdbnomics/issues
+URL: https://git.nomics.world/dbnomics/rdbnomics
+BugReports: https://git.nomics.world/dbnomics/rdbnomics/issues
 Encoding: UTF-8
 LazyData: true
 Imports:
     curl,
     jsonlite,
     data.table
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 Suggests:
     knitr,
     rmarkdown,

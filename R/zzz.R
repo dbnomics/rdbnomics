@@ -38,7 +38,9 @@
     rdbnomics.metadata = TRUE,
     rdbnomics.filters = NULL,
     rdbnomics.progress_bar = TRUE,
-    rdbnomics.translate_codes = TRUE
+    rdbnomics.translate_codes = TRUE,
+    rdbnomics.progress_bar_datasets = FALSE,
+    rdbnomics.progress_bar_dimensions = FALSE
   )
   opts <- append(
     opts,

@@ -277,6 +277,23 @@ to_xts <- function(
       no_code = numeric()
     )
   }
+
+  if (!inherits(x[[1]], "Date")) {
+    stop(
+      paste0(
+        "The first needed column '", needed_columns[1], "' is not of class ",
+        "'Date' which is a problem for data.table::as.xts.data.table()."
+      ),
+      "\n",
+      paste0(
+        "Please check with packageVersion(\"rdbnomics\") that your version is ",
+        "greater or equal to '0.5.2'. Otherwise update rdbnomics or contact ",
+        "s915.stem@gmail.com."
+      ),
+      call. = FALSE
+    )
+  }
+
   x <- data.table::as.xts.data.table(x)
   xts::xtsAttributes(x) <- list(codename = attr_names)
 

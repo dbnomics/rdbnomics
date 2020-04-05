@@ -38,7 +38,7 @@ h4.date { /* Header 4 - and the author and data headers use this too  */
 # DBnomics: the world's economic database
 
 Explore all the economic data from different providers (national and international statistical institutes, central banks, etc.), for free, following the link [db.nomics.world](https://db.nomics.world)  
-(*N.B.: in the examples, data have already been retrieved on december 11<sup>rd</sup> 2019*).
+(*N.B.: in the examples, data have already been retrieved on march 23<sup>rd</sup> 2020*).
 
 [![](dbnomics001.png)](https://db.nomics.world)
 
@@ -57,6 +57,7 @@ library <- function(...) {
 ```
 
 ```{r}
+library(data.table)
 library(magrittr)
 library(dplyr)
 library(ggplot2)
@@ -571,6 +572,158 @@ ggplot(df, aes(x = period, y = value, color = series_name)) +
   geom_line(size = 1.2) +
   geom_point(size = 2) +
   dbnomics()
+```
+
+# Fetch the available datasets of a provider
+
+When fetching series from [DBnomics](https://db.nomics.world), you need
+to give a provider and a dataset before specifying correct dimensions. With
+the function `rdb_datasets`, you can download the list of the available datasets
+for a provider.  
+For example, to fetch the **IMF** datasets, you have to use:
+```{r, eval = FALSE}
+rdb_datasets(provider_code = "IMF")
+```
+
+The result is a named list (its name is **IMF**) with one element which is a
+`data.table`:
+```{r, eval = TRUE, echo = FALSE}
+str(rdbnomics:::rdbnomics_df016)
+```
+
+With the same function, if you want to fetch the available datasets for multiple
+providers, you can give a vector of providers and get a named list.
+```{r, eval = FALSE}
+rdb_datasets(provider_code = c("IMF", "BDF"))
+```
+```{r, eval = TRUE, echo = FALSE}
+str(rdbnomics:::rdbnomics_df018)
+```
+```{r, eval = TRUE, echo = FALSE}
+rdbnomics:::rdbnomics_df018 %>%
+  sapply(function(y) { paste0(": ", nrow(y)) }) %>%
+  {
+    paste0("Number of datasets for ", names(.), " ", unname(.))
+  } %>%
+  cat(sep = "\n")
+```
+
+In the event that you only request the datasets for one provider, if you define
+`simplify = TRUE`, then the result will be a `data.table` not a named list.
+```{r, eval = FALSE}
+rdb_datasets(provider_code = "IMF", simplify = TRUE)
+```
+```{r, eval = TRUE, echo = FALSE}
+rdbnomics:::rdbnomics_df017 %>% display_table()
+```
+
+The extent of datasets gathered by [DBnomics](https://db.nomics.world) can be
+appreciate by using the function with the argument `provider_code` set to
+`NULL`:
+```{r, eval = FALSE}
+options(rdbnomics.progress_bar_datasets = TRUE)
+rdb_datasets()
+options(rdbnomics.progress_bar_datasets = FALSE)
+```
+```{r, eval = TRUE, echo = FALSE}
+rdbnomics:::rdbnomics_df019 %>%
+  {
+    data.table(Provider = names(.), `Number of datasets` = sapply(., nrow))
+  } %>%
+  .[order(Provider)] %>%
+  display_table()
+```
+
+# Fetch the possible dimensions of available datasets of a provider
+
+When fetching series from [DBnomics](https://db.nomics.world), it can be 
+interesting and especially useful to specify dimensions for a particular
+dataset to download only the series you want to analyse. With
+the function `rdb_dimensions`, you can download these dimensions and their
+meanings.  
+For example, for the dataset **WEO** of the **IMF**, you may use:
+```{r, eval = FALSE}
+rdb_dimensions(provider_code = "IMF", dataset_code = "WEO")
+```
+
+The result is a nested named list (its names are **IMF**, **WEO** and the
+dimensions names) with a `data.table` at the end of each branch:
+```{r, eval = TRUE, echo = FALSE}
+rdbnomics:::rdbnomics_df020 %$%
+  IMF %$%
+  WEO %>%
+  {
+    paste0("Number of dimensions for IMF/WEO : ", length(.))
+  } %>%
+  cat(sep = "\n")
+```
+
+```{r, eval = TRUE, echo = FALSE}
+rdbnomics:::rdbnomics_df020 %$%
+  IMF %$%
+  WEO %>%
+  .[[1]] %>%
+  display_table()
+```
+
+```{r, eval = TRUE, echo = FALSE}
+rdbnomics:::rdbnomics_df020 %$%
+  IMF %$%
+  WEO %>%
+  .[[2]] %>%
+  display_table()
+```
+
+In the event that you only request the dimensions for one dataset for one
+provider, if you define `simplify = TRUE`, then the result will be a named list
+`data.table` not a nested named list.
+```{r, eval = FALSE}
+rdb_dimensions(provider_code = "IMF", dataset_code = "WEO", simplify = TRUE)
+```
+```{r, eval = TRUE, echo = FALSE}
+str(rdbnomics:::rdbnomics_df021)
+```
+
+You can measure the vast extent of datasets gathered by
+[DBnomics](https://db.nomics.world) by downloading all the possible
+dimensions. To do this, you have to set the arguments
+`provider_code` and `dataset_code` to `NULL`.  
+Warning : it's relatively long to run and heavy to show so we display
+the first 100.
+```{r, eval = FALSE}
+options(rdbnomics.progress_bar_datasets = TRUE)
+rdb_dimensions()
+options(rdbnomics.progress_bar_datasets = FALSE)
+```
+```{r, eval = TRUE, echo = FALSE}
+rdbnomics:::rdbnomics_df022 %>%
+  .[order(Provider, Dataset)] %>%
+  head(100) %>%
+  display_table()
+
+# rdbnomics_df022 %>%
+#   sapply(function(u) {
+#     sapply(
+#       u,
+#       function(x) {
+#         sapply(
+#           x,
+#           function(y) {
+#             nrow(y)
+#           },
+#           simplify = FALSE
+#         ) %>%
+#           {
+#             data.table(Dimension = names(.), `Number of codes` = unname(.))
+#           }
+#       },
+#       simplify = FALSE
+#     ) %>%
+#     rbindlist(idcol = "Dataset")
+#   },
+#   simplify = FALSE
+# ) %>%
+#   rbindlist(idcol = "Provider")
 ```
 
 # Proxy configuration or connection error `Could not resolve host`
