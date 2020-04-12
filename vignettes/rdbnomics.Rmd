@@ -38,7 +38,7 @@ h4.date { /* Header 4 - and the author and data headers use this too  */
 # DBnomics: the world's economic database
 
 Explore all the economic data from different providers (national and international statistical institutes, central banks, etc.), for free, following the link [db.nomics.world](https://db.nomics.world)  
-(*N.B.: in the examples, data have already been retrieved on march 23<sup>rd</sup> 2020*).
+(*N.B.: in the examples, data have already been retrieved on april 6<sup>th</sup> 2020*).
 
 [![](dbnomics001.png)](https://db.nomics.world)
 

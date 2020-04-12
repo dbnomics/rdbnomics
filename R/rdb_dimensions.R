@@ -33,6 +33,7 @@
 #' dimensions are requested for only one provider and one dataset then a
 #' named list of \code{data.table}s is returned, not a nested named list of
 #' \code{data.table}s.
+#' @param ... Additionals arguments.
 #' @return A nested named list of \code{data.table}s or a named list of
 #' \code{data.table}s.
 #' @examples
@@ -66,8 +67,15 @@ rdb_dimensions <- function(
   provider_code = NULL, dataset_code = NULL,
   use_readLines = getOption("rdbnomics.use_readLines"),
   curl_config = getOption("rdbnomics.curl_config"),
-  simplify = FALSE
+  simplify = FALSE,
+  ...
 ) {
+  # Additionals arguments
+  progress_bar = TRUE
+  if (length(list(...)) > 0) {
+    progress_bar = list(...)$progress_bar
+  }
+
   # All providers
   if (is.null(provider_code) & !is.null(dataset_code)) {
     stop(
@@ -112,7 +120,7 @@ rdb_dimensions <- function(
 
   # Fetching all datasets
   dimensions <- sapply(provider_code, function(pc) {
-    if (getOption("rdbnomics.progress_bar_dimensions")) {
+    if (getOption("rdbnomics.progress_bar_dimensions") & progress_bar) {
       pb <- utils::txtProgressBar(
         min = 0, max = length(dataset_code[[pc]]), style = 3
       )
@@ -182,7 +190,7 @@ rdb_dimensions <- function(
           z
         }, simplify = FALSE)
 
-        if (getOption("rdbnomics.progress_bar_dimensions")) {
+        if (getOption("rdbnomics.progress_bar_dimensions") & progress_bar) {
           utils::setTxtProgressBar(pb, i)
         }
 
@@ -192,7 +200,9 @@ rdb_dimensions <- function(
       })
     }, simplify = FALSE)
 
-    if (getOption("rdbnomics.progress_bar_dimensions")) { close(pb) }
+    if (getOption("rdbnomics.progress_bar_dimensions") & progress_bar) {
+      close(pb)
+    }
 
     tmp_dim <- stats::setNames(tmp_dim, dataset_code[[pc]])
     Filter(Negate(is.null), tmp_dim)

@@ -793,3 +793,97 @@ new_title <- function(x) {
 
   toupper(x)
 }
+
+#-------------------------------------------------------------------------------
+# get_dimensions_values
+get_dimensions_values <- function(DT, ...) {
+  tryCatch({
+    tmpDT <- DT[, .SD, .SDcols = c("provider_code", "dataset_code")]
+    tmpDT <- unique(tmpDT)
+    tmpDT[, k := .I]
+    tmpDT <- lapply(tmpDT$k, function(x) {
+      tmpx <- rdb_dimensions(
+        provider_code = tmpDT[k == x]$provider_code,
+        dataset_code = tmpDT[k == x]$dataset_code,
+        ...
+      )
+      tmpx <- tmpx[[1]][[1]]
+      lapply(tmpx, function(y) {  
+        DT2 <- data.table::copy(y)
+        DT2[, dataset_code := tmpDT[k == x]$dataset_code]
+        data.table::setcolorder(
+          DT2,
+          c("dataset_code", setdiff(colnames(DT2), "dataset_code"))
+        )
+        DT2
+      })
+    })
+    tmpDT <- unlist(tmpDT, recursive = FALSE)  
+    unname(tmpDT)
+  }, error = function(e) {
+    NULL
+  })
+}
+
+#-------------------------------------------------------------------------------
+# get_dimensions_names
+get_dimensions_names <- function(DT = NULL, dimensions_values = NULL, ...) {
+  tryCatch({
+    if (is.null(dimensions_values)) {
+      tmpDT <- get_dimensions_values(DT, ...)
+    } else {
+      tmpDT <- dimensions_values
+    }
+    lapply(tmpDT, function(x) {
+      c(
+        unique(x$dataset_code),
+        utils::tail(colnames(x), -1)
+      )
+    })
+  }, error = function(e) {
+    NULL
+  })
+}
+
+#-------------------------------------------------------------------------------
+# get_geo_colname2
+get_geo_colname2 <- function(x, y) {
+  u <- try(
+    {
+      nm <- unlist(x)
+      nm <- names(nm)
+      nm <- grep("\\.dimensions_value[s]*_label[s]\\.", nm, value = TRUE)
+      nm <- gsub("\\.dimensions_value[s]*_label[s]", "", nm)
+      nm <- gsub("dataset[s]*\\.*", "", nm)
+      nm <- gsub("\\.[^.]*$", "", nm)
+      nm <- unique(nm)
+
+      nm <- lapply(nm, function(u) {
+        pc <- gsub("/.*", "", u)
+
+        dc <- gsub(paste0(pc, "/"), "", u)
+        dc <- gsub("\\..*", "", dc)
+        
+        code <- gsub(paste0(pc, "/", dc, "\\."), "", u)
+        c(pc, dc, code, new_title(code))
+      })
+      nm <- lapply(nm, `[`, 2:4)
+
+      if (!is.null(y)) {
+        for (i in seq_along(nm)) {
+          for (j in seq_along(y)) {
+            if (nm[[i]][1] == y[[j]][1] & nm[[i]][2] == y[[j]][2]) {
+              nm[[i]][3] <- y[[j]][3]
+            }
+          }
+        }
+      }
+      nm
+    },
+    silent = TRUE
+  )
+  if (inherits(u, "try-error")) {
+    return(y)
+  }
+  u
+}

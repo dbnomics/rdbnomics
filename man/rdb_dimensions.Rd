@@ -9,7 +9,8 @@ rdb_dimensions(
   dataset_code = NULL,
   use_readLines = getOption("rdbnomics.use_readLines"),
   curl_config = getOption("rdbnomics.curl_config"),
-  simplify = FALSE
+  simplify = FALSE,
+  ...
 )
 }
 \arguments{
@@ -42,6 +43,8 @@ For available curl options see \code{\link[curl]{curl_options}},
 dimensions are requested for only one provider and one dataset then a
 named list of \code{data.table}s is returned, not a nested named list of
 \code{data.table}s.}
+
+\item{...}{Additionals arguments.}
 }
 \value{
 A nested named list of \code{data.table}s or a named list of
