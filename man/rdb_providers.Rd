@@ -54,7 +54,8 @@ rdb_providers(curl_config = list(proxy = "<proxy>", proxyport = <port>))
 }
 }
 \seealso{
-\code{\link{rdb_last_updates}}
+\code{\link{rdb_last_updates}}, \code{\link{rdb_datasets}},
+\code{\link{rdb_dimensions}}
 }
 \author{
 Sebastien Galais

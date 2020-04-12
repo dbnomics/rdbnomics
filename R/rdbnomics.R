@@ -13,7 +13,8 @@ if (getRversion() >= "2.15.1") {
   vars <- c(
     ".", ":=", "value", "dotI", "period", "period_start_day", "series_code",
     "filtered", "original_period", "series_name", "original_value",
-    "period_middle_day"
+    "period_middle_day", "code", "name", "A", "B", "C", "k", "V1", "V2",
+    "dataset_code"
   )
   utils::globalVariables(unique(vars))
 }

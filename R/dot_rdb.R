@@ -80,12 +80,13 @@
   # Checking if the limit has been reached
   num_found <- DBlist$series$num_found
   limit <- DBlist$series$limit
-  
+
   # Additional informations to translate geo, freq, ...
   if (!getOption("rdbnomics.translate_codes")) {
     additional_geo_column <- additional_geo_mapping <- NULL
   } else {
     additional_geo_column <- get_geo_colname(DBlist)
+    additional_geo_column <- get_geo_colname2(DBlist, additional_geo_column)
     additional_geo_mapping <- get_geo_names(DBlist, additional_geo_column)
     # Check coherence
     if (is.null(additional_geo_column) | is.null(additional_geo_mapping)) {

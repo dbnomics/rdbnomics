@@ -1,3 +1,13 @@
+# rdbnomics 0.6.0
+
+* New function `rdb_datasets()` to request the available datasets of the
+  providers (@fmgithub2017, #3 github).
+* New function `rdb_dimensions()` to request the list of the dimensions of
+  the available datasets of the providers (@fmgithub2017, #3 github).
+* Add a clearer error message to the function to_xts() in README (Martin
+  Feldkircher, 20200326 email).
+* Update vignette for `rdb_datasets()` and `rdb_dimensions()`.
+
 # rdbnomics 0.5.2
 
 * Correction of a bug in the internal function `deploy`. The cases
