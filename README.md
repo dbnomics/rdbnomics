@@ -106,6 +106,34 @@ In the event that you only use the argument `api_link`, you can drop the name an
 df1 <- rdb("https://api.db.nomics.world/v22/series/WB/DB?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%7D&q=IC.REG.PROC.FE.NO&observations=1&format=json&align_periods=1&offset=0&facets=0")
 ```
 
+## Fetch the available datasets of a provider
+```r
+# Example with the IMF datasets:
+df_datasets <- rdb_datasets(provider_code = "IMF")
+
+# Example with the IMF and BDF datasets:
+df_datasets <- rdb_datasets(provider_code = c("IMF", "BDF"))
+```
+
+In the event that you only request the datasets for one provider, if you define
+`simplify = TRUE`, then the result will be a `data.table` not a named list.
+```r
+df_datasets <- rdb_datasets(provider_code = "IMF", simplify = TRUE)
+```
+
+## Fetch the possible dimensions of available datasets of a provider
+```r
+# Example for the dataset WEO of the IMF:
+df_dimensions <- rdb_dimensions(provider_code = "IMF", dataset_code = "WEO")
+```
+
+In the event that you only request the dimensions for one dataset for one
+provider, if you define `simplify = TRUE`, then the result will be a named list
+`data.table` not a nested named list.
+```r
+df_dimensions <- rdb_dimensions(provider_code = "IMF", dataset_code = "WEO", simplify = TRUE)
+```
+
 ## Proxy configuration or connection error `Could not resolve host`
 When using the function `rdb`, you may come across the following error:
 ```r
