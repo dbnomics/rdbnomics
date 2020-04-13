@@ -35,7 +35,7 @@
 #' rdb_providers(curl_config = list(proxy = "<proxy>", proxyport = <port>))
 #' }
 #' @seealso \code{\link{rdb_last_updates}}, \code{\link{rdb_datasets}},
-#' \code{\link{rdb_dimensions}}
+#' \code{\link{rdb_dimensions}}, \code{\link{rdb_series}}
 #' @author Sebastien Galais
 #' @export
 rdb_providers <- function(

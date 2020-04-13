@@ -1,8 +1,11 @@
-#' Download list of dimensions for datasets of DBnomics providers.
+#' Download list of series for datasets of DBnomics providers.
 #'
-#' \code{rdb_dimensions} downloads the list of dimensions (if they exist) for
+#' \code{rdb_series} downloads the list of series for
 #' available datasets of a selection of providers from
-#' \href{https://db.nomics.world/}{DBnomics}.
+#' \href{https://db.nomics.world/}{DBnomics}. \cr
+#' /!\ We warn the user that this function can be (very) long to execute. We remind
+#' that DBnomics requests data from 63 providers to retrieve 21675 datasets for
+#' a total of approximately 720 millions series.
 #'
 #' By default, the function returns a nested named list of \code{data.table}s
 #' containing the dimensions of datasets for providers from
@@ -33,41 +36,42 @@
 #' dimensions are requested for only one provider and one dataset then a
 #' named list of \code{data.table}s is returned, not a nested named list of
 #' \code{data.table}s.
+#' @param verbose Logical (default \code{FALSE}). Show number of series per
+#' datasets and providers.
 #' @param ... Additionals arguments.
 #' @return A nested named list of \code{data.table}s or a named list of
 #' \code{data.table}s.
 #' @examples
 #' \dontrun{
-#' rdb_dimensions(provider_code = "IMF", dataset_code = "WEO")
+#' rdb_series(provider_code = "IMF", dataset_code = "WEO")
 #' 
-#' rdb_dimensions(provider_code = "IMF", dataset_code = "WEO", simplify = TRUE)
+#' rdb_series(provider_code = "IMF", dataset_code = "WEO", simplify = TRUE)
 #' 
-#' rdb_dimensions(provider_code = "IMF")
+#' rdb_series(provider_code = "IMF", verbose = TRUE)
 #' 
-#' # /!\ It is very long !
-#' options(rdbnomics.progress_bar_dimensions = TRUE)
-#' rdb_dimensions()
-#' options(rdbnomics.progress_bar_dimensions = FALSE)
+#' options(rdbnomics.progress_bar_series = TRUE)
+#' rdb_series(provider_code = "IMF", dataset_code = "WEO")
+#' options(rdbnomics.progress_bar_series = FALSE)
 #' 
-#' rdb_dimensions(
+#' rdb_series(
 #'   provider_code = "IMF", dataset_code = "WEO",
 #'   use_readLines = TRUE
 #' )
 #' 
-#' rdb_dimensions(
+#' rdb_series(
 #'   provider_code = "IMF", dataset_code = "WEO",
 #'   curl_config = list(proxy = "<proxy>", proxyport = <port>)
 #' )
 #' }
 #' @seealso \code{\link{rdb_providers}}, \code{\link{rdb_last_updates}},
-#' \code{\link{rdb_datasets}}, \code{\link{rdb_series}}
+#' \code{\link{rdb_datasets}}, \code{\link{rdb_dimensions}}
 #' @author Sebastien Galais
 #' @export
-rdb_dimensions <- function(
+rdb_series <- function(
   provider_code = NULL, dataset_code = NULL,
   use_readLines = getOption("rdbnomics.use_readLines"),
   curl_config = getOption("rdbnomics.curl_config"),
-  simplify = FALSE,
+  simplify = FALSE, verbose = FALSE,
   ...
 ) {
   # Additionals arguments
@@ -80,14 +84,16 @@ rdb_dimensions <- function(
   }
   check_argument(progress_bar, "logical")
 
-  # All providers
-  if (is.null(provider_code) & !is.null(dataset_code)) {
-    stop(
-      "If you give datasets codes, please give also a provider code.",
-      call. = FALSE
-    )
+  only_first_two = FALSE
+  if (length(list(...)) > 0) {
+    tmp_only_first_two = list(...)$only_first_two
+    if (!is.null(tmp_only_first_two)) {
+      only_first_two <- tmp_only_first_two
+    }
   }
+  check_argument(only_first_two, "logical")
 
+  # All providers
   if (is.null(provider_code)) {
     provider_code <- rdb_providers(
       code = TRUE,
@@ -123,112 +129,116 @@ rdb_dimensions <- function(
   authorized_version(api_version)
 
   # Fetching all datasets
-  dimensions <- sapply(provider_code, function(pc) {
-    if (getOption("rdbnomics.progress_bar_dimensions") & progress_bar) {
+  series <- sapply(provider_code, function(pc) {
+    if (getOption("rdbnomics.progress_bar_series") & progress_bar) {
       pb <- utils::txtProgressBar(
         min = 0, max = length(dataset_code[[pc]]), style = 3
       )
     }
     
-    tmp_dim <- sapply(seq_along(dataset_code[[pc]]), function(i) {
+    tmp_ser <- sapply(seq_along(dataset_code[[pc]]), function(i) {
       tryCatch({
         dc <- dataset_code[[pc]][i]
 
-        tmp <- paste0(api_base_url, "/v", api_version, "/datasets/", pc, "/", dc)
-        tmp <- get_data(tmp, use_readLines, curl_config)
+        api_link <- paste0(api_base_url, "/v", api_version, "/series/", pc, "/", dc)
+        DBlist <- get_data(api_link, use_readLines, curl_config)
 
-        tmp1 <- tmp$datasets$docs$dimensions_labels
-        if (is.null(tmp1)) {  
-          tmp1 <- try(
-            tmp$datasets[[paste0(pc, "/", dc)]]$dimensions_labels,
-            silent = TRUE
-          )
-          if (inherits(tmp1, "try-error")) {
-            tmp1 <- NULL
+        limit <- DBlist$series$limit
+        num_found <- DBlist$series$num_found
+
+        if (verbose) {
+          if (getOption("rdbnomics.progress_bar_series") & progress_bar) {
+            cat("\n")
           }
-        }
-        if (is.null(tmp1)) {
-          # Sometimes "dimensions_labels" is missing
-          tmp1 <- data.table::data.table(A = character(), B = character())
-        } else {
-          tmp1 <- as.list(tmp1)
-          tmp1 <- data.table::data.table(A = unlist(tmp1), B = names(tmp1))
-          tmp1 <- unique(tmp1)
+          cat(
+            paste0(
+              "The dataset '", dc, "' from provider '", pc, "' contains ",
+              num_found, " series."
+            ),
+            "\n"
+          )
         }
 
-        tmp2 <- tmp$datasets$docs$dimensions_values_labels
-        if (is.null(tmp2)) {  
-          tmp2 <- try(
-            tmp$datasets[[paste0(pc, "/", dc)]]$dimensions_values_labels,
-            silent = TRUE
+        DBdata <- list(
+          data.table::data.table(
+            series_code = DBlist$series$docs$series_code,
+            series_name = DBlist$series$docs$series_name
           )
-          if (inherits(tmp2, "try-error")) {
-            tmp2 <- NULL
-          }
-        }
-        
-        tmp3 <- sapply(names(tmp2), function(nm) {
-          z <- tmp2[[nm]]
-          if (
-            is.list(z) & !is.data.frame(z) &
-            !data.table::is.data.table(z)
-          ) {
-            # "z" is actually a list with a matrix
-            z <- z[[1]]
-            z <- as.data.table(z)
-          } else {
-            if (is.matrix(z)) {
-              # "z" is actually a matrix
-              z <- as.data.table(z)
-            } else {
-              z <- as.data.table(z)
-              z <- as.list(z)
-              z <- data.table::data.table(V1 = names(z), V2 = unlist(z))
-            }
-          }
-          data.table::setnames(z, "V1", nm)
-          new_name <- tmp1[B == nm]$A
-          data.table::setnames(
-            z, "V2", ifelse(length(new_name) <= 0, new_title(nm), new_name)
-          )
-          z
-        }, simplify = FALSE)
+        )
 
-        if (getOption("rdbnomics.progress_bar_dimensions") & progress_bar) {
+        if (num_found > limit) {
+          DBdata0 <- DBdata
+          rm(DBdata)
+
+          sequence <- seq(1, floor(num_found / limit), 1)
+
+          # Modifying link
+          if (grepl("offset=", api_link)) {
+            api_link <- gsub("\\&offset=[0-9]+", "", api_link)
+            api_link <- gsub("\\?offset=[0-9]+", "", api_link)
+          }
+          sep <- ifelse(grepl("\\?", api_link), "&", "?")
+
+          if (only_first_two) {
+            sequence <- utils::head(sequence, 1)
+          }
+
+          DBdata <- lapply(sequence, function(j) {
+            # Modifying link
+            tmp_api_link <- paste0(
+              api_link, sep, "offset=", format(j * limit, scientific = FALSE)
+            )
+            # Fetching data
+            DBlist <- get_data(tmp_api_link, use_readLines, curl_config)
+
+            # Extracting data
+            data.table::data.table(
+              series_code = DBlist$series$docs$series_code,
+              series_name = DBlist$series$docs$series_name
+            )
+          })
+
+          DBdata <- append(DBdata, DBdata0, 0)
+          rm(DBdata0)
+        }
+
+        DBdata <- rbindlist(DBdata, use.names = TRUE, fill = TRUE)
+
+        if (getOption("rdbnomics.progress_bar_series") & progress_bar) {
           utils::setTxtProgressBar(pb, i)
         }
 
-        tmp3
+        DBdata
       }, error = function(e) {
         NULL
       })
     }, simplify = FALSE)
 
-    if (getOption("rdbnomics.progress_bar_dimensions") & progress_bar) {
+    if (getOption("rdbnomics.progress_bar_series") & progress_bar) {
       close(pb)
     }
 
-    tmp_dim <- stats::setNames(tmp_dim, dataset_code[[pc]])
-    Filter(Negate(is.null), tmp_dim)
+    tmp_ser <- stats::setNames(tmp_ser, dataset_code[[pc]])
+    Filter(Negate(is.null), tmp_ser)
   }, simplify = FALSE)
-  dimensions <- Filter(Negate(is.null), dimensions)
+  series <- Filter(Negate(is.null), series)
   # We remove the empty lists, the empty data.tables, etc.
-  dimensions <- check_dimensions(dimensions, 2)
+  series <- check_dimensions(series, 2)
 
-  if (length(dimensions) <= 0) {
+  if (length(series) <= 0) {
     warning(
-      "Error when fetching the dimensions.",
+      "Error when fetching the series.",
       call. = FALSE
     )
     return(NULL)
   }
 
   if (simplify) {
-    len <- sapply(dimensions, length)
-    if (length(dimensions) == 1 & len[1] == 1) {
-      return(dimensions[[1]][[1]])
+    len <- sapply(series, length)
+    if (length(series) == 1 & len[1] == 1) {
+      return(series[[1]][[1]])
     }
   }
 
-  dimensions
+  series
 }

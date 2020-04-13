@@ -27,6 +27,7 @@
 #' @param simplify Logical (default \code{FALSE}). If \code{TRUE}, when the
 #' datasets are requested for only one provider then a \code{data.table}
 #' is returned, not a list of \code{data.table}s.
+#' @param ... Additionals arguments.
 #' @return A named list of \code{data.table}s or a \code{data.table}.
 #' @examples
 #' \dontrun{
@@ -49,14 +50,15 @@
 #' )
 #' }
 #' @seealso \code{\link{rdb_providers}}, \code{\link{rdb_last_updates}},
-#' \code{\link{rdb_dimensions}}
+#' \code{\link{rdb_dimensions}}, \code{\link{rdb_series}}
 #' @author Sebastien Galais
 #' @export
 rdb_datasets <- function(
   provider_code = NULL,
   use_readLines = getOption("rdbnomics.use_readLines"),
   curl_config = getOption("rdbnomics.curl_config"),
-  simplify = FALSE
+  simplify = FALSE,
+  ...
 ) {
   # TO CHECK THE DATASETS
   # parse_web <- sapply(provider_code, function(x) {
@@ -65,6 +67,16 @@ rdb_datasets <- function(
   #   y <- gsub(paste0(".*href=\"/", x, "/"), "", y)
   #   gsub("\".*", "", y)
   # }, simplify = FALSE)
+
+  # Additionals arguments
+  progress_bar = TRUE
+  if (length(list(...)) > 0) {
+    tmp_progress_bar = list(...)$progress_bar
+    if (!is.null(tmp_progress_bar)) {
+      progress_bar <- tmp_progress_bar
+    }
+  }
+  check_argument(progress_bar, "logical")
 
   # All providers
   if (is.null(provider_code)) {
@@ -89,7 +101,7 @@ rdb_datasets <- function(
   authorized_version(api_version)
 
   # Fetching all datasets
-  if (getOption("rdbnomics.progress_bar_datasets")) {
+  if (getOption("rdbnomics.progress_bar_datasets") & progress_bar) {
     pb <- utils::txtProgressBar(min = 0, max = length(provider_code), style = 3)
   }
 
@@ -105,7 +117,7 @@ rdb_datasets <- function(
       tmp <- tmp[, .(code, name)]
       tmp <- unique(tmp)
 
-      if (getOption("rdbnomics.progress_bar_datasets")) {
+      if (getOption("rdbnomics.progress_bar_datasets") & progress_bar) {
         utils::setTxtProgressBar(pb, i)
       }
 
@@ -115,7 +127,9 @@ rdb_datasets <- function(
     })
   }, simplify = FALSE)
 
-  if (getOption("rdbnomics.progress_bar_datasets")) { close(pb) }
+  if (getOption("rdbnomics.progress_bar_datasets") & progress_bar) {
+    close(pb)
+  }
 
   datasets <- stats::setNames(datasets, provider_code)
   datasets <- Filter(Negate(is.null), datasets)

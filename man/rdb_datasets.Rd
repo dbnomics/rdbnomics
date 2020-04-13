@@ -8,7 +8,8 @@ rdb_datasets(
   provider_code = NULL,
   use_readLines = getOption("rdbnomics.use_readLines"),
   curl_config = getOption("rdbnomics.curl_config"),
-  simplify = FALSE
+  simplify = FALSE,
+  ...
 )
 }
 \arguments{
@@ -35,6 +36,8 @@ For available curl options see \code{\link[curl]{curl_options}},
 \item{simplify}{Logical (default \code{FALSE}). If \code{TRUE}, when the
 datasets are requested for only one provider then a \code{data.table}
 is returned, not a list of \code{data.table}s.}
+
+\item{...}{Additionals arguments.}
 }
 \value{
 A named list of \code{data.table}s or a \code{data.table}.
@@ -71,7 +74,7 @@ rdb_datasets(
 }
 \seealso{
 \code{\link{rdb_providers}}, \code{\link{rdb_last_updates}},
-\code{\link{rdb_dimensions}}
+\code{\link{rdb_dimensions}}, \code{\link{rdb_series}}
 }
 \author{
 Sebastien Galais

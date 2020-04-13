@@ -142,7 +142,9 @@
 
     DBdata <- lapply(sequence, function(i) {
       # Modifying link
-      tmp_api_link <- paste0(api_link, sep, "offset=", i * limit)
+      tmp_api_link <- paste0(
+        api_link, sep, "offset=", format(i * limit, scientific = FALSE)
+      )
       # Fetching data
       DBlist <- get_data(tmp_api_link, use_readLines, curl_config)
 
