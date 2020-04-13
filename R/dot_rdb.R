@@ -86,7 +86,6 @@
     additional_geo_column <- additional_geo_mapping <- NULL
   } else {
     additional_geo_column <- get_geo_colname(DBlist)
-    additional_geo_column <- get_geo_colname2(DBlist, additional_geo_column)
     additional_geo_mapping <- get_geo_names(DBlist, additional_geo_column)
     # Check coherence
     if (is.null(additional_geo_column) | is.null(additional_geo_mapping)) {

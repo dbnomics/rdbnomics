@@ -846,6 +846,7 @@ get_dimensions_names <- function(DT = NULL, dimensions_values = NULL, ...) {
 }
 
 #-------------------------------------------------------------------------------
+# JUST A TRY, DO NOT USE !
 # get_geo_colname2
 get_geo_colname2 <- function(x, y) {
   u <- try(
