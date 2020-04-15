@@ -8,7 +8,7 @@
 #' a total of approximately 720 millions series.
 #'
 #' By default, the function returns a nested named list of \code{data.table}s
-#' containing the dimensions of datasets for providers from
+#' containing the series of datasets for providers from
 #' \href{https://db.nomics.world/}{DBnomics}.
 #' 
 #' @param provider_code Character string (default \code{NULL}). DBnomics code
@@ -18,7 +18,7 @@
 #' @param dataset_code Character string (default \code{NULL}). DBnomics code
 #' of one or multiple datasets of a provider. If \code{NULL}, the datasets
 #' codes are dowloaded with the function \code{\link{rdb_datasets}} and then
-#' the dimensions are requested.
+#' the series are requested.
 #' @param use_readLines Logical (default \code{FALSE}). If \code{TRUE}, then
 #' the data are requested and read with the base function \code{readLines} i.e.
 #' through the default R internet connection. This can be used to get round the
@@ -33,14 +33,13 @@
 #' \code{names(curl_options())} and
 #' \href{https://curl.haxx.se/libcurl/c/curl_easy_setopt.html}{libcurl}.
 #' @param simplify Logical (default \code{FALSE}). If \code{TRUE}, when the
-#' dimensions are requested for only one provider and one dataset then a
-#' named list of \code{data.table}s is returned, not a nested named list of
+#' series are requested for only one provider and one dataset then a
+#' \code{data.table} is returned, not a nested named list of
 #' \code{data.table}s.
 #' @param verbose Logical (default \code{FALSE}). Show number of series per
 #' datasets and providers.
 #' @param ... Additionals arguments.
-#' @return A nested named list of \code{data.table}s or a named list of
-#' \code{data.table}s.
+#' @return A nested named list of \code{data.table}s or a \code{data.table}.
 #' @examples
 #' \dontrun{
 #' rdb_series(provider_code = "IMF", dataset_code = "WEO")

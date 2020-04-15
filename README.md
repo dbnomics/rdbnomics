@@ -137,7 +137,9 @@ df_dimensions <- rdb_dimensions(provider_code = "IMF", dataset_code = "WEO", sim
 ## Fetch the number of series of available datasets of a provider
 ```r
 # Example for the dataset WEOAGG of the IMF:
-rdb_series(provider_code = "IMF", dataset_code = "WEOAGG", simplify = TRUE)
+df_series <- rdb_series(provider_code = "IMF", dataset_code = "WEOAGG")
+
+df_series <- rdb_series(provider_code = "IMF", dataset_code = "WEOAGG", simplify = TRUE)
 ```
 
 :warning: We ask the user to use this function parsimoniously because there are a huge amount

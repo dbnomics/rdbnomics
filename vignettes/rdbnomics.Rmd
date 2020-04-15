@@ -731,7 +731,7 @@ rdbnomics:::rdbnomics_df022 %>%
 You can download the list of series, and especially their codes, of a dataset's
 provider by using the function `rdb_series`. The result is a nested named list
 with a `data.table` at the end of each branch. If you define `simplify = TRUE`,
-then the result will be a named list `data.table` not a nested named list.  
+then the result will be a `data.table` not a nested named list.  
 For example, for the **IMF** provider and the dataset **WEO**, the command is:
 ```{r, eval = FALSE}
 rdb_series(provider_code = "IMF", dataset_code = "WEO", simplify = TRUE)

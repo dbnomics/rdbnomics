@@ -23,7 +23,7 @@ datasets are requested.}
 \item{dataset_code}{Character string (default \code{NULL}). DBnomics code
 of one or multiple datasets of a provider. If \code{NULL}, the datasets
 codes are dowloaded with the function \code{\link{rdb_datasets}} and then
-the dimensions are requested.}
+the series are requested.}
 
 \item{use_readLines}{Logical (default \code{FALSE}). If \code{TRUE}, then
 the data are requested and read with the base function \code{readLines} i.e.
@@ -41,8 +41,8 @@ For available curl options see \code{\link[curl]{curl_options}},
 \href{https://curl.haxx.se/libcurl/c/curl_easy_setopt.html}{libcurl}.}
 
 \item{simplify}{Logical (default \code{FALSE}). If \code{TRUE}, when the
-dimensions are requested for only one provider and one dataset then a
-named list of \code{data.table}s is returned, not a nested named list of
+series are requested for only one provider and one dataset then a
+\code{data.table} is returned, not a nested named list of
 \code{data.table}s.}
 
 \item{verbose}{Logical (default \code{FALSE}). Show number of series per
@@ -51,8 +51,7 @@ datasets and providers.}
 \item{...}{Additionals arguments.}
 }
 \value{
-A nested named list of \code{data.table}s or a named list of
-\code{data.table}s.
+A nested named list of \code{data.table}s or a \code{data.table}.
 }
 \description{
 \code{rdb_series} downloads the list of series for
@@ -64,7 +63,7 @@ a total of approximately 720 millions series.
 }
 \details{
 By default, the function returns a nested named list of \code{data.table}s
-containing the dimensions of datasets for providers from
+containing the series of datasets for providers from
 \href{https://db.nomics.world/}{DBnomics}.
 }
 \examples{
