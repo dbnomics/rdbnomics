@@ -134,6 +134,16 @@ provider, if you define `simplify = TRUE`, then the result will be a named list
 df_dimensions <- rdb_dimensions(provider_code = "IMF", dataset_code = "WEO", simplify = TRUE)
 ```
 
+## Fetch the number of series of available datasets of a provider
+```r
+# Example for the dataset WEOAGG of the IMF:
+rdb_series(provider_code = "IMF", dataset_code = "WEOAGG", simplify = TRUE)
+```
+
+:warning: We ask the user to use this function parsimoniously because there are a huge amount
+of series per dataset. Please only fetch for one dataset if you need it or
+visit the website [https://db.nomics.world](https://db.nomics.world).  
+
 ## Proxy configuration or connection error `Could not resolve host`
 When using the function `rdb`, you may come across the following error:
 ```r

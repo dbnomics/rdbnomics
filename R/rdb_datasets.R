@@ -69,9 +69,9 @@ rdb_datasets <- function(
   # }, simplify = FALSE)
 
   # Additionals arguments
-  progress_bar = TRUE
+  progress_bar <- TRUE
   if (length(list(...)) > 0) {
-    tmp_progress_bar = list(...)$progress_bar
+    tmp_progress_bar <- list(...)$progress_bar
     if (!is.null(tmp_progress_bar)) {
       progress_bar <- tmp_progress_bar
     }

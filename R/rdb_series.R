@@ -75,23 +75,32 @@ rdb_series <- function(
   ...
 ) {
   # Additionals arguments
-  progress_bar = TRUE
+  progress_bar <- TRUE
   if (length(list(...)) > 0) {
-    tmp_progress_bar = list(...)$progress_bar
+    tmp_progress_bar <- list(...)$progress_bar
     if (!is.null(tmp_progress_bar)) {
       progress_bar <- tmp_progress_bar
     }
   }
   check_argument(progress_bar, "logical")
 
-  only_first_two = FALSE
+  only_first_two <- FALSE
   if (length(list(...)) > 0) {
-    tmp_only_first_two = list(...)$only_first_two
+    tmp_only_first_two <- list(...)$only_first_two
     if (!is.null(tmp_only_first_two)) {
       only_first_two <- tmp_only_first_two
     }
   }
   check_argument(only_first_two, "logical")
+
+  only_number_series <- FALSE
+  if (length(list(...)) > 0) {
+    tmp_only_number_series <- list(...)$only_number_series
+    if (!is.null(tmp_only_number_series)) {
+      only_number_series <- tmp_only_number_series
+    }
+  }
+  check_argument(only_number_series, "logical")
 
   # All providers
   if (is.null(provider_code)) {
@@ -145,6 +154,10 @@ rdb_series <- function(
 
         limit <- DBlist$series$limit
         num_found <- DBlist$series$num_found
+
+        if (only_number_series) {
+          return(data.table(Number_of_series = num_found))
+        }
 
         if (verbose) {
           if (getOption("rdbnomics.progress_bar_series") & progress_bar) {
