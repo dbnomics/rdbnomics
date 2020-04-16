@@ -184,6 +184,12 @@ rdb_series <- function(
 
           sequence <- seq(1, floor(num_found / limit), 1)
 
+          if (getOption("rdbnomics.progress_bar_series") & progress_bar) {
+            pb_offset <- utils::txtProgressBar(
+              min = 0, max = max(sequence), style = 3
+            )
+          }
+
           # Modifying link
           if (grepl("offset=", api_link)) {
             api_link <- gsub("\\&offset=[0-9]+", "", api_link)
@@ -203,6 +209,10 @@ rdb_series <- function(
             # Fetching data
             DBlist <- get_data(tmp_api_link, use_readLines, curl_config)
 
+            if (getOption("rdbnomics.progress_bar_series") & progress_bar) {
+              utils::setTxtProgressBar(pb_offset, j)
+            }
+
             # Extracting data
             data.table::data.table(
               series_code = DBlist$series$docs$series_code,
@@ -212,6 +222,10 @@ rdb_series <- function(
 
           DBdata <- append(DBdata, DBdata0, 0)
           rm(DBdata0)
+    
+          if (getOption("rdbnomics.progress_bar_series") & progress_bar) {
+            close(pb_offset)
+          }
         }
 
         DBdata <- rbindlist(DBdata, use.names = TRUE, fill = TRUE)
