@@ -688,7 +688,7 @@ You can measure the vast extent of datasets gathered by
 [DBnomics](https://db.nomics.world) by downloading all the possible
 dimensions. To do this, you have to set the arguments
 `provider_code` and `dataset_code` to `NULL`.  
-<b><font color='red'>&#9888;</font></b> it's relatively long to run and heavy to show so we display
+<b><font color='red'>&#9888;</font></b> It's relatively long to run and heavy to show so we display
 the first 100.
 ```{r, eval = FALSE}
 options(rdbnomics.progress_bar_datasets = TRUE)
@@ -726,7 +726,7 @@ rdbnomics:::rdbnomics_df022 %>%
 #   rbindlist(idcol = "Provider")
 ```
 
-# Fetch the number of series of available datasets of a provider
+# Fetch the series codes and names of available datasets of a provider
 
 You can download the list of series, and especially their codes, of a dataset's
 provider by using the function `rdb_series`. The result is a nested named list
