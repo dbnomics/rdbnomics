@@ -7,6 +7,8 @@
 rdb_series(
   provider_code = NULL,
   dataset_code = NULL,
+  dimensions = NULL,
+  query = NULL,
   use_readLines = getOption("rdbnomics.use_readLines"),
   curl_config = getOption("rdbnomics.curl_config"),
   simplify = FALSE,
@@ -24,6 +26,14 @@ datasets are requested.}
 of one or multiple datasets of a provider. If \code{NULL}, the datasets
 codes are dowloaded with the function \code{\link{rdb_datasets}} and then
 the series are requested.}
+
+\item{dimensions}{List or character string (single quoted)  (default \code{NULL}).
+DBnomics code of one or several dimensions in the specified provider and dataset.
+If it is a named list, then the function \code{toJSON} (from the
+package \pkg{jsonlite}) is applied to generate the json object.}
+
+\item{query}{Character string (default \code{NULL}). A query to
+filter/select series from a provider's dataset.}
 
 \item{use_readLines}{Logical (default \code{FALSE}). If \code{TRUE}, then
 the data are requested and read with the base function \code{readLines} i.e.
@@ -70,7 +80,13 @@ containing the series of datasets for providers from
 \dontrun{
 rdb_series(provider_code = "IMF", dataset_code = "WEO")
 
-rdb_series(provider_code = "IMF", dataset_code = "WEO", simplify = TRUE)
+## With dimensions
+rdb_series("IMF", "WEO", dimensions = list(`weo-country` = "AGO"))
+rdb_series("IMF", "WEO", dimensions = list(`weo-subject` = "NGDP_RPCH"), simplify = TRUE)
+
+## With query
+rdb_series("IMF", "WEO", query = "ARE")
+rdb_series("IMF", c("WEO", "WEOAGG"), query = "NGDP_RPCH")
 
 rdb_series(provider_code = "IMF", verbose = TRUE)
 
