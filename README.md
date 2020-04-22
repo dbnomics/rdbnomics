@@ -139,7 +139,13 @@ df_dimensions <- rdb_dimensions(provider_code = "IMF", dataset_code = "WEO", sim
 # Example for the dataset WEOAGG of the IMF:
 df_series <- rdb_series(provider_code = "IMF", dataset_code = "WEOAGG")
 
-df_series <- rdb_series(provider_code = "IMF", dataset_code = "WEOAGG", simplify = TRUE)
+# With dimensions
+df_series <- rdb_series("IMF", "WEO", dimensions = list(`weo-country` = "AGO"))
+df_series <- rdb_series("IMF", "WEO", dimensions = list(`weo-subject` = "NGDP_RPCH"), simplify = TRUE)
+
+# With a query
+df_series <- rdb_series("IMF", "WEO", query = "ARE")
+df_series <- rdb_series("IMF", c("WEO", "WEOAGG"), query = "NGDP_RPCH")
 ```
 
 :warning: We ask the user to use this function parsimoniously because there are a huge amount
