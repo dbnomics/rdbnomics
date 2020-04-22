@@ -741,7 +741,7 @@ rdbnomics:::rdbnomics_df023 %>%
   display_table()
 ```
 
-Like the function `rdb()`, you add features to `rdb_series()`. You can ask for
+Like the function `rdb()`, you can add features to `rdb_series()`. You can ask for
 the series with specific `dimensions`:
 ```{r, eval = FALSE}
 rdb_series(provider_code = "IMF", dataset_code = "WEO", dimensions = list(`weo-subject` = "NGDP_RPCH"), simplify = TRUE)
