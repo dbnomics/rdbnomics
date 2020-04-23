@@ -540,7 +540,7 @@ df <- rdb(api_link = "https://api.db.nomics.world/v22/series?observations=1&seri
   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
-df <- rdbnomics:::rdbnomics_df012
+df <- head(rdbnomics:::rdbnomics_df012, 50)
 ```
 
 ```{r, echo = FALSE}
@@ -732,22 +732,34 @@ You can download the list of series, and especially their codes, of a dataset's
 provider by using the function `rdb_series`. The result is a nested named list
 with a `data.table` at the end of each branch. If you define `simplify = TRUE`,
 then the result will be a `data.table` not a nested named list.  
-For example, for the **IMF** provider and the dataset **WEO**, the command is:
+For example, for the **IMF** provider and the dataset **WEO**, the command is (onyl first 100):
 ```{r, eval = FALSE}
 rdb_series(provider_code = "IMF", dataset_code = "WEO", simplify = TRUE)
 ```
 ```{r, eval = TRUE, echo = FALSE}
 rdbnomics:::rdbnomics_df023 %>%
+  head(100) %>%
   display_table()
+```
+
+Like the function `rdb()`, you can add features to `rdb_series()`. You can ask for
+the series with specific `dimensions`:
+```{r, eval = FALSE}
+rdb_series(provider_code = "IMF", dataset_code = "WEO", dimensions = list(`weo-subject` = "NGDP_RPCH"), simplify = TRUE)
+```
+or with a `query`:
+```{r, eval = FALSE}
+rdb_series(provider_code = "IMF", dataset_code = c("WEO", "WEOAGG"), query = "NGDP_RPCH")
 ```
 
 <b><font color='red'>&#9888;</font></b> We ask the user to use this function parsimoniously because there are a huge amount
 of series per dataset. Please only fetch for one dataset if you need it or
 visit the website [https://db.nomics.world](https://db.nomics.world).  
-For example, for the **IMF** provider, the number of series is:
+For example, for the **IMF** provider, the number of series is (only first 5):
 ```{r, eval = TRUE, echo = FALSE}
 rdbnomics:::rdbnomics_df024 %>%
   .[order(-`Number of series`)] %>%
+  head(5) %>%
   display_table()
 ```
 
@@ -885,7 +897,7 @@ The content of two columns are modified:
 - `series_name`: same as before for original series, but the suffix ` (filtered)` is added for filtered series.
 
 ```{r, eval = TRUE, echo = FALSE}
-df <- rdbnomics:::rdbnomics_df013
+df <- head(rdbnomics:::rdbnomics_df013, 50)
 ```
 
 ```{r, echo = FALSE}

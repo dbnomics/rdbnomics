@@ -1,3 +1,7 @@
+# rdbnomics 0.6.1
+
+* New arguments `dimensions` and `query` for the function `rdb_series()`.
+
 # rdbnomics 0.6.0
 
 * New function `rdb_datasets()` to request the available datasets of the

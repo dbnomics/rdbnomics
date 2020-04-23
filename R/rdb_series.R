@@ -19,6 +19,12 @@
 #' of one or multiple datasets of a provider. If \code{NULL}, the datasets
 #' codes are dowloaded with the function \code{\link{rdb_datasets}} and then
 #' the series are requested.
+#' @param dimensions List or character string (single quoted)  (default \code{NULL}).
+#' DBnomics code of one or several dimensions in the specified provider and dataset.
+#' If it is a named list, then the function \code{toJSON} (from the
+#' package \pkg{jsonlite}) is applied to generate the json object.
+#' @param query Character string (default \code{NULL}). A query to
+#' filter/select series from a provider's dataset.
 #' @param use_readLines Logical (default \code{FALSE}). If \code{TRUE}, then
 #' the data are requested and read with the base function \code{readLines} i.e.
 #' through the default R internet connection. This can be used to get round the
@@ -44,7 +50,13 @@
 #' \dontrun{
 #' rdb_series(provider_code = "IMF", dataset_code = "WEO")
 #' 
-#' rdb_series(provider_code = "IMF", dataset_code = "WEO", simplify = TRUE)
+#' ## With dimensions
+#' rdb_series("IMF", "WEO", dimensions = list(`weo-country` = "AGO"))
+#' rdb_series("IMF", "WEO", dimensions = list(`weo-subject` = "NGDP_RPCH"), simplify = TRUE)
+#' 
+#' ## With query
+#' rdb_series("IMF", "WEO", query = "ARE")
+#' rdb_series("IMF", c("WEO", "WEOAGG"), query = "NGDP_RPCH")
 #' 
 #' rdb_series(provider_code = "IMF", verbose = TRUE)
 #' 
@@ -68,6 +80,7 @@
 #' @export
 rdb_series <- function(
   provider_code = NULL, dataset_code = NULL,
+  dimensions = NULL, query = NULL,
   use_readLines = getOption("rdbnomics.use_readLines"),
   curl_config = getOption("rdbnomics.curl_config"),
   simplify = FALSE, verbose = FALSE,
@@ -124,6 +137,19 @@ rdb_series <- function(
   }
 
   # Checking arguments
+  query_null <- is.null(query)
+  query_not_null <- !query_null
+  if (query_not_null) {
+    check_argument(query, "character", not_null = FALSE)
+  }
+
+  dimensions_null <- is.null(dimensions)
+  dimensions_not_null <- !dimensions_null
+  if (dimensions_not_null) {
+    dimensions <- to_json_if_list(dimensions)
+    check_argument(dimensions, c("character", "json"), not_null = FALSE)
+  }
+
   check_argument(use_readLines, "logical")
   check_argument(simplify, "logical")
 
@@ -148,7 +174,19 @@ rdb_series <- function(
       tryCatch({
         dc <- dataset_code[[pc]][i]
 
-        api_link <- paste0(api_base_url, "/v", api_version, "/series/", pc, "/", dc)
+        api_link <- paste0(
+          api_base_url, "/v", api_version, "/series/", pc, "/", dc
+        )
+        if (query_not_null) {
+          api_link <- paste0(api_link, "?q=", utils::URLencode(query))
+        }
+        if (dimensions_not_null) {
+          api_link <- paste0(
+            api_link, ifelse(grepl("\\?", api_link), "&", "?"),
+            "dimensions=", dimensions
+          )
+        }
+
         DBlist <- get_data(api_link, use_readLines, curl_config)
 
         limit <- DBlist$series$limit
