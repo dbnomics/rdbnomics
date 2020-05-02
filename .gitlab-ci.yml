@@ -31,3 +31,11 @@ build_version_latest:
     - R CMD build .
     - PKG_FILE_NAME=$(ls -1t *.tar.gz | head -n 1)
     - R CMD check "${PKG_FILE_NAME}" --no-manual --as-cran
+
+build_version_devel:
+  image: rocker/r-ver:devel
+  script:
+    - R -e 'install.packages(c("curl", "jsonlite", "data.table", "tinytest", "knitr", "rmarkdown"))'
+    - R CMD build .
+    - PKG_FILE_NAME=$(ls -1t *.tar.gz | head -n 1)
+    - R CMD check "${PKG_FILE_NAME}" --no-manual --as-cran
