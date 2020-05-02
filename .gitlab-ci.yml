@@ -1,3 +1,7 @@
+before_script:
+  - apt-get update
+  - apt-get install -y --no-install-recommends qpdf pandoc pandoc-citeproc
+
 build_markdown_v1: # to test R Markdown v1 without pandoc, must install knitr and rmarkdown
   image: jangorecki/r-base-dev
   script:
@@ -8,6 +12,14 @@ build_markdown_v1: # to test R Markdown v1 without pandoc, must install knitr an
 
 build_cran:
   image: jangorecki/r-pkg
+  script:
+    - R -e 'install.packages(c("curl", "jsonlite", "data.table", "tinytest"))'
+    - R CMD build .
+    - PKG_FILE_NAME=$(ls -1t *.tar.gz | head -n 1)
+    - R CMD check "${PKG_FILE_NAME}" --no-manual --as-cran
+
+build_version_latest:
+  image: rocker/r-ver:latest
   script:
     - R -e 'install.packages(c("curl", "jsonlite", "data.table", "tinytest"))'
     - R CMD build .
