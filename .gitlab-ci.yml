@@ -1,5 +1,11 @@
+variables:
+  _R_CHECK_CRAN_INCOMING_: "false"
+  _R_CHECK_FORCE_SUGGESTS_: "true"
+  APT_PKGS: "libcurl4-openssl-dev libssh2-1-dev libssl-dev libxml2-dev zlib1g-dev git"
+
 before_script:
   - apt-get update
+  - apt-get install -y --no-install-recommends ${APT_PKGS}
   - apt-get install -y --no-install-recommends qpdf pandoc pandoc-citeproc
 
 build_markdown_v1: # to test R Markdown v1 without pandoc, must install knitr and rmarkdown
@@ -21,7 +27,7 @@ build_cran:
 build_version_latest:
   image: rocker/r-ver:latest
   script:
-    - R -e 'install.packages(c("curl", "jsonlite", "data.table", "tinytest"))'
+    - R -e 'install.packages(c("curl", "jsonlite", "data.table", "tinytest", "knitr", "rmarkdown"))'
     - R CMD build .
     - PKG_FILE_NAME=$(ls -1t *.tar.gz | head -n 1)
     - R CMD check "${PKG_FILE_NAME}" --no-manual --as-cran
