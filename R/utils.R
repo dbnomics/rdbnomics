@@ -888,3 +888,64 @@ get_geo_colname2 <- function(x, y) {
   }
   u
 }
+
+#-------------------------------------------------------------------------------
+# ellipsis_default
+ellipsis_default <- function(name, x, default) {
+  if (length(x) <= 0) {
+    return(default)
+  }
+  tmp <- x[[name]]
+  if (is.null(tmp)) {
+    return(default)
+  }
+  tmp
+}
+
+#-------------------------------------------------------------------------------
+# additional_info
+additional_info <- function(x) {
+  # Additional informations to translate geo, freq, ...
+  if (!getOption("rdbnomics.translate_codes")) {
+    additional_geo_column <- additional_geo_mapping <- NULL
+  } else {
+    additional_geo_column <- get_geo_colname(x)
+    additional_geo_mapping <- get_geo_names(x, additional_geo_column)
+    # Check coherence
+    if (is.null(additional_geo_column) | is.null(additional_geo_mapping)) {
+      additional_geo_column <- additional_geo_mapping <- NULL
+    }
+    if (!is.null(additional_geo_column) & !is.null(additional_geo_mapping)) {
+      if (length(additional_geo_column) != length(additional_geo_mapping)) {
+        if (
+          length(additional_geo_column) == 0 |
+          length(additional_geo_mapping) == 0
+        ) {
+          additional_geo_column <- additional_geo_mapping <- NULL
+        } else {
+          check_agc <- sapply(additional_geo_column, paste0, collapse = "|")
+          additional_geo_column <- stats::setNames(additional_geo_column, check_agc)
+
+          check_agm <- sapply(additional_geo_mapping, function(u) {
+            u1 <- u$dataset_code[1]
+            u2 <- colnames(u)[2:3]
+            u2 <- paste0(u2, collapse = "|")
+            paste0(u1, "|", u2)
+          })
+          additional_geo_mapping <- stats::setNames(additional_geo_mapping, check_agm)
+
+          keep <- intersect(check_agc, check_agm)
+
+          if (length(keep) == 0) {
+            additional_geo_column <- additional_geo_mapping <- NULL
+          } else {
+            additional_geo_column <- additional_geo_column[sort(keep)]
+            additional_geo_mapping <- additional_geo_mapping[sort(keep)]
+          }
+        }
+      }
+    }
+  }
+
+  list(additional_geo_column, additional_geo_mapping)
+}

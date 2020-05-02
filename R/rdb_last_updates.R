@@ -57,10 +57,7 @@ rdb_last_updates <- function(
   updates <- paste0(api_base_url, "/v", api_version, "/last-updates")
   updates <- get_data(updates, use_readLines, curl_config)
 
-  if (api_version == 21) {
-    updates <- updates$datasets
-    data.table::setDT(updates)
-  } else if (api_version == 22){
+  if (api_version == 22){
     n <- updates$datasets$num_found
     lim <- updates$datasets$limit
     updates <- updates$datasets$docs

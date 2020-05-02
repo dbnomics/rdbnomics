@@ -58,14 +58,13 @@ library <- function(...) {
 
 ```{r}
 library(data.table)
-library(magrittr)
-library(dplyr)
-library(ggplot2)
 library(rdbnomics)
 ```
 
 ```{r, echo = FALSE}
 reorder_cols <- function(x) {
+  data.table::setDT(x)
+
   cols <- c(
     "provider_code", "dataset_code", "dataset_name", "series_code",
     "series_name", "original_period", "period", "original_value", "value",
@@ -91,96 +90,40 @@ reorder_cols <- function(x) {
   
   cols <- match(cols, colnames(x))
 
-  dplyr::select(x, cols)
+  x[, .SD, .SDcols = cols]
 }
 
 knitr::opts_chunk$set(dev.args = list(bg = "transparent"))
 
-dbnomics <- function(color_palette = "Set1", ...) {
-  # Check if ggplot2 is installed.
-  ggplot2_ok <- try(utils::packageVersion("ggplot2"), silent = TRUE)
-  if (inherits(ggplot2_ok, "try-error")) {
-    stop(
-      "Please run install.packages('ggplot2') to use dbnomics().",
-      call. = FALSE
-    )
-  }
-
-  # DBnomics vignette theme
-  result <- list(
-    ggplot2::scale_x_date(expand = c(0, 0)),
-    ggplot2::scale_y_continuous(
-      labels = function(x) { format(x, big.mark = " ") }
-    ),
-    ggplot2::xlab(""),
-    ggplot2::ylab(""),
-    ggplot2::theme_bw(),
-    ggplot2::theme(
-      legend.position = "bottom", legend.direction = "vertical",
-      legend.background = ggplot2::element_rect(
-        fill = "transparent", colour = NA
-      ),
-      legend.key = ggplot2::element_blank(),
-      panel.background = ggplot2::element_rect(
-        fill = "transparent", colour = NA
-      ),
-      plot.background = ggplot2::element_rect(
-        fill = "transparent", colour = NA
-      ),
-      legend.title = ggplot2::element_blank()
-    ),
-    ggplot2::theme(...),
-    ggplot2::annotate(
-      geom = "text", label = "DBnomics <https://db.nomics.world>", 
-      x = structure(Inf, class = "Date"), y = -Inf,
-      hjust = 1.1, vjust = -0.4, col = "grey", 
-      fontface = "italic"
-    )
-  )
-
-  if (!is.null(color_palette)) {
-    result <- c(
-      result,
-      list(ggplot2::scale_color_brewer(palette = color_palette))
-    )
-  }
-
-  result
-}
-
 display_table <- function(DT) {
-  DT_ok <- FALSE
-  if (
-    "rmarkdown" %in% installed.packages()[, "Package"] &
-    "DT" %in% installed.packages()[, "Package"]
-  ) {
-    if (rmarkdown::pandoc_available()) {
-      if (rmarkdown::pandoc_version() >= numeric_version("1.12.3")) {
-        DT_ok <- TRUE
+  DT <- head(DT)
+  DT <- as.data.table(
+    lapply(DT, function(x) {
+      if (is.character(x)) {
+        ifelse(
+          nchar(x) > 16,
+          paste0(substr(x, 1, 16), "..."),
+          x
+        )
+      } else {
+        x
       }
-    }
-  }
-
-  if (DT_ok) {
-    DT::datatable(
-      DT,
-      rownames = FALSE, options = list(pageLength = 5, scrollX = TRUE)
-    )
-  } else {
-    dplyr::as.tbl(DT)
-  }
+    })
+  )
+  DT[]
 }
 ```
 
 ```{r, eval = FALSE}
-df <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN") %>%
-  filter(!is.na(value))
+df <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN")
+df <- df[!is.na(value)]
 ```
 ```{r, eval = TRUE, echo = FALSE}
 df <- rdbnomics:::rdbnomics_df001
+data.table::setDT(df)
 ```
 
-In such data.frame (data.table or tibble), you will always find at least ten columns:
+In such data.frame (data.table), you will always find at least ten columns:
 
 - `provider_code`
 - `dataset_code`
@@ -200,16 +143,38 @@ The other columns depend on the provider and on the dataset. They always come in
 - `freq` (code) and `Frequency` (name)
 
 ```{r, echo = FALSE}
-df %>%
-  reorder_cols() %>%
-  display_table()
+df <- reorder_cols(df)
+display_table(df)
 ```
 
-```{r, fig.align = 'center'}
-ggplot(df, aes(x = period, y = value, color = series_name)) +
-  geom_line(size = 1.2) +
-  geom_point(size = 2) +
-  dbnomics()
+```{r, echo = FALSE, fig.align = 'center'}
+# ggplot(df, aes(x = period, y = value, color = series_name)) +
+#   geom_line(size = 1.2) +
+#   geom_point(size = 2) +
+#   dbnomics()
+i <- 1
+x1 <- df[series_name == sort(unique(series_name))[i]]$period
+y1 <- df[series_name == sort(unique(series_name))[i]]$value
+cols <- c("red", "blue", "darkgreen")
+PCH <- 18
+
+plot(
+  x1, y1, col = cols[1], type = "l", xlab = "", ylab = "",
+  xlim = c(min(df$period), max(df$period)),
+  ylim = c(min(df$value) - 0.5, max(df$value)),
+  panel.first = grid(lty = 1)
+)
+points(x1, y1, col = cols[1], pch = PCH)
+legend(
+  "bottomleft", inset = 0.005,
+  legend = sort(unique(df$series_name)),
+  col = cols,
+  lty = 1, pch = PCH,  box.lty = 0, cex = 0.7
+)
+mtext(
+  text = "DBnomics <https://db.nomics.world>",
+  side = 3, col = "grey", font = 3, adj = 1
+)
 ```
 
 In the event that you only use the argument `ids`, you can drop it and run:
@@ -220,49 +185,117 @@ df <- rdb("AMECO/ZUTN/EA19.1.0.0.0.ZUTN")
 ## Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider
 
 ```{r, eval = FALSE}
-df <- rdb(ids = c("AMECO/ZUTN/EA19.1.0.0.0.ZUTN", "AMECO/ZUTN/DNK.1.0.0.0.ZUTN")) %>%
-  filter(!is.na(value))
+df <- rdb(ids = c("AMECO/ZUTN/EA19.1.0.0.0.ZUTN", "AMECO/ZUTN/DNK.1.0.0.0.ZUTN"))
+df <- df[!is.na(value)]
 ```
 ```{r, eval = TRUE, echo = FALSE}
 df <- rdbnomics:::rdbnomics_df002
+data.table::setDT(df)
 ```
 
 ```{r, echo = FALSE}
-df %>%
-  arrange(series_code, period) %>%
-  reorder_cols() %>%
-  display_table()
+df <- df[order(series_code, period)]
+df <- reorder_cols(df)
+display_table(df)
 ```
 
-```{r, fig.align = 'center'}
-ggplot(df, aes(x = period, y = value, color = series_name)) +
-  geom_line(size = 1.2) +
-  geom_point(size = 2) +
-  dbnomics()
+```{r, echo = FALSE, fig.align = 'center'}
+# ggplot(df, aes(x = period, y = value, color = series_name)) +
+#   geom_line(size = 1.2) +
+#   geom_point(size = 2) +
+#   dbnomics()
+i <- 1
+x1 <- df[series_name == sort(unique(series_name))[i]]$period
+y1 <- df[series_name == sort(unique(series_name))[i]]$value
+i <- 2
+x2 <- df[series_name == sort(unique(series_name))[i]]$period
+y2 <- df[series_name == sort(unique(series_name))[i]]$value
+cols <- c("red", "blue", "darkgreen")
+PCH <- 18
+
+plot(
+  x1, y1, col = cols[1], type = "l", xlab = "", ylab = "",
+  xlim = c(min(df$period), max(df$period)),
+  ylim = c(min(df$value) - 1.7, max(df$value)),
+  panel.first = grid(lty = 1)
+)
+points(x1, y1, col = cols[1], pch = PCH)
+lines(x2, y2, col = cols[2], type = "l")
+points(x2, y2, col = cols[2], pch = PCH)
+legend(
+  "bottomleft", inset = 0.005,
+  legend = sort(unique(df$series_name)),
+  col = cols,
+  lty = 1, pch = PCH,  box.lty = 0, cex = 0.7
+)
+mtext(
+  text = "DBnomics <https://db.nomics.world>",
+  side = 3, col = "grey", font = 3, adj = 1
+)
 ```
 
 ## Fetch two series from different datasets of different providers
 
 ```{r, eval = FALSE}
-df <- rdb(ids = c("AMECO/ZUTN/EA19.1.0.0.0.ZUTN", "Eurostat/une_rt_q/Q.SA.TOTAL.PC_ACT.T.EA19")) %>%
-  filter(!is.na(value))
+df <- rdb(ids = c("AMECO/ZUTN/EA19.1.0.0.0.ZUTN", "Eurostat/une_rt_q/Q.SA.TOTAL.PC_ACT.T.EA19"))
+df <- df[!is.na(value)]
 ```
 ```{r, eval = TRUE, echo = FALSE}
 df <- rdbnomics:::rdbnomics_df003
+data.table::setDT(df)
 ```
 
 ```{r, echo = FALSE}
-df %>%
-  arrange(series_code, period) %>%
-  reorder_cols() %>%
-  display_table()
+df <- df[order(series_code, period)]
+df <- reorder_cols(df)
+display_table(df)
 ```
 
-```{r, fig.align = 'center'}
-ggplot(df, aes(x = period, y = value, color = series_name)) +
-  geom_line(size = 1.2) +
-  geom_point(size = 2) +
-  dbnomics(legend.text = element_text(size = 7))
+```{r, echo = FALSE, fig.align = 'center'}
+# ggplot(df, aes(x = period, y = value, color = series_name)) +
+#   geom_line(size = 1.2) +
+#   geom_point(size = 2) +
+#   dbnomics(legend.text = element_text(size = 7))
+i <- 1
+x1 <- df[series_name == sort(unique(series_name))[i]]$period
+y1 <- df[series_name == sort(unique(series_name))[i]]$value
+i <- 2
+x2 <- df[series_name == sort(unique(series_name))[i]]$period
+y2 <- df[series_name == sort(unique(series_name))[i]]$value
+cols <- c("red", "blue", "darkgreen")
+PCH <- 18
+legend_text <- sort(unique(df$series_name))
+legend_text[2] <- sapply(
+  legend_text[2],
+  function(y) {
+    paste0(
+      paste0(
+        strsplit(y, "active ")[[1]], collapse = "active\n"
+      ),
+      "\n"
+    )
+  }
+)
+
+plot(
+  x1, y1, col = cols[1], type = "l", xlab = "", ylab = "",
+  xlim = c(min(df$period), max(df$period)),
+  ylim = c(min(df$value) - 1.5, max(df$value)),
+  panel.first = grid(lty = 1)
+)
+points(x1, y1, col = cols[1], pch = PCH)
+lines(x2, y2, col = cols[2], type = "l")
+points(x2, y2, col = cols[2], pch = PCH)
+legend(
+  "bottomleft", inset = 0.005,
+  legend = legend_text,
+  col = cols,
+  lty = 1, pch = PCH,  box.lty = 0, cex = 0.7
+)
+mtext(
+  text = "DBnomics <https://db.nomics.world>",
+  side = 3, col = "grey", font = 3, adj = 1
+)
 ```
 
 # Fetch time series by `mask`
@@ -270,24 +303,48 @@ The code mask notation is a very concise way to select one or many time series a
 
 ## Fetch one series from dataset 'Balance of Payments' (BOP) of IMF
 ```{r, eval = FALSE}
-df <- rdb("IMF", "BOP", mask = "A.FR.BCA_BP6_EUR") %>%
-  filter(!is.na(value))
+df <- rdb("IMF", "BOP", mask = "A.FR.BCA_BP6_EUR")
+df <- df[!is.na(value)]
 ```
 ```{r, eval = TRUE, echo = FALSE}
 df <- rdbnomics:::rdbnomics_df004
+data.table::setDT(df)
 ```
 
 ```{r, echo = FALSE}
-df %>%
-  reorder_cols() %>%
-  display_table()
+df <- reorder_cols(df)
+display_table(df)
 ```
 
-```{r, fig.align = 'center'}
-ggplot(df, aes(x = period, y = value, color = series_name)) +
-  geom_step(size = 1.2) +
-  geom_point(size = 2) +
-  dbnomics()
+```{r, echo = FALSE, fig.align = 'center'}
+# ggplot(df, aes(x = period, y = value, color = series_name)) +
+#   geom_step(size = 1.2) +
+#   geom_point(size = 2) +
+#   dbnomics()
+i <- 1
+x1 <- df[series_name == sort(unique(series_name))[i]]$period
+y1 <- df[series_name == sort(unique(series_name))[i]]$value
+cols <- c("red", "blue", "darkgreen")
+PCH <- 18
+legend_text <- sort(unique(df$series_name))
+
+plot(
+  x1, y1, col = cols[1], type = "s", xlab = "", ylab = "",
+  xlim = c(min(df$period), max(df$period)),
+  ylim = c(min(df$value), max(df$value)),
+  panel.first = grid(lty = 1)
+)
+points(x1, y1, col = cols[1], pch = PCH)
+legend(
+  "bottomleft", inset = 0.005,
+  legend = legend_text,
+  col = cols,
+  lty = 1, pch = PCH,  box.lty = 0, cex = 0.7
+)
+mtext(
+  text = "DBnomics <https://db.nomics.world>",
+  side = 3, col = "grey", font = 3, adj = 1
+)
 ```
 
 In the event that you only use the arguments `provider_code`, `dataset_code` and `mask`, you can drop the name `mask` and run:
@@ -299,61 +356,89 @@ df <- rdb("IMF", "BOP", "A.FR.BCA_BP6_EUR")
 
 You just have to add a `+` between two different values of a dimension.
 ```{r, eval = FALSE}
-df <- rdb("IMF", "BOP", mask = "A.FR+ES.BCA_BP6_EUR") %>%
-  filter(!is.na(value))
+df <- rdb("IMF", "BOP", mask = "A.FR+ES.BCA_BP6_EUR")
+df <- df[!is.na(value)]
 ```
 ```{r, eval = TRUE, echo = FALSE}
 df <- rdbnomics:::rdbnomics_df005
+data.table::setDT(df)
 ```
 
 ```{r, echo = FALSE}
-df %>%
-  arrange(series_code, period) %>%
-  reorder_cols() %>%
-  display_table()
+df <- df[order(series_code, period)]
+df <- reorder_cols(df)
+display_table(df)
 ```
 
-```{r, fig.align = 'center'}
-ggplot(df, aes(x = period, y = value, color = series_name)) +
-  geom_step(size = 1.2) +
-  geom_point(size = 2) +
-  dbnomics()
+```{r, echo = FALSE, fig.align = 'center'}
+# ggplot(df, aes(x = period, y = value, color = series_name)) +
+#   geom_step(size = 1.2) +
+#   geom_point(size = 2) +
+#   dbnomics()
+i <- 1
+x1 <- df[series_name == sort(unique(series_name))[i]]$period
+y1 <- df[series_name == sort(unique(series_name))[i]]$value
+i <- 2
+x2 <- df[series_name == sort(unique(series_name))[i]]$period
+y2 <- df[series_name == sort(unique(series_name))[i]]$value
+cols <- c("red", "blue", "darkgreen")
+PCH <- 18
+legend_text <- sort(unique(df$series_name))
+
+plot(
+  x1, y1, col = cols[1], type = "s", xlab = "", ylab = "",
+  xlim = c(min(df$period), max(df$period)),
+  ylim = c(min(df$value) - 2*10^4, max(df$value)),
+  panel.first = grid(lty = 1)
+)
+points(x1, y1, col = cols[1], pch = PCH)
+lines(x2, y2, col = cols[2], type = "s")
+points(x2, y2, col = cols[2], pch = PCH)
+legend(
+  "bottomleft", inset = 0.005,
+  legend = legend_text,
+  col = cols,
+  lty = 1, pch = PCH,  box.lty = 0, cex = 0.7
+)
+mtext(
+  text = "DBnomics <https://db.nomics.world>",
+  side = 3, col = "grey", font = 3, adj = 1
+)
 ```
 
 ## Fetch all series along one dimension from dataset 'Balance of Payments' (BOP) of IMF
 
 ```{r, eval = FALSE}
-df <- rdb("IMF", "BOP", mask = "A..BCA_BP6_EUR") %>%
-  filter(!is.na(value)) %>%
-  arrange(desc(period), REF_AREA) %>%
-  head(100)
+df <- rdb("IMF", "BOP", mask = "A..BCA_BP6_EUR")
+df <- df[!is.na(value)]
+df <- df[order(-period, REF_AREA)]
+df <- head(df, 100)
 ```
 ```{r, eval = TRUE, echo = FALSE}
 df <- rdbnomics:::rdbnomics_df006
+data.table::setDT(df)
 ```
 
 ```{r, echo = FALSE}
-df %>%
-  reorder_cols() %>%
-  display_table()
+df <- reorder_cols(df)
+display_table(df)
 ```
 
 ## Fetch series along multiple dimensions from dataset 'Balance of Payments' (BOP) of IMF
 
 ```{r, eval = FALSE}
-df <- rdb("IMF", "BOP", mask = "A.FR.BCA_BP6_EUR+IA_BP6_EUR") %>%
-  filter(!is.na(value)) %>%
-  group_by(INDICATOR) %>%
-  top_n(n = 50, wt = period)
+df <- rdb("IMF", "BOP", mask = "A.FR.BCA_BP6_EUR+IA_BP6_EUR")
+df <- df[!is.na(value)]
+df <- df[order(period), head(.SD, 50), by = INDICATOR]
 ```
 ```{r, eval = TRUE, echo = FALSE}
-df <- ungroup(rdbnomics:::rdbnomics_df007)
+df <- rdbnomics:::rdbnomics_df007
+data.table::setDT(df)
 ```
 
 ```{r, echo = FALSE}
-df %>%
-  reorder_cols() %>%
-  display_table()
+df <- reorder_cols(df)
+display_table(df)
 ```
 
 # Fetch time series by `dimensions`
@@ -362,81 +447,173 @@ Searching by `dimensions` is a less concise way to select time series than using
 ## Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider
 
 ```{r, eval = FALSE}
-df <- rdb("AMECO", "ZUTN", dimensions = list(geo = "ea19")) %>%
-  filter(!is.na(value))
+df <- rdb("AMECO", "ZUTN", dimensions = list(geo = "ea19"))
+df <- df[!is.na(value))]
 # or
 # df <- rdb("AMECO", "ZUTN", dimensions = '{"geo": ["ea19"]}') %>%
 #   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
 df <- rdbnomics:::rdbnomics_df008
+data.table::setDT(df)
 ```
 
 ```{r, echo = FALSE}
-df %>%
-  reorder_cols() %>%
-  display_table()
+df <- reorder_cols(df)
+display_table(df)
 ```
 
-```{r, fig.align = 'center'}
-ggplot(df, aes(x = period, y = value, color = series_name)) +
-  geom_line(size = 1.2) +
-  geom_point(size = 2) +
-  dbnomics()
+```{r, echo = FALSE, fig.align = 'center'}
+# ggplot(df, aes(x = period, y = value, color = series_name)) +
+#   geom_line(size = 1.2) +
+#   geom_point(size = 2) +
+#   dbnomics()
+i <- 1
+x1 <- df[series_name == sort(unique(series_name))[i]]$period
+y1 <- df[series_name == sort(unique(series_name))[i]]$value
+cols <- c("red", "blue", "darkgreen")
+PCH <- 18
+legend_text <- sort(unique(df$series_name))
+
+plot(
+  x1, y1, col = cols[1], type = "l", xlab = "", ylab = "",
+  xlim = c(min(df$period), max(df$period)),
+  ylim = c(min(df$value) - 0.2, max(df$value)),
+  panel.first = grid(lty = 1)
+)
+points(x1, y1, col = cols[1], pch = PCH)
+legend(
+  "bottomleft", inset = 0.005,
+  legend = legend_text,
+  col = cols,
+  lty = 1, pch = PCH,  box.lty = 0, cex = 0.7
+)
+mtext(
+  text = "DBnomics <https://db.nomics.world>",
+  side = 3, col = "grey", font = 3, adj = 1
+)
 ```
 
 ## Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider
 
 ```{r, eval = FALSE}
-df <- rdb("AMECO", "ZUTN", dimensions = list(geo = c("ea19", "dnk"))) %>%
-  filter(!is.na(value))
+df <- rdb("AMECO", "ZUTN", dimensions = list(geo = c("ea19", "dnk")))
+df <- df[!is.na(value))]
 # or
 # df <- rdb("AMECO", "ZUTN", dimensions = '{"geo": ["ea19", "dnk"]}') %>%
 #   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
 df <- rdbnomics:::rdbnomics_df009
+data.table::setDT(df)
 ```
 
 ```{r, echo = FALSE}
-df %>%
-  arrange(series_code, period) %>%
-  reorder_cols() %>%
-  display_table()
+df <- df[order(series_code, period)]
+df <- reorder_cols(df)
+display_table(df)
 ```
 
-```{r, fig.align = 'center'}
-ggplot(df, aes(x = period, y = value, color = series_name)) +
-  geom_line(size = 1.2) +
-  geom_point(size = 2) +
-  dbnomics()
+```{r, echo = FALSE, fig.align = 'center'}
+# ggplot(df, aes(x = period, y = value, color = series_name)) +
+#   geom_line(size = 1.2) +
+#   geom_point(size = 2) +
+#   dbnomics()
+i <- 1
+x1 <- df[series_name == sort(unique(series_name))[i]]$period
+y1 <- df[series_name == sort(unique(series_name))[i]]$value
+i <- 2
+x2 <- df[series_name == sort(unique(series_name))[i]]$period
+y2 <- df[series_name == sort(unique(series_name))[i]]$value
+cols <- c("red", "blue", "darkgreen")
+PCH <- 18
+legend_text <- sort(unique(df$series_name))
+
+plot(
+  x1, y1, col = cols[1], type = "l", xlab = "", ylab = "",
+  xlim = c(min(df$period), max(df$period)),
+  ylim = c(min(df$value) - 1.2, max(df$value)),
+  panel.first = grid(lty = 1)
+)
+points(x1, y1, col = cols[1], pch = PCH)
+lines(x2, y2, col = cols[2], type = "l")
+points(x2, y2, col = cols[2], pch = PCH)
+legend(
+  "bottomleft", inset = 0.005,
+  legend = legend_text,
+  col = cols,
+  lty = 1, pch = PCH,  box.lty = 0, cex = 0.7
+)
+mtext(
+  text = "DBnomics <https://db.nomics.world>",
+  side = 3, col = "grey", font = 3, adj = 1
+)
 ```
 
 ## Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank
 
 ```{r, eval = FALSE}
-df <- rdb("WB", "DB", dimensions = list(country = c("DZ", "PE"), indicator = c("ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"))) %>%
-  filter(!is.na(value))
+df <- rdb("WB", "DB", dimensions = list(country = c("DZ", "PE"), indicator = c("ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS")))
+df <- df[!is.na(value))]
 # or
 # df <- rdb("WB", "DB", dimensions = '{"country": ["DZ", "PE"], "indicator": ["ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"]}') %>%
 #   filter(!is.na(value))
 ```
 ```{r, eval = TRUE, echo = FALSE}
 df <- rdbnomics:::rdbnomics_df010
+data.table::setDT(df)
 ```
 
 ```{r, echo = FALSE}
-df %>%
-  arrange(series_name, period) %>%
-  reorder_cols() %>%
-  display_table()
+df <- df[order(series_name, period)]
+df <- reorder_cols(df)
+display_table(df)
 ```
 
-```{r, fig.align = 'center'}
-ggplot(df, aes(x = period, y = value, color = series_name)) +
-  geom_line(size = 1.2) +
-  geom_point(size = 2) +
-  dbnomics()
+```{r, echo = FALSE, fig.align = 'center'}
+# ggplot(df, aes(x = period, y = value, color = series_name)) +
+#   geom_line(size = 1.2) +
+#   geom_point(size = 2) +
+#   dbnomics()
+i <- 1
+x1 <- df[series_name == sort(unique(series_name))[i]]$period
+y1 <- df[series_name == sort(unique(series_name))[i]]$value
+i <- 2
+x2 <- df[series_name == sort(unique(series_name))[i]]$period
+y2 <- df[series_name == sort(unique(series_name))[i]]$value
+i <- 3
+x3 <- df[series_name == sort(unique(series_name))[i]]$period
+y3 <- df[series_name == sort(unique(series_name))[i]]$value
+i <- 4
+x4 <- df[series_name == sort(unique(series_name))[i]]$period
+y4 <- df[series_name == sort(unique(series_name))[i]]$value
+cols <- c("red", "blue", "darkgreen", "purple")
+PCH <- 18
+legend_text <- sort(unique(df$series_name))
+
+plot(
+  x1, y1, col = cols[1], type = "l", xlab = "", ylab = "",
+  xlim = c(min(df$period), max(df$period)),
+  ylim = c(min(df$value) - 7, max(df$value)),
+  panel.first = grid(lty = 1)
+)
+points(x1, y1, col = cols[1], pch = PCH)
+lines(x2, y2, col = cols[2], type = "l")
+points(x2, y2, col = cols[2], pch = PCH)
+lines(x3, y3, col = cols[3], type = "l")
+points(x3, y3, col = cols[3], pch = PCH)
+lines(x4, y4, col = cols[4], type = "l")
+points(x4, y4, col = cols[4], pch = PCH)
+legend(
+  "bottomleft", inset = 0.005,
+  legend = legend_text,
+  col = cols,
+  lty = 1, pch = PCH,  box.lty = 0, cex = 0.7
+)
+mtext(
+  text = "DBnomics <https://db.nomics.world>",
+  side = 3, col = "grey", font = 3, adj = 1
+)
 ```
 
 # Fetch time series with a `query`
@@ -444,47 +621,110 @@ The query is a Google-like search that will filter/select time series from a pro
 
 ## Fetch one series from dataset 'WEO by countries' (WEO) of IMF
 ```{r, eval = FALSE}
-df <- rdb("IMF", "WEO", query = "France current account balance percent") %>%
-  filter(!is.na(value))
+df <- rdb("IMF", "WEO", query = "France current account balance percent")
+df <- df[!is.na(value))]
 ```
 ```{r, eval = TRUE, echo = FALSE}
 df <- rdbnomics:::rdbnomics_df014
+data.table::setDT(df)
 ```
 
 ```{r, echo = FALSE}
-df %>%
-  reorder_cols() %>%
-  display_table()
+df <- reorder_cols(df)
+display_table(df)
 ```
 
-```{r, fig.align = 'center'}
-ggplot(df, aes(x = period, y = value, color = series_name)) +
-  geom_line(size = 1.2) +
-  geom_point(size = 2) +
-  dbnomics()
+```{r, echo = FALSE, fig.align = 'center'}
+# ggplot(df, aes(x = period, y = value, color = series_name)) +
+#   geom_line(size = 1.2) +
+#   geom_point(size = 2) +
+#   dbnomics()
+i <- 1
+x1 <- df[series_name == sort(unique(series_name))[i]]$period
+y1 <- df[series_name == sort(unique(series_name))[i]]$value
+cols <- c("red", "blue", "darkgreen", "purple")
+PCH <- 18
+legend_text <- sort(unique(df$series_name))
+
+plot(
+  x1, y1, col = cols[1], type = "l", xlab = "", ylab = "",
+  xlim = c(min(df$period), max(df$period)),
+  ylim = c(min(df$value) - 0.5, max(df$value)),
+  panel.first = grid(lty = 1)
+)
+points(x1, y1, col = cols[1], pch = PCH)
+legend(
+  "bottomleft", inset = 0.005,
+  legend = legend_text,
+  col = cols,
+  lty = 1, pch = PCH,  box.lty = 0, cex = 0.7
+)
+mtext(
+  text = "DBnomics <https://db.nomics.world>",
+  side = 3, col = "grey", font = 3, adj = 1
+)
 ```
 
 ## Fetch series from dataset 'WEO by countries' (WEO) of IMF
 ```{r, eval = FALSE}
-df <- rdb("IMF", "WEO", query = "current account balance percent") %>%
-  filter(!is.na(value))
+df <- rdb("IMF", "WEO", query = "current account balance percent")
+df <- df[!is.na(value))]
 ```
 ```{r, eval = TRUE, echo = FALSE}
 df <- rdbnomics:::rdbnomics_df015
+data.table::setDT(df)
 ```
 
 ```{r, echo = FALSE}
-df %>%
-  reorder_cols() %>%
-  display_table()
+df <- reorder_cols(df)
+display_table(df)
 ```
 
-```{r, fig.align = 'center'}
-ggplot(df, aes(x = period, y = value, color = `WEO Country`)) +
-  geom_line(size = 1.2) +
-  geom_point(size = 2) +
-  ggtitle("Current account balance (% GDP)") +
-  dbnomics(legend.direction = "horizontal")
+```{r, echo = FALSE, fig.align = 'center'}
+# ggplot(df, aes(x = period, y = value, color = `WEO Country`)) +
+#   geom_line(size = 1.2) +
+#   geom_point(size = 2) +
+#   ggtitle("Current account balance (% GDP)") +
+#   dbnomics(legend.direction = "horizontal")
+i <- 1
+x1 <- df[series_name == sort(unique(series_name))[i]]$period
+y1 <- df[series_name == sort(unique(series_name))[i]]$value
+i <- 2
+x2 <- df[series_name == sort(unique(series_name))[i]]$period
+y2 <- df[series_name == sort(unique(series_name))[i]]$value
+i <- 3
+x3 <- df[series_name == sort(unique(series_name))[i]]$period
+y3 <- df[series_name == sort(unique(series_name))[i]]$value
+i <- 4
+x4 <- df[series_name == sort(unique(series_name))[i]]$period
+y4 <- df[series_name == sort(unique(series_name))[i]]$value
+cols <- c("red", "blue", "darkgreen", "purple")
+PCH <- 18
+legend_text <- sort(unique(df$series_name))
+
+plot(
+  x1, y1, col = cols[1], type = "l", xlab = "", ylab = "",
+  xlim = c(min(df$period), max(df$period)),
+  ylim = c(min(df$value), max(df$value)),
+  panel.first = grid(lty = 1)
+)
+points(x1, y1, col = cols[1], pch = PCH)
+lines(x2, y2, col = cols[2], type = "l")
+points(x2, y2, col = cols[2], pch = PCH)
+lines(x3, y3, col = cols[3], type = "l")
+points(x3, y3, col = cols[3], pch = PCH)
+lines(x4, y4, col = cols[4], type = "l")
+points(x4, y4, col = cols[4], pch = PCH)
+legend(
+  "bottomleft", inset = 0.005,
+  legend = legend_text,
+  col = cols,
+  lty = 1, pch = PCH,  box.lty = 0, cex = 0.7
+)
+mtext(
+  text = "DBnomics <https://db.nomics.world>",
+  side = 3, col = "grey", font = 3, adj = 1
+)
 ```
 
 # Fetch time series found on the web site
@@ -502,25 +742,58 @@ When you don't know the codes of the dimensions, provider, dataset or series, yo
 - use the `rdb(api_link = ...)` function such as below.  
 
 ```{r, eval = FALSE}
-df <- rdb(api_link = "https://api.db.nomics.world/v22/series/WB/DB?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%7D&q=IC.REG.PROC.FE.NO&observations=1&format=json&align_periods=1&offset=0&facets=0") %>%
-  filter(!is.na(value))
+df <- rdb(api_link = "https://api.db.nomics.world/v22/series/WB/DB?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%7D&q=IC.REG.PROC.FE.NO&observations=1&format=json&align_periods=1&offset=0&facets=0")
+df <- df[!is.na(value))]
 ```
 ```{r, eval = TRUE, echo = FALSE}
 df <- rdbnomics:::rdbnomics_df011
+data.table::setDT(df)
 ```
 
 ```{r, echo = FALSE}
-df %>%
-  arrange(period, series_name) %>%
-  reorder_cols() %>%
-  display_table()
+df <- df[order(period, series_name)]
+df <- reorder_cols(df)
+display_table(df)
 ```
 
-```{r, fig.align = 'center'}
-ggplot(df, aes(x = period, y = value, color = series_name)) +
-  geom_step(size = 1.2) +
-  geom_point(size = 2) +
-  dbnomics()
+```{r, echo = FALSE, fig.align = 'center'}
+# ggplot(df, aes(x = period, y = value, color = series_name)) +
+#   geom_step(size = 1.2) +
+#   geom_point(size = 2) +
+#   dbnomics()
+i <- 1
+x1 <- df[series_name == sort(unique(series_name))[i]]$period
+y1 <- df[series_name == sort(unique(series_name))[i]]$value
+i <- 2
+x2 <- df[series_name == sort(unique(series_name))[i]]$period
+y2 <- df[series_name == sort(unique(series_name))[i]]$value
+i <- 3
+x3 <- df[series_name == sort(unique(series_name))[i]]$period
+y3 <- df[series_name == sort(unique(series_name))[i]]$value
+cols <- c("red", "blue", "darkgreen")
+PCH <- 18
+
+plot(
+  x1, y1, col = cols[1], type = "s", xlab = "", ylab = "",
+  xlim = c(min(df$period), max(df$period)),
+  ylim = c(min(df$value) - 1.2, max(df$value)),
+  panel.first = grid(lty = 1)
+)
+points(x1, y1, col = cols[1], pch = PCH)
+lines(x2, y2, col = cols[2], type = "s")
+points(x2, y2, col = cols[2], pch = PCH)
+lines(x3, y3, col = cols[3], type = "s")
+points(x3, y3, col = cols[3], pch = PCH)
+legend(
+  "bottomleft", inset = 0.005,
+  legend = sort(unique(df$series_name)),
+  col = cols,
+  lty = 1, pch = PCH,  box.lty = 0, cex = 0.7
+)
+mtext(
+  text = "DBnomics <https://db.nomics.world>",
+  side = 3, col = "grey", font = 3, adj = 1
+)
 ```
 
 In the event that you only use the argument `api_link`, you can drop the name and run:
@@ -536,17 +809,18 @@ On the cart page of the [DBnomics website](https://db.nomics.world), click on "*
 </center>
   
 ```{r, eval = FALSE}
-df <- rdb(api_link = "https://api.db.nomics.world/v22/series?observations=1&series_ids=BOE/6008/RPMTDDC,BOE/6231/RPMTBVE") %>%
-  filter(!is.na(value))
+df <- rdb(api_link = "https://api.db.nomics.world/v22/series?observations=1&series_ids=BOE/6008/RPMTDDC,BOE/6231/RPMTBVE")
+df <- df[!is.na(value))]
 ```
 ```{r, eval = TRUE, echo = FALSE}
-df <- head(rdbnomics:::rdbnomics_df012, 50)
+df <- rdbnomics:::rdbnomics_df012
+data.table::setDT(df)
 ```
 
 ```{r, echo = FALSE}
-df %<>%
-  mutate(
-    series_name = sapply(
+df[
+    ,
+    series_name := sapply(
       series_name,
       function(y) {
         paste0(
@@ -557,21 +831,48 @@ df %<>%
         )
       }
     )
-  )
+  ]
 ```
 
 ```{r, echo = FALSE}
-df %>%
-  arrange(period, series_name) %>%
-  reorder_cols() %>%
-  display_table()
+df <- df[order(period, series_name)]
+df <- reorder_cols(df)
+display_table(df)
 ```
 
-```{r, fig.align = 'center'}
-ggplot(df, aes(x = period, y = value, color = series_name)) +
-  geom_line(size = 1.2) +
-  geom_point(size = 2) +
-  dbnomics()
+```{r, echo = FALSE, fig.align = 'center'}
+# ggplot(df, aes(x = period, y = value, color = series_name)) +
+#   geom_line(size = 1.2) +
+#   geom_point(size = 2) +
+#   dbnomics()
+i <- 1
+x1 <- df[series_name == sort(unique(series_name))[i]]$period
+y1 <- df[series_name == sort(unique(series_name))[i]]$value
+i <- 2
+x2 <- df[series_name == sort(unique(series_name))[i]]$period
+y2 <- df[series_name == sort(unique(series_name))[i]]$value
+cols <- c("red", "blue", "darkgreen")
+PCH <- 18
+
+plot(
+  x1, y1, col = cols[1], type = "l", xlab = "", ylab = "",
+  xlim = c(min(df$period), max(df$period)),
+  ylim = c(min(df$value) - 4*10^3, max(df$value)),
+  panel.first = grid(lty = 1)
+)
+points(x1, y1, col = cols[1], pch = PCH)
+lines(x2, y2, col = cols[2], type = "l")
+points(x2, y2, col = cols[2], pch = PCH)
+legend(
+  "bottomleft", inset = 0.005,
+  legend = sort(unique(df$series_name)),
+  col = cols,
+  lty = 1, pch = PCH,  box.lty = 0, cex = 0.7
+)
+mtext(
+  text = "DBnomics <https://db.nomics.world>",
+  side = 3, col = "grey", font = 3, adj = 1
+)
 ```
 
 # Fetch the available datasets of a provider
@@ -600,12 +901,10 @@ rdb_datasets(provider_code = c("IMF", "BDF"))
 str(rdbnomics:::rdbnomics_df018)
 ```
 ```{r, eval = TRUE, echo = FALSE}
-rdbnomics:::rdbnomics_df018 %>%
-  sapply(function(y) { paste0(": ", nrow(y)) }) %>%
-  {
-    paste0("Number of datasets for ", names(.), " ", unname(.))
-  } %>%
-  cat(sep = "\n")
+DT <- rdbnomics:::rdbnomics_df018
+DT <- sapply(DT, function(y) { paste0(": ", nrow(y)) })
+DT <- paste0("Number of datasets for ", names(DT), " ", unname(DT))
+cat(DT, sep = "\n")
 ```
 
 In the event that you only request the datasets for one provider, if you define
@@ -614,7 +913,9 @@ In the event that you only request the datasets for one provider, if you define
 rdb_datasets(provider_code = "IMF", simplify = TRUE)
 ```
 ```{r, eval = TRUE, echo = FALSE}
-rdbnomics:::rdbnomics_df017 %>% display_table()
+DT <- rdbnomics:::rdbnomics_df017
+data.table::setDT(DT)
+display_table(DT)
 ```
 
 The extent of datasets gathered by [DBnomics](https://db.nomics.world) can be
@@ -626,12 +927,10 @@ rdb_datasets()
 options(rdbnomics.progress_bar_datasets = FALSE)
 ```
 ```{r, eval = TRUE, echo = FALSE}
-rdbnomics:::rdbnomics_df019 %>%
-  {
-    data.table(Provider = names(.), `Number of datasets` = sapply(., nrow))
-  } %>%
-  .[order(Provider)] %>%
-  display_table()
+DT <- rdbnomics:::rdbnomics_df019
+DT <- data.table(Provider = names(DT), `Number of datasets` = sapply(DT, nrow))
+DT <- DT[order(Provider)]
+display_table(DT)
 ```
 
 # Fetch the possible dimensions of available datasets of a provider
@@ -649,29 +948,22 @@ rdb_dimensions(provider_code = "IMF", dataset_code = "WEO")
 The result is a nested named list (its names are **IMF**, **WEO** and the
 dimensions names) with a `data.table` at the end of each branch:
 ```{r, eval = TRUE, echo = FALSE}
-rdbnomics:::rdbnomics_df020 %$%
-  IMF %$%
-  WEO %>%
-  {
-    paste0("Number of dimensions for IMF/WEO : ", length(.))
-  } %>%
-  cat(sep = "\n")
+DT <- rdbnomics:::rdbnomics_df020
+DT <- DT$IMF$WEO
+DT <- paste0("Number of dimensions for IMF/WEO : ", length(DT))
+cat(DT, sep = "\n")
 ```
 
 ```{r, eval = TRUE, echo = FALSE}
-rdbnomics:::rdbnomics_df020 %$%
-  IMF %$%
-  WEO %>%
-  .[[1]] %>%
-  display_table()
+DT <- rdbnomics:::rdbnomics_df020
+DT <- DT$IMF$WEO[[1]]
+display_table(DT)
 ```
 
 ```{r, eval = TRUE, echo = FALSE}
-rdbnomics:::rdbnomics_df020 %$%
-  IMF %$%
-  WEO %>%
-  .[[2]] %>%
-  display_table()
+DT <- rdbnomics:::rdbnomics_df020
+DT <- DT$IMF$WEO[[2]]
+display_table(DT)
 ```
 
 In the event that you only request the dimensions for one dataset for one
@@ -696,10 +988,10 @@ rdb_dimensions()
 options(rdbnomics.progress_bar_datasets = FALSE)
 ```
 ```{r, eval = TRUE, echo = FALSE}
-rdbnomics:::rdbnomics_df022 %>%
-  .[order(Provider, Dataset)] %>%
-  head(100) %>%
-  display_table()
+DT <- rdbnomics:::rdbnomics_df022
+DT <- DT[order(Provider, Dataset)]
+DT <- head(DT, 100)
+display_table(DT)
 
 # rdbnomics_df022 %>%
 #   sapply(function(u) {
@@ -737,9 +1029,9 @@ For example, for the **IMF** provider and the dataset **WEO**, the command is (o
 rdb_series(provider_code = "IMF", dataset_code = "WEO", simplify = TRUE)
 ```
 ```{r, eval = TRUE, echo = FALSE}
-rdbnomics:::rdbnomics_df023 %>%
-  head(100) %>%
-  display_table()
+DT <- rdbnomics:::rdbnomics_df023
+DT <- head(DT, 100)
+display_table(DT)
 ```
 
 Like the function `rdb()`, you can add features to `rdb_series()`. You can ask for
@@ -757,10 +1049,10 @@ of series per dataset. Please only fetch for one dataset if you need it or
 visit the website [https://db.nomics.world](https://db.nomics.world).  
 For example, for the **IMF** provider, the number of series is (only first 5):
 ```{r, eval = TRUE, echo = FALSE}
-rdbnomics:::rdbnomics_df024 %>%
-  .[order(-`Number of series`)] %>%
-  head(5) %>%
-  display_table()
+DT <- rdbnomics:::rdbnomics_df024
+DT <- DT[order(-`Number of series`)]
+DT <- head(DT, 5)
+display_table(DT)
 ```
 
 # Proxy configuration or connection error `Could not resolve host`
@@ -886,7 +1178,7 @@ df <- rdb(
 )
 ```
 
-The data.frame (data.table or tibble) columns change a little bit when filters are used. There are two new columns:
+The data.frame (data.table) columns change a little bit when filters are used. There are two new columns:
 
 - `period_middle_day`: the middle day of `original_period` (can be useful when you compare graphically interpolated series and original ones).
 - `filtered` (boolean): `TRUE` if the series is filtered, `FALSE` otherwise.
@@ -897,79 +1189,59 @@ The content of two columns are modified:
 - `series_name`: same as before for original series, but the suffix ` (filtered)` is added for filtered series.
 
 ```{r, eval = TRUE, echo = FALSE}
-df <- head(rdbnomics:::rdbnomics_df013, 50)
+df <- rdbnomics:::rdbnomics_df013
+data.table::setDT(df)
 ```
 
 ```{r, echo = FALSE}
-df %>%
-  arrange(filtered, series_name, period) %>%
-  reorder_cols() %>%
-  display_table()
+df <- df[order(filtered, series_name, period)]
+df <- reorder_cols(df)
+display_table(df)
 ```
 
-```{r, fig.align = 'center'}
-ggplot(filter(df, !is.na(value)), aes(x = period, y = value, color = series_name)) +
-  geom_line(size = 1.2) +
-  geom_point(size = 2) +
-  dbnomics()
-```
+```{r, echo = FALSE, fig.align = 'center'}
+# ggplot(df[!is.na(value)], aes(x = period, y = value, color = series_name)) +
+#   geom_line(size = 1.2) +
+#   geom_point(size = 2) +
+#   dbnomics()
+df <- df[!is.na(value)]
+i <- 1
+x1 <- df[series_name == sort(unique(series_name))[i]]$period
+y1 <- df[series_name == sort(unique(series_name))[i]]$value
+i <- 2
+x2 <- df[series_name == sort(unique(series_name))[i]]$period
+y2 <- df[series_name == sort(unique(series_name))[i]]$value
+i <- 3
+x3 <- df[series_name == sort(unique(series_name))[i]]$period
+y3 <- df[series_name == sort(unique(series_name))[i]]$value
+i <- 4
+x4 <- df[series_name == sort(unique(series_name))[i]]$period
+y4 <- df[series_name == sort(unique(series_name))[i]]$value
+cols <- c("red", "blue", "darkgreen", "purple")
+PCH <- 18
+legend_text <- sort(unique(df$series_name))
 
-# Appendix
-
-## ggplot2 function `dbnomics()` used in the vignette
-
-We show the function `dbnomics()` as an information.
-
-```{r, eval = FALSE}
-dbnomics <- function(color_palette = "Set1", ...) {
-  # Check if ggplot2 is installed.
-  ggplot2_ok <- try(utils::packageVersion("ggplot2"), silent = TRUE)
-  if (inherits(ggplot2_ok, "try-error")) {
-    stop(
-      "Please run install.packages('ggplot2') to use dbnomics().",
-      call. = FALSE
-    )
-  }
-
-  # DBnomics vignette theme
-  result <- list(
-    ggplot2::scale_x_date(expand = c(0, 0)),
-    ggplot2::scale_y_continuous(
-      labels = function(x) { format(x, big.mark = " ") }
-    ),
-    ggplot2::xlab(""),
-    ggplot2::ylab(""),
-    ggplot2::theme_bw(),
-    ggplot2::theme(
-      legend.position = "bottom", legend.direction = "vertical",
-      legend.background = ggplot2::element_rect(
-        fill = "transparent", colour = NA
-      ),
-      legend.key = ggplot2::element_blank(),
-      panel.background = ggplot2::element_rect(
-        fill = "transparent", colour = NA
-      ),
-      plot.background = ggplot2::element_rect(
-        fill = "transparent", colour = NA
-      ),
-      legend.title = ggplot2::element_blank()
-    ),
-    ggplot2::theme(...),
-    ggplot2::annotate(
-      geom = "text", label = "DBnomics <https://db.nomics.world>", 
-      x = structure(Inf, class = "Date"), y = -Inf,
-      hjust = 1.1, vjust = -0.4, col = "grey", 
-      fontface = "italic"
-    )
-  )
-
-  if (!is.null(color_palette)) {
-    result <- c(
-      result,
-      list(ggplot2::scale_color_brewer(palette = color_palette))
-    )
-  }
-
-  result
-}
+plot(
+  x1, y1, col = cols[1], type = "l", xlab = "", ylab = "",
+  xlim = c(min(df$period), max(df$period)),
+  ylim = c(min(df$value) - 4, max(df$value)),
+  panel.first = grid(lty = 1)
+)
+points(x1, y1, col = cols[1], pch = PCH)
+lines(x2, y2, col = cols[2], type = "l")
+points(x2, y2, col = cols[2], pch = PCH)
+lines(x3, y3, col = cols[3], type = "l")
+points(x3, y3, col = cols[3], pch = PCH)
+lines(x4, y4, col = cols[4], type = "l")
+points(x4, y4, col = cols[4], pch = PCH)
+legend(
+  "bottomleft", inset = 0.005,
+  legend = legend_text,
+  col = cols,
+  lty = 1, pch = PCH,  box.lty = 0, cex = 0.7
+)
+mtext(
+  text = "DBnomics <https://db.nomics.world>",
+  side = 3, col = "grey", font = 3, adj = 1
+)
 ```

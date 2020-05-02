@@ -11,7 +11,7 @@ dbnomics(color_palette = "Set1", ...)
 default color palette. If you want to use the default palette, set it to
 \code{NULL}.}
 
-\item{...}{Arguments to be passed to the function \code{\link[ggplot2]{theme}}.}
+\item{...}{Arguments to be passed to the function \code{ggplot2::theme}.}
 }
 \description{
 \code{dbnomics} is a simple ggplot2 theme for drawing nicer graphics. We do not

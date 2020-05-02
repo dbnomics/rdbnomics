@@ -1,7 +1,7 @@
 Package: rdbnomics
 Type: Package
 Title: Download DBnomics Data
-Version: 0.6.1
+Version: 0.6.2
 Authors@R: c(person("Sebastien", "Galais", role = c("cre", "ctb"),
                      email = "s915.stem@gmail.com"),
              person("Thomas", "Brand", role = c("aut"),
@@ -17,15 +17,11 @@ Encoding: UTF-8
 LazyData: true
 Imports:
     curl,
-    jsonlite,
-    data.table
-RoxygenNote: 7.1.0
+    data.table,
+    jsonlite
 Suggests:
     knitr,
     rmarkdown,
-    dplyr,
-    magrittr,
-    ggplot2,
-    DT,
-    testthat
+    tinytest
 VignetteBuilder: knitr
+RoxygenNote: 7.1.0

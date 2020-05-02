@@ -87,31 +87,13 @@ rdb_series <- function(
   ...
 ) {
   # Additionals arguments
-  progress_bar <- TRUE
-  if (length(list(...)) > 0) {
-    tmp_progress_bar <- list(...)$progress_bar
-    if (!is.null(tmp_progress_bar)) {
-      progress_bar <- tmp_progress_bar
-    }
-  }
+  progress_bar <- ellipsis_default("progress_bar", list(...), TRUE)
   check_argument(progress_bar, "logical")
 
-  only_first_two <- FALSE
-  if (length(list(...)) > 0) {
-    tmp_only_first_two <- list(...)$only_first_two
-    if (!is.null(tmp_only_first_two)) {
-      only_first_two <- tmp_only_first_two
-    }
-  }
+  only_first_two <- ellipsis_default("only_first_two", list(...), FALSE)
   check_argument(only_first_two, "logical")
 
-  only_number_series <- FALSE
-  if (length(list(...)) > 0) {
-    tmp_only_number_series <- list(...)$only_number_series
-    if (!is.null(tmp_only_number_series)) {
-      only_number_series <- tmp_only_number_series
-    }
-  }
+  only_number_series <- ellipsis_default("only_number_series", list(...), FALSE)
   check_argument(only_number_series, "logical")
 
   # All providers

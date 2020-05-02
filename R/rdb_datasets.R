@@ -69,13 +69,7 @@ rdb_datasets <- function(
   # }, simplify = FALSE)
 
   # Additionals arguments
-  progress_bar <- TRUE
-  if (length(list(...)) > 0) {
-    tmp_progress_bar <- list(...)$progress_bar
-    if (!is.null(tmp_progress_bar)) {
-      progress_bar <- tmp_progress_bar
-    }
-  }
+  progress_bar <- ellipsis_default("progress_bar", list(...), TRUE)
   check_argument(progress_bar, "logical")
 
   # All providers
