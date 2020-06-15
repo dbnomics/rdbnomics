@@ -89,12 +89,22 @@ get_data <- function(x, userl, curl_args, headers = NULL, opt = NULL, run = 0) {
         response <- rawToChar(response$content)
 
         if (!is.null(jsonlite::fromJSON(response)$errors)) {
+          cat("\n")
+          for (ie in 1:nrow(jsonlite::fromJSON(response)$errors)) {
+            cat(
+              jsonlite::fromJSON(response)$errors[ie,]$message, " : ",
+              jsonlite::fromJSON(response)$errors[ie,]$provider_code, "/",
+              jsonlite::fromJSON(response)$errors[ie,]$dataset_code, "/",
+              jsonlite::fromJSON(response)$errors[ie,]$series_code,
+              "\n"
+            )
+          }
+        }
+
+        if (jsonlite::fromJSON(response)$series$num_found <= 0) {
+          run <- 100
           stop(
-            "\n",
-            jsonlite::fromJSON(response)$errors$message, " : ",
-            jsonlite::fromJSON(response)$errors$provider_code, "/",
-            jsonlite::fromJSON(response)$errors$dataset_code, "/",
-            jsonlite::fromJSON(response)$errors$series_code,
+            "Error when fetching the data.",
             call. = FALSE
           )
         }

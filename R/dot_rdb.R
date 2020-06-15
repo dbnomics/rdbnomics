@@ -336,23 +336,25 @@
   # Additional informations translations
   if (!is.null(additional_geo_column) & !is.null(additional_geo_mapping)) {
     for (i in seq_along(additional_geo_mapping)) {
-      addcol <- additional_geo_column[[i]][3]
-      suffix <- ""
-      if (addcol %in% colnames(DBdata)) {
-        suffix <- "_add"
-        newcol <- paste0(addcol, suffix)
-        setnames(additional_geo_mapping[[i]], addcol, newcol)
-      }
+      if (additional_geo_column[[i]][2] %in% colnames(DBdata)) {
+        addcol <- additional_geo_column[[i]][3]
+        suffix <- ""
+        if (addcol %in% colnames(DBdata)) {
+          suffix <- "_add"
+          newcol <- paste0(addcol, suffix)
+          setnames(additional_geo_mapping[[i]], addcol, newcol)
+        }
 
-      DBdata <- merge(
-        DBdata, additional_geo_mapping[[i]],
-        by = c("dataset_code", additional_geo_column[[i]][2]),
-        all.x = TRUE, all.y = FALSE, sort = FALSE, allow.cartesian = FALSE
-      )
+        DBdata <- merge(
+          DBdata, additional_geo_mapping[[i]],
+          by = c("dataset_code", additional_geo_column[[i]][2]),
+          all.x = TRUE, all.y = FALSE, sort = FALSE, allow.cartesian = FALSE
+        )
 
-      if (suffix != "") {
-        DBdata[, (addcol) := ifelse(is.na(get(newcol)), get(addcol), get(newcol))]
-        DBdata[, (newcol) := NULL]
+        if (suffix != "") {
+          DBdata[, (addcol) := ifelse(is.na(get(newcol)), get(addcol), get(newcol))]
+          DBdata[, (newcol) := NULL]
+        }
       }
     }
   }
