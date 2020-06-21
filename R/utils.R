@@ -101,12 +101,20 @@ get_data <- function(x, userl, curl_args, headers = NULL, opt = NULL, run = 0) {
           }
         }
 
-        if (jsonlite::fromJSON(response)$series$num_found <= 0) {
-          run <- 100
-          stop(
-            "Error when fetching the data.",
-            call. = FALSE
-          )
+        jsonnum <- try(
+          jsonlite::fromJSON(response)$series$num_found,
+          silent = TRUE
+        )
+        if (!inherits(jsonnum, "try-error")) {
+          if (!is.null(jsonnum)) {
+            if (jsonlite::fromJSON(response)$series$num_found <= 0) {
+              run <- 100
+              stop(
+                "Error when fetching the data.",
+                call. = FALSE
+              )
+            }
+          }
         }
 
         jsonlite::fromJSON(response)
@@ -625,7 +633,33 @@ get_geo_names <- function(x, colname) {
             )[]
           )
         } else {
-          NULL
+          expr <- paste0(
+            "(", paste0(codes[i], collapse = "|"), ")*",
+            "\\.dimensions_value[s]*_label[s]*\\.(",
+            paste0(nm[i], collapse = "|"),
+            "){1}[0-9]*"
+          )
+
+          elt <- grep(expr, names(unlist(x)), value = TRUE)
+          for (y in nm) {
+            elt <- gsub(paste0(y, '\\..*'), y, elt)
+          }
+          elt <- gsub("[0-9]*$", "", elt)
+          elt <- unique(elt)
+
+          if (length(elt) > 0) {
+            elt_ <- gsub('\\.', '"]][["', elt)
+            elt_ <- paste0('[["', elt_, '"]]')
+            y <- eval(parse(text = paste0("x", elt_)))
+            suppressWarnings(
+              setnames(
+                data.table(X1 = codes[i], X2 = y[, 1], X3 = y[, 2]),
+                c("dataset_code", colname[[i]][2:3])
+              )[]
+            )
+          } else {
+            NULL
+          }
         }
       })
       DTs <- Filter(Negate(is.null), DTs)
