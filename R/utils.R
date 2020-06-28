@@ -15,9 +15,12 @@ get_data <- function(x, userl, curl_args, headers = NULL, opt = NULL, run = 0) {
   tryCatch({
     if (userl) {
       # Only readLines
-      if (as.numeric(R.Version()$major) >= 3) {
+      if (as.numeric(R.Version()$major) == 3) {
         if (as.numeric(R.Version()$minor) < 2) {
-          suppressMessages(suppressWarnings(utils::setInternet2(TRUE)))
+          try(
+            suppressMessages(suppressWarnings(utils::setInternet2(TRUE))),
+            silent = TRUE
+          )
         }
       }
 
@@ -589,7 +592,20 @@ get_geo_colname <- function(x) {
         ref_elt <- gsub(".*\\.", "", z)
         elt_ <- gsub('\\.', '"]][["', z)
         elt_ <- paste0('[["', elt_, '"]]')
-        c(codes[i], ref_elt, eval(parse(text = paste0("x", elt_))))
+        
+        res <- c(codes[i], ref_elt, eval(parse(text = paste0("x", elt_))))
+        if (length(res) > 0) {
+          if (res[2] == res[3]) {
+            if (res[3] == capital_first(res[3])) {
+              res[3] <- toupper(res[3])
+            } else {
+              res[3] <- capital_first(res[3])
+            }
+          }
+          res
+        } else {
+          res
+        }
       })
     },
     silent = TRUE
