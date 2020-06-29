@@ -152,6 +152,7 @@
       call. = FALSE
     )
   })
+  DBdata[, original_period := as.character(original_period)]
 
   tryCatch({
     data.table::setnames(DBdata, "period_start_day", "period")
@@ -292,6 +293,7 @@
         call. = FALSE
       )
     })
+    DBlist[, original_period := as.character(original_period)]
     # In case of different classes, the class of the column 'original_period'
     # is set to 'character'
     if (
