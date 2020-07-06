@@ -123,7 +123,7 @@ df <- rdbnomics:::rdbnomics_df001
 data.table::setDT(df)
 ```
 
-In such data.frame (data.table), you will always find at least ten columns:
+In such `data.table`, you will always find at least ten columns:
 
 - `provider_code`
 - `dataset_code`
@@ -450,8 +450,8 @@ Searching by `dimensions` is a less concise way to select time series than using
 df <- rdb("AMECO", "ZUTN", dimensions = list(geo = "ea19"))
 df <- df[!is.na(value))]
 # or
-# df <- rdb("AMECO", "ZUTN", dimensions = '{"geo": ["ea19"]}') %>%
-#   filter(!is.na(value))
+# df <- rdb("AMECO", "ZUTN", dimensions = '{"geo": ["ea19"]}')
+# df <- df[!is.na(value))]
 ```
 ```{r, eval = TRUE, echo = FALSE}
 df <- rdbnomics:::rdbnomics_df008
@@ -500,8 +500,8 @@ mtext(
 df <- rdb("AMECO", "ZUTN", dimensions = list(geo = c("ea19", "dnk")))
 df <- df[!is.na(value))]
 # or
-# df <- rdb("AMECO", "ZUTN", dimensions = '{"geo": ["ea19", "dnk"]}') %>%
-#   filter(!is.na(value))
+# df <- rdb("AMECO", "ZUTN", dimensions = '{"geo": ["ea19", "dnk"]}')
+# df <- df[!is.na(value))]
 ```
 ```{r, eval = TRUE, echo = FALSE}
 df <- rdbnomics:::rdbnomics_df009
@@ -556,8 +556,8 @@ mtext(
 df <- rdb("WB", "DB", dimensions = list(country = c("DZ", "PE"), indicator = c("ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS")))
 df <- df[!is.na(value))]
 # or
-# df <- rdb("WB", "DB", dimensions = '{"country": ["DZ", "PE"], "indicator": ["ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"]}') %>%
-#   filter(!is.na(value))
+# df <- rdb("WB", "DB", dimensions = '{"country": ["DZ", "PE"], "indicator": ["ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"]}')
+# df <- df[!is.na(value))]
 ```
 ```{r, eval = TRUE, echo = FALSE}
 df <- rdbnomics:::rdbnomics_df010
@@ -1178,7 +1178,7 @@ df <- rdb(
 )
 ```
 
-The data.frame (data.table) columns change a little bit when filters are used. There are two new columns:
+The `data.table` columns change a little bit when filters are used. There are two new columns:
 
 - `period_middle_day`: the middle day of `original_period` (can be useful when you compare graphically interpolated series and original ones).
 - `filtered` (boolean): `TRUE` if the series is filtered, `FALSE` otherwise.
