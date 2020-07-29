@@ -1,6 +1,7 @@
 # rdbnomics <img src="man/figures/logo.png" align="right" width="120" />
 
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/rdbnomics)](https://cran.r-project.org/package=rdbnomics)
+[![](http://cranlogs.r-pkg.org/badges/grand-total/rdbnomics)](https://cran.r-project.org/package=rdbnomics)
 [![pipeline status](https://git.nomics.world/dbnomics/rdbnomics/badges/master/pipeline.svg)](https://git.nomics.world/dbnomics/rdbnomics/commits/master)
 [![status](https://tinyverse.netlify.com/badge/rdbnomics)](https://CRAN.R-project.org/package=rdbnomics)
 
