@@ -113,12 +113,12 @@ df3 <- rdb(ids = c("AMECO/ZUTN/EA19.1.0.0.0.ZUTN", "IMF/BOP/A.FR.BCA_BP6_EUR"))
 # Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 df1 <- rdb("AMECO", "ZUTN", dimensions = list(geo = "ea12"))
 # or
-df1 <- rdb("AMECO", "ZUTN", dimensions = '{"geo": ["ea12"]}')
+df1 <- rdb("AMECO", "ZUTN", dimensions = '{"geo":["ea12"]}')
 
 # Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 df2 <- rdb("AMECO", "ZUTN", dimensions = list(geo = c("ea12", "dnk")))
 # or
-df2 <- rdb("AMECO", "ZUTN", dimensions = '{"geo": ["ea12", "dnk"]}')
+df2 <- rdb("AMECO", "ZUTN", dimensions = '{"geo":["ea12","dnk"]}')
 
 # Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank:
 dim <- list(
@@ -128,8 +128,8 @@ dim <- list(
 df3 <- rdb("WB", "DB", dimensions = dim)
 # or
 dim <- paste0(
-  '{"country": ["DZ", "PE"],',
-  '"indicator": ["ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"]}'
+  '{"country":["DZ","PE"],',
+  '"indicator":["ENF.CONT.COEN.COST.ZS","IC.REG.COST.PC.FE.ZS"]}'
 )
 df3 <- rdb("WB", "DB", dimensions = dim)
 

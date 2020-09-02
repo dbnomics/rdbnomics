@@ -1,3 +1,9 @@
+# rdbnomics 0.6.3
+
+* New badge in README.
+* Correction of .gitlab-ci.yml with pkg-config.
+* Correction of `rdb()` examples in the doc and README.
+
 # rdbnomics 0.6.2
 
 * Remove **ggplot2**, **DT** and **dplyr** vignette dependencies.

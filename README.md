@@ -75,17 +75,17 @@ df4 <- rdb("IMF", "BOP", "A.FR.BCA_BP6_EUR")
 # Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 df1 <- rdb("AMECO", "ZUTN", dimensions = list(geo = "ea12"))
 # or
-df1 <- rdb("AMECO", "ZUTN", dimensions = '{"geo": ["ea12"]}')
+df1 <- rdb("AMECO", "ZUTN", dimensions = '{"geo":["ea12"]}')
 
 # Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 df2 <- rdb("AMECO", "ZUTN", dimensions = list(geo = c("ea12", "dnk")))
 # or
-df2 <- rdb("AMECO", "ZUTN", dimensions = '{"geo": ["ea12", "dnk"]}')
+df2 <- rdb("AMECO", "ZUTN", dimensions = '{"geo":["ea12","dnk"]}')
 
 # Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank:
 df3 <- rdb("WB", "DB", dimensions = list(country = c("DZ", "PE"), indicator = c("ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS")))
 # or
-df3 <- rdb("WB", "DB", dimensions = '{"country": ["DZ", "PE"], "indicator": ["ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"]}')
+df3 <- rdb("WB", "DB", dimensions = '{"country":["DZ","PE"],"indicator":["ENF.CONT.COEN.COST.ZS","IC.REG.COST.PC.FE.ZS"]}')
 ```
 
 ### Fetch time series with a `query`:

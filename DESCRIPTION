@@ -1,7 +1,7 @@
 Package: rdbnomics
 Type: Package
 Title: Download DBnomics Data
-Version: 0.6.2
+Version: 0.6.3
 Authors@R: c(person("Sebastien", "Galais", role = c("cre", "ctb"),
                      email = "s915.stem@gmail.com"),
              person("Thomas", "Brand", role = c("aut"),
@@ -24,4 +24,4 @@ Suggests:
     rmarkdown,
     tinytest
 VignetteBuilder: knitr
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
