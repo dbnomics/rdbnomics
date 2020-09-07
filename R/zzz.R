@@ -32,7 +32,7 @@
     rdbnomics.authorized_api_version = c(21, 22),
     rdbnomics.verbose_warning_readLines = FALSE,
     rdbnomics.timestamp_tz = "GMT",
-    rdbnomics.http_ok = "200[[:blank:]]+OK$",
+    rdbnomics.http_ok = "200([[:blank:]]+OK)?[[:blank:]]*$",
     rdbnomics.curl_config = NULL,
     rdbnomics.rdb_no_arg = TRUE,
     rdbnomics.metadata = TRUE,
