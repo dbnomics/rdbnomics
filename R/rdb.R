@@ -174,7 +174,7 @@
 #' ## Apply filter(s) to the series
 #' # One filter
 #' df1 <- rdb(
-#'   ids = c("IMF/WEO/ABW.BCA", "IMF/WEO/ABW.BCA_NGDPD"),
+#'   ids = c("IMF/WEO/ABW.BCA.us_dollars", "IMF/WEO/ABW.BCA_NGDPD.pcent_gdp"),
 #'   filters = list(
 #'     code = "interpolate",
 #'     parameters = list(frequency = "daily", method = "spline")
@@ -183,7 +183,7 @@
 #' 
 #' # Two filters
 #' df1 <- rdb(
-#'   ids = c("IMF/WEO/ABW.BCA", "IMF/WEO/ABW.BCA_NGDPD"),
+#'   ids = c("IMF/WEO/ABW.BCA.us_dollars", "IMF/WEO/ABW.BCA_NGDPD.pcent_gdp"),
 #'   filters = list(
 #'     list(
 #'       code = "interpolate",
