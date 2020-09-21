@@ -12,7 +12,7 @@ Depends:
     R (>= 3.1.0)
 License: AGPL-3
 URL: https://git.nomics.world/dbnomics/rdbnomics
-BugReports: https://git.nomics.world/dbnomics/rdbnomics/issues
+BugReports: https://git.nomics.world/dbnomics/rdbnomics/-/issues
 Encoding: UTF-8
 LazyData: true
 Imports:

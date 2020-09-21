@@ -35,7 +35,7 @@ After installation, a vignette is available to the user with:
 * transform time series with filters,
 * ...
 
-Just follow the link <a href="https://cran.r-project.org/web/packages/rdbnomics/vignettes/rdbnomics.html" target="_blank">rdbnomics</a> or run:
+Just follow the link <a href="https://CRAN.R-project.org/package=rdbnomics/vignettes/rdbnomics.html" target="_blank">rdbnomics</a> or run:
 ```r
 vignette("rdbnomics")
 ```
