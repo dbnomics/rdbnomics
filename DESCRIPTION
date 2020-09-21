@@ -20,10 +20,8 @@ Imports:
     data.table,
     jsonlite
 Suggests:
-    ggplot2,
     knitr,
     rmarkdown,
-    tinytest,
-    xts
+    tinytest
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1

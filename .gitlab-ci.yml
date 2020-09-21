@@ -12,7 +12,7 @@ before_script:
 build_markdown_v1: # to test R Markdown v1 without pandoc, must install knitr and rmarkdown
   image: jangorecki/r-base-dev
   script:
-    - R -e 'install.packages(c("curl", "jsonlite", "data.table", "tinytest", "knitr", "rmarkdown", "ggplot2", "xts"))'
+    - R -e 'install.packages(c("curl", "jsonlite", "data.table", "tinytest", "knitr", "rmarkdown"))'
     - R CMD build .
     - PKG_FILE_NAME=$(ls -1t *.tar.gz | head -n 1)
     - R CMD check "${PKG_FILE_NAME}" --no-manual --as-cran
@@ -20,7 +20,7 @@ build_markdown_v1: # to test R Markdown v1 without pandoc, must install knitr an
 build_cran:
   image: jangorecki/r-pkg
   script:
-    - R -e 'install.packages(c("curl", "jsonlite", "data.table", "tinytest", "ggplot2", "xts"))'
+    - R -e 'install.packages(c("curl", "jsonlite", "data.table", "tinytest"))'
     - R CMD build .
     - PKG_FILE_NAME=$(ls -1t *.tar.gz | head -n 1)
     - R CMD check "${PKG_FILE_NAME}" --no-manual --as-cran
@@ -28,7 +28,7 @@ build_cran:
 build_version_latest:
   image: rocker/r-ver:latest
   script:
-    - R -e 'install.packages(c("curl", "jsonlite", "data.table", "tinytest", "knitr", "rmarkdown", "ggplot2", "xts"))'
+    - R -e 'install.packages(c("curl", "jsonlite", "data.table", "tinytest", "knitr", "rmarkdown"))'
     - R CMD build .
     - PKG_FILE_NAME=$(ls -1t *.tar.gz | head -n 1)
     - R CMD check "${PKG_FILE_NAME}" --no-manual --as-cran
@@ -36,7 +36,7 @@ build_version_latest:
 build_version_devel:
   image: rocker/r-ver:devel
   script:
-    - R -e 'install.packages(c("curl", "jsonlite", "data.table", "tinytest", "knitr", "rmarkdown", "ggplot2", "xts"))'
+    - R -e 'install.packages(c("curl", "jsonlite", "data.table", "tinytest", "knitr", "rmarkdown"))'
     - R CMD build .
     - PKG_FILE_NAME=$(ls -1t *.tar.gz | head -n 1)
     - R CMD check "${PKG_FILE_NAME}" --no-manual --as-cran
