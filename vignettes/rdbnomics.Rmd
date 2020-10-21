@@ -619,9 +619,9 @@ mtext(
 # Fetch time series with a `query`
 The query is a Google-like search that will filter/select time series from a provider's dataset.
 
-## Fetch one series from dataset 'WEO by countries' (WEO) of IMF
+## Fetch one series from dataset 'WEO by countries (2019-10 release)' (WEO:2019-10) of IMF
 ```{r, eval = FALSE}
-df <- rdb("IMF", "WEO", query = "France current account balance percent")
+df <- rdb("IMF", "WEO:2019-10", query = "France current account balance percent")
 df <- df[!is.na(value))]
 ```
 ```{r, eval = TRUE, echo = FALSE}
@@ -665,9 +665,9 @@ mtext(
 )
 ```
 
-## Fetch series from dataset 'WEO by countries' (WEO) of IMF
+## Fetch series from dataset 'WEO by countries (2019-10 release)' (WEO:2019-10) of IMF
 ```{r, eval = FALSE}
-df <- rdb("IMF", "WEO", query = "current account balance percent")
+df <- rdb("IMF", "WEO:2019-10", query = "current account balance percent")
 df <- df[!is.na(value))]
 ```
 ```{r, eval = TRUE, echo = FALSE}
@@ -940,29 +940,35 @@ interesting and especially useful to specify dimensions for a particular
 dataset to download only the series you want to analyse. With
 the function `rdb_dimensions`, you can download these dimensions and their
 meanings.  
-For example, for the dataset **WEO** of the **IMF**, you may use:
+For example, for the dataset **WEO:2019-10** of the **IMF**, you may use:
 ```{r, eval = FALSE}
-rdb_dimensions(provider_code = "IMF", dataset_code = "WEO")
+rdb_dimensions(provider_code = "IMF", dataset_code = "WEO:2019-10")
 ```
 
-The result is a nested named list (its names are **IMF**, **WEO** and the
+The result is a nested named list (its names are **IMF**, **WEO:2019-10** and the
 dimensions names) with a `data.table` at the end of each branch:
 ```{r, eval = TRUE, echo = FALSE}
 DT <- rdbnomics:::rdbnomics_df020
-DT <- DT$IMF$WEO
-DT <- paste0("Number of dimensions for IMF/WEO : ", length(DT))
+DT <- DT$IMF$`WEO:2019-10`
+DT <- paste0("Number of dimensions for IMF/WEO:2019-10 : ", length(DT))
 cat(DT, sep = "\n")
 ```
 
 ```{r, eval = TRUE, echo = FALSE}
 DT <- rdbnomics:::rdbnomics_df020
-DT <- DT$IMF$WEO[[1]]
+DT <- DT$IMF$`WEO:2019-10`[[1]]
 display_table(DT)
 ```
 
 ```{r, eval = TRUE, echo = FALSE}
 DT <- rdbnomics:::rdbnomics_df020
-DT <- DT$IMF$WEO[[2]]
+DT <- DT$IMF$`WEO:2019-10`[[2]]
+display_table(DT)
+```
+
+```{r, eval = TRUE, echo = FALSE}
+DT <- rdbnomics:::rdbnomics_df020
+DT <- DT$IMF$`WEO:2019-10`[[3]]
 display_table(DT)
 ```
 
@@ -970,7 +976,7 @@ In the event that you only request the dimensions for one dataset for one
 provider, if you define `simplify = TRUE`, then the result will be a named list
 `data.table` not a nested named list.
 ```{r, eval = FALSE}
-rdb_dimensions(provider_code = "IMF", dataset_code = "WEO", simplify = TRUE)
+rdb_dimensions(provider_code = "IMF", dataset_code = "WEO:2019-10", simplify = TRUE)
 ```
 ```{r, eval = TRUE, echo = FALSE}
 str(rdbnomics:::rdbnomics_df021)
@@ -1024,9 +1030,9 @@ You can download the list of series, and especially their codes, of a dataset's
 provider by using the function `rdb_series`. The result is a nested named list
 with a `data.table` at the end of each branch. If you define `simplify = TRUE`,
 then the result will be a `data.table` not a nested named list.  
-For example, for the **IMF** provider and the dataset **WEO**, the command is (onyl first 100):
+For example, for the **IMF** provider and the dataset **WEO:2019-10**, the command is (only first 100):
 ```{r, eval = FALSE}
-rdb_series(provider_code = "IMF", dataset_code = "WEO", simplify = TRUE)
+rdb_series(provider_code = "IMF", dataset_code = "WEO:2019-10", simplify = TRUE)
 ```
 ```{r, eval = TRUE, echo = FALSE}
 DT <- rdbnomics:::rdbnomics_df023
@@ -1037,11 +1043,11 @@ display_table(DT)
 Like the function `rdb()`, you can add features to `rdb_series()`. You can ask for
 the series with specific `dimensions`:
 ```{r, eval = FALSE}
-rdb_series(provider_code = "IMF", dataset_code = "WEO", dimensions = list(`weo-subject` = "NGDP_RPCH"), simplify = TRUE)
+rdb_series(provider_code = "IMF", dataset_code = "WEO:2019-10", dimensions = list(`weo-subject` = "NGDP_RPCH"), simplify = TRUE)
 ```
 or with a `query`:
 ```{r, eval = FALSE}
-rdb_series(provider_code = "IMF", dataset_code = c("WEO", "WEOAGG"), query = "NGDP_RPCH")
+rdb_series(provider_code = "IMF", dataset_code = c("WEO:2019-10", "WEOAGG:2019-10"), query = "NGDP_RPCH")
 ```
 
 <b><font color='red'>&#9888;</font></b> We ask the user to use this function parsimoniously because there are a huge amount

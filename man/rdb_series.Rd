@@ -78,29 +78,29 @@ containing the series of datasets for providers from
 }
 \examples{
 \dontrun{
-rdb_series(provider_code = "IMF", dataset_code = "WEO")
+rdb_series(provider_code = "IMF", dataset_code = "WEO:2019-10")
 
 ## With dimensions
-rdb_series("IMF", "WEO", dimensions = list(`weo-country` = "AGO"))
-rdb_series("IMF", "WEO", dimensions = list(`weo-subject` = "NGDP_RPCH"), simplify = TRUE)
+rdb_series("IMF", "WEO:2019-10", dimensions = list(`weo-country` = "AGO"))
+rdb_series("IMF", "WEO:2019-10", dimensions = list(`weo-subject` = "NGDP_RPCH"), simplify = TRUE)
 
 ## With query
-rdb_series("IMF", "WEO", query = "ARE")
-rdb_series("IMF", c("WEO", "WEOAGG"), query = "NGDP_RPCH")
+rdb_series("IMF", "WEO:2019-10", query = "ARE")
+rdb_series("IMF", c("WEO:2019-10", "WEOAGG:2019-10"), query = "NGDP_RPCH")
 
 rdb_series(provider_code = "IMF", verbose = TRUE)
 
 options(rdbnomics.progress_bar_series = TRUE)
-rdb_series(provider_code = "IMF", dataset_code = "WEO")
+rdb_series(provider_code = "IMF", dataset_code = "WEO:2019-10")
 options(rdbnomics.progress_bar_series = FALSE)
 
 rdb_series(
-  provider_code = "IMF", dataset_code = "WEO",
+  provider_code = "IMF", dataset_code = "WEO:2019-10",
   use_readLines = TRUE
 )
 
 rdb_series(
-  provider_code = "IMF", dataset_code = "WEO",
+  provider_code = "IMF", dataset_code = "WEO:2019-10",
   curl_config = list(proxy = "<proxy>", proxyport = <port>)
 )
 }

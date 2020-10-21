@@ -1,3 +1,7 @@
+# rdbnomics 0.6.4
+
+* Update series name WEO to WEO:2019-10.
+
 # rdbnomics 0.6.3
 
 * New badge in README.

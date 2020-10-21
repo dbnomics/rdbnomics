@@ -23,7 +23,7 @@ when reproducing the vignette examples.
 library(magrittr)
 library(ggplot2)
 
-rdb("IMF", "WEO", query = "France current account balance percent") \%>\%
+rdb("IMF", "WEO:2019-10", query = "France current account balance percent") \%>\%
   ggplot(aes(x = period, y = value, color = series_name)) +
   geom_line(size = 1.2) +
   geom_point(size = 2) +

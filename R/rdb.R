@@ -116,10 +116,10 @@
 #'
 #'
 #' ## By query
-#' # Fetch one series from dataset 'WEO by countries' (WEO) from IMF :
-#' df1 <- rdb("IMF", "WEO", query = "France current account balance percent")
-#' # Fetch series from dataset 'WEO by countries' (WEO) from IMF :
-#' df2 <- rdb("IMF", "WEO", query = "current account balance percent")
+#' # Fetch one series from dataset 'WEO by countries (2019-10 release)' (WEO:2019-10) from IMF :
+#' df1 <- rdb("IMF", "WEO:2019-10", query = "France current account balance percent")
+#' # Fetch series from dataset 'WEO by countries (2019-10 release)' (WEO:2019-10) from IMF :
+#' df2 <- rdb("IMF", "WEO:2019-10", query = "current account balance percent")
 #' 
 #' 
 #' ## By api_link
@@ -174,7 +174,7 @@
 #' ## Apply filter(s) to the series
 #' # One filter
 #' df1 <- rdb(
-#'   ids = c("IMF/WEO/ABW.BCA.us_dollars", "IMF/WEO/ABW.BCA_NGDPD.pcent_gdp"),
+#'   ids = c("IMF/WEO:2019-10/ABW.BCA.us_dollars", "IMF/WEO:2019-10/ABW.BCA_NGDPD.pcent_gdp"),
 #'   filters = list(
 #'     code = "interpolate",
 #'     parameters = list(frequency = "daily", method = "spline")
@@ -183,7 +183,7 @@
 #' 
 #' # Two filters
 #' df1 <- rdb(
-#'   ids = c("IMF/WEO/ABW.BCA.us_dollars", "IMF/WEO/ABW.BCA_NGDPD.pcent_gdp"),
+#'   ids = c("IMF/WEO:2019-10/ABW.BCA.us_dollars", "IMF/WEO:2019-10/ABW.BCA_NGDPD.pcent_gdp"),
 #'   filters = list(
 #'     list(
 #'       code = "interpolate",

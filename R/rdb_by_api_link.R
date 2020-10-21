@@ -102,7 +102,7 @@
 #' ## Apply filter(s) to the series
 #' # One filter
 #' df3 <- rdb_by_api_link(
-#'   "https://api.db.nomics.world/v22/series/IMF/WEO/ABW.BCA?observations=1",
+#'   "https://api.db.nomics.world/v22/series/IMF/WEO:2019-10/ABW.BCA?observations=1",
 #'   filters = list(
 #'     code = "interpolate",
 #'     parameters = list(frequency = "daily", method = "spline")
@@ -111,7 +111,7 @@
 #' 
 #' # Two filters
 #' df3 <- rdb_by_api_link(
-#'   "https://api.db.nomics.world/v22/series/IMF/WEO/ABW.BCA?observations=1",
+#'   "https://api.db.nomics.world/v22/series/IMF/WEO:2019-10/ABW.BCA?observations=1",
 #'   filters = list(
 #'     list(
 #'       code = "interpolate",

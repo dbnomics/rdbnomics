@@ -62,9 +62,9 @@ containing the dimensions of datasets for providers from
 }
 \examples{
 \dontrun{
-rdb_dimensions(provider_code = "IMF", dataset_code = "WEO")
+rdb_dimensions(provider_code = "IMF", dataset_code = "WEO:2019-10")
 
-rdb_dimensions(provider_code = "IMF", dataset_code = "WEO", simplify = TRUE)
+rdb_dimensions(provider_code = "IMF", dataset_code = "WEO:2019-10", simplify = TRUE)
 
 rdb_dimensions(provider_code = "IMF")
 
@@ -74,12 +74,12 @@ rdb_dimensions()
 options(rdbnomics.progress_bar_dimensions = FALSE)
 
 rdb_dimensions(
-  provider_code = "IMF", dataset_code = "WEO",
+  provider_code = "IMF", dataset_code = "WEO:2019-10",
   use_readLines = TRUE
 )
 
 rdb_dimensions(
-  provider_code = "IMF", dataset_code = "WEO",
+  provider_code = "IMF", dataset_code = "WEO:2019-10",
   curl_config = list(proxy = "<proxy>", proxyport = <port>)
 )
 }
