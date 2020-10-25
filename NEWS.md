@@ -1,6 +1,11 @@
 # rdbnomics 0.6.4
 
-* Update series name WEO to WEO:2019-10.
+* Update series name WEO to WEO:2019-10 and WEOAGG to WEOAGG:2019-10.
+  For all WEO releases (and WEO by group of countries), each release is
+  considered as a different dataset, and therefore carries a different code.
+  For example WEO:2008-10 for the October 2008 release. The WEO dataset no
+  longer exists on DBnomics. To get the latest release automatically, you can
+  use the WEO:latest code.
 
 # rdbnomics 0.6.3
 
